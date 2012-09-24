@@ -14,7 +14,6 @@ function showmodules() {
 	    items.push('<li><button class="modulelink" style="border:none; color:blue; cursor: pointer;">' + module.ident + '</button>' + module.desc + '</li>');
 	});
     $('#modules').html($('<p/>', { html: "Found " + TEI.modules.length + " modules"}));
-
     $('#modules').append($('<ul/>', {
 	'class': 'modules',
 	html: items.join('')
@@ -32,6 +31,7 @@ function showelements(name  )
 	  }
 	});
     $('#elements').append($('<ul/>', {'class': 'elements',html: items.join('') }));
+    $('#attributes').html($('<h2/>'));
 }
 
 function showattributes(name  )
