@@ -1,4 +1,5 @@
 td#elements{font-size:90%; margin:5%;background-color:#EEE;padding:2%; border:1px dotted black;}
 td#attributes{font-size:90%; margin:5%;padding:2%;}
+td { vertical-align:top; }
 h2 {color:#900;}
 .modulelink, .elementlink, .attributelink {border:none; color:blue; cursor:pointer;}
