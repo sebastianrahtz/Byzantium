@@ -34,6 +34,19 @@ function showelements(name  )
     $('#elements').append($('<ul/>', {'class': 'elements',html: items.join('') }));
 }
 
+function showattributes(name  )
+{
+    var items = [];
+    $('#attributes').html($('<h2/>', {html: "Attributes in element " + name }));
+    $.each(TEI.elements, function(i, element) {
+	if (element.ident == name) {
+	    $.each(element.attributes, function(i, att) {
+	    items.push('<li><button class="attributelink" style="border:none; color:blue; cursor: pointer;">' + att.ident + '</button>' + att.desc + '</li>');
+	    }
+		  )}});
+    $('#attributes').append($('<ul/>', {'class': 'elements',html: items.join('') }));
+}
+
 $(document).ready(function(){ 
    $('#message').html('<p>Loading source.....' + url + '</p>');
    $.ajax({
@@ -48,6 +61,10 @@ $(document).ready(function(){
 });
 $(document).on("click","button.modulelink",function() {
     showelements($(this).text() );
+        return false;
+})
+$(document).on("click","button.elementlink",function() {
+    showattributes($(this).text() );
         return false;
 })
 
