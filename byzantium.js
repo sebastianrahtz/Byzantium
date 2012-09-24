@@ -1,5 +1,6 @@
 var url='http://tei.oucs.ox.ac.uk/test.js';
-var url="http://localhost/Byzantium/p5subset.json";
+//var url="http://localhost/Byzantium/p5subset.json";
+//var url="http://bits.nsms.ox.ac.uk:8080/jenkins/job/TEIP5/lastSuccessfulBuild/artifact/release/xml/tei/odd/p5subset.json";
 var TEI=[];
 
 function teijs(data) {
@@ -34,13 +35,15 @@ function showelements(name  )
 }
 
 $(document).ready(function(){ 
-   $('#message').html('<p>Loading source.....</p>');
+   $('#message').html('<p>Loading source.....' + url + '</p>');
    $.ajax({
     url: url,
     dataType: 'jsonp',
-    jsonpCallback: 'teijs'
+       jsonpCallback: 'teijs',
+       success: function(data) {
+	   $('#message').html('<p>Successfuly read ' + url)
+       }
    });
-   $('#message').html('<p>Successfuly read ' + url);
 
 });
 $(document).on("click","button.modulelink",function() {
