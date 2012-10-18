@@ -1,21 +1,76 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" " http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd ">
-<html xmlns=" http://www.w3.org/1999/xhtml ">
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>Byzantium</title> 
-<script src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
-<script src="byzantium.js" type="text/javascript"></script> 
-<link type="text/css" rel="stylesheet" href="byzantium.css"/>
+<script src="jquery.js"></script>
+<script src="Roma.js"></script>
+<style type="text/css">
+#selected
+{
+float:right;
+}
+</style>
 </head>
 <body>
-<h1>Byzantium</h1>
-<div id="message"></div>
-<div id="modules"></div>
-<table>
-  <tr>
-    <td id="elements"></td>
-    <td id="attributes"></td>
-  </tr>
-</table>
+<div id='startPage'>
+<h1>Welcome to Roma!</h1>
+<h2>Please make a selection:</h2>
+<button class="newProject">New Project</button>
+<button class="loadProject">Load Project</button>
+<button class="uploadProject">Upload Project</button>
+
+</div>
+
+<div id='message'></div>
+
+<div id='selected'></div>
+
+<div id='startInfo'>
+	<form>
+	Title:<input type="text" id='title'><br>
+	</form>
+	<form>
+	Filename:<input type="text" id='filename'><br>
+	</form>
+	<form>
+	Author Name:<input type="text" id='author'><br>
+	</form>
+	<form>
+	Description:<textarea rows="4" cols="40" id='description'></textarea><br>
+	</form>
+	<button class="saveStartInfo">Next</button>
+
+</div>
+
+<div id='modules'></div>
+
+<div id='elements'></div>
+
+<div id='attributes'></div>
+
+<div id='output'></div>
+
+<div id='actions'>
+<button class="back">Back</button> 
+<button class="export">Export</button>
+<button class="save">Save</button>
+<form>
+Save Project:<input type="text" id='saveAs'><br>
+</form>
+</div>
+<div id='loadProjectTools'>
+	<form>
+	<b>Load Which Project:</b><input type="text" id='loadAs'><br>
+	</form>
+	<button class="load">Load</button>
+	<div id="items_table">
+		 <h2>Saved Projects</h2>
+		 <table id=pairs></table>
+	</div>
+	<form>
+	<b>Delete Which Project:</b><input type="text" id="deleteProject"><br>
+	</form>
+	<button class="delete">Delete</button>
+</div>
 </body>
-</html> 
+</html>
