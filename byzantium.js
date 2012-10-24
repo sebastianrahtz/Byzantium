@@ -1,4 +1,4 @@
-var url='http://users.ox.ac.uk/~rahtz/test.js';
+var url='';
 var TEI=[];
 var AddedModules=[];
 var ExcludedElements=[];
@@ -12,11 +12,10 @@ var filename = ""
 var author = ""
 var description = ""
 
-
 //SETS JSON OBJECT
 function teijs(data) {
     TEI=data;
-    showmodules();
+    //showmodules();
 }
 
 //DISPLAYS INITIAL MODULES
@@ -58,10 +57,6 @@ function showelements(name  )
     $('#elements').html($('<h2/>', {html: "Elements in module " + name }));
     $.each(TEI.elements, function(i, element) {
         if (element.module == name) {
-			//alert(element.attributes);
-			//$.each(element.attributes, function(i, attribute){
-			//	alert(attribute.ident);
-			//});
 			currentModule = name;
             items.push('<td><button class="addRemove" id="' + name + ":" + element.ident + '">');
 			if($.inArray((name + ":" + element.ident), ExcludedElements) == -1){
@@ -141,9 +136,21 @@ function showattributes(name ) {
 
 //READY FUNCTION. DISPLAYS MODULES
 $(document).ready(function(){
+	//if(localStorage.getItem("tei%*$&#Default") === null){
+		$.ajax({
+		url: 'http://users.ox.ac.uk/~rahtz/test.js',
+		dataType: 'jsonp',
+		jsonpCallback: 'teijs',
+		success: function(data) {
+		   localStorage.setItem("tei%*$&#Default", JSON.stringify(data, null, 2));
+		}
+		});
+	//}
 	$('#actions').hide();
 	$('#loadProjectTools').hide();
 	$('#startInfo').hide();
+	$('#teiSelection').hide();
+	$('#upload').hide();
 })
 
 
@@ -310,10 +317,10 @@ function setXML(){
    var i=0;
    for (i=0; i<=localStorage.length-1; i++) {
 	 key = localStorage.key(i);
-	 if(key == "TEI_SPECIFICATIONS"){
+	 if(key.split("%*$&#")[0] != "proj"){
 	 }
 	 else{
-		pairs += "<tr><td>"+key+"</td></tr>\n";
+		pairs += "<tr><td>"+key.split("%*$&#")[1]+"</td></tr>\n";
 	 }
    }
    if (pairs == "<tr><th>Name</th><th>Value</th></tr>\n") {
@@ -321,6 +328,30 @@ function setXML(){
    }
    document.getElementById('pairs').innerHTML = pairs;
  }
+ 
+  function doShowTEI(){
+   var key = "";
+   var pairs = "<tr><th>Name</th></tr>\n";
+   var i=0;
+   for (i=0; i<=localStorage.length-1; i++) {
+	 key = localStorage.key(i);
+	 if(key.split("%*$&#")[0] != "tei"){
+	 }
+	 else{
+		pairs += "<tr><td>"+key.split("%*$&#")[1]+"</td></tr>\n";
+	 }
+   }
+   if (pairs == "<tr><th>Name</th><th>Value</th></tr>\n") {
+	 pairs += "<tr><td><i>empty</i></td>\n<td><i>empty</i></td></tr>\n";
+   }
+   document.getElementById('teipairs').innerHTML = pairs;
+ }
+ 
+ 
+ 
+ 
+
+ 
  
 //--------------------------------------------------------------------------------------------------------------
 //------------------------------------------------BUTTON CLICKS HERE--------------------------------------------
@@ -341,13 +372,85 @@ $(document).on("click","button.saveStartInfo", function(){
 	author = $("#author").val();
 	description = $("#description").val();
 	$('#startInfo').hide();
-	loadTEI();
+	$('#teiSelection').show();
+	$('#OnlineSelector').hide();
+	$('#ExistingSelector').hide();
+	$('#UploadCustom').hide();
+});
+
+$(document).on("click","button.TEI_Custom", function(){
+	$('#UploadCustom').show();
+	$("#ExistingSelector").hide();
+	$("#OnlineSelector").hide();
+})
+
+$(document).on("click","button.TEI_Default", function(){
+	$.ajax({
+	url: 'http://users.ox.ac.uk/~rahtz/test.js',
+	dataType: 'jsonp',
+	jsonpCallback: 'teijs',
+	success: function(data) {
+	   localStorage.setItem("tei%*$&#"+name, JSON.stringify(data, null, 2));
+	}
+	});
+	$("#UploadCustom").hide();
+	$("#OnlineSelector").hide();
+	$("#ExistingSelector").hide();
+});
+
+$(document).on("click","button.TEI_Online", function(){
+	$("#UploadCustom").hide();
+	$("#OnlineSelector").show();
+	$("#ExistingSelector").hide();
+
+	
+})
+$(document).on("click","button.setOnline", function(){
+	var TEIurl= $('#TEI_OnlineSelector').val();
+	var name = $('#TEI_OnlineName').val();
+	if((TEIurl != "") && (name != "")){
+		$.ajax({
+		url: TEIurl,
+		dataType: 'jsonp',
+		jsonpCallback: 'teijs',
+		success: function(data) {
+		   localStorage.setItem("tei%*$&#"+name, JSON.stringify(data, null, 2));
+		}
+		});
+	}
+})
+
+$(document).on("click","button.TEI_Existing", function(){
+	$("#ExistingSelector").show();
+	$("#OnlineSelector").hide();
+	$("#UploadCustom").hide();
+	doShowTEI();
+})
+
+$(document).on("click","button.setExisting", function(){
+	var name = $('#loadTEI').val();
+	var getTEI = localStorage.getItem("tei%*$&#" + name);
+	TEI = JSON.parse(getTEI);
+})
+
+
+
+$(document).on("click","button.SubmitTEI", function(){
 	showNewModules();
-	$('#actions').show();
+	if(TEI == []){
+	}
+	else{
+		$('#teiSelection').hide();
+		$('#actions').show();
+		showmodules();
+		showNewModules();
+		
+	}
 });
 
 $(document).on("click","button.loadProject", function(){
 	$('#startPage').hide();
+	url = 'http://users.ox.ac.uk/~rahtz/test.js';
 	loadTEI();
 	$('#modules').hide();
 	$('#loadProjectTools').show();
@@ -363,7 +466,7 @@ $(document).on("click","button.save", function(){
 	else{
 		setXML();
 		var data = xml;
-		localStorage.setItem(name, data);
+		localStorage.setItem("proj%*$&#"+name, data);
 		
 	}
 	doShowAll();
@@ -375,7 +478,7 @@ $(document).on("click","button.load", function(){
 	if(name == ''){
 	}
 	else{
-		var data = localStorage.getItem(name);
+		var data = localStorage.getItem('proj%*$&#'+name);
 		loadFile(data);
 	}
 	showNewModules();
@@ -391,18 +494,34 @@ $(document).on("click","button.delete", function(){
 	if(name == ''){
 	}
 	else{
-		localStorage.removeItem(name);
+		localStorage.removeItem("proj%*$&#" + name);
 	}
 	doShowAll();
 })
 
-//CLICK BUTTON EVENT FOR OUTPUT
-$(document).on("click","button.export", function(){
-setXML();
-alert(xml);
-data='<TEI xmlns="http://www.tei-c.org/ns/1.0" xml:lang="en"><teiHeader><fileDesc><titleStmt><title>My TEI Extension</title><author>generated by Roma 4.9</author></titleStmt><publicationStmt><p>for use by whoever wants it</p></publicationStmt><notesStmt><note type="ns">http://www.example.org/ns/nonTEI</note></notesStmt><sourceDesc><p>created on Thursday 11th October 2012 09:46:32 AM</p></sourceDesc></fileDesc></teiHeader><text><front><divGen type="toc"/></front><body><p>My TEI Customization	starts with modules tei, core, textstructure and	header</p><schemaSpec ident="myTEI" docLang="en" prefix="tei_"	xml:lang="en"><moduleRef key="core" except=""/><moduleRef	key="tei" except=""/><moduleRef key="header"	except=""/><moduleRef key="textstructure" except=""/><elementSpec ident="freddy" ns="http://www.example.org/ns/nonTEI"	     mode="add"><desc/><classes><memberOf key="model.addrPart"/><memberOf key="model.nameLike.agent"/><memberOf key="att.editLike"/><memberOf key="att.lexicographic"/></classes><content xmlns:rng="http://relaxng.org/ns/structure/1.0"></content></elementSpec></schemaSpec></body></text></TEI>';
-  var uri='http://oxgarage.oucs.ox.ac.uk:8080/ege-webservice/Conversions/ODD%3Atext%3Axml/ODDC%3Atext%3Axml/relaxng%3Aapplication%3Axml-relaxng/';
-  var f = document.createElement('form');
+$(document).on("click","button.output", function(){
+	var value = $("#outputSelection").val();
+	if(value == "XML"){
+		uri='http://oxgarage.oucs.ox.ac.uk:8080/ege-webservice/Conversions/TEI%3Atext%3Axml/xml%3Aapplication%3Axml/';
+	}
+	if(value == "RELAX NG Schema"){
+		uri = 'http://oxgarage.oucs.ox.ac.uk:8080/ege-webservice/Conversions/ODD%3Atext%3Axml/ODDC%3Atext%3Axml/relaxng%3Aapplication%3Axml-relaxng/';
+	}
+	if(value == "ISO Schematron"){
+		uri = 'http://oxgarage.oucs.ox.ac.uk:8080/ege-webservice/Conversions/ODD%3Atext%3Axml/ODDC%3Atext%3Axml/isosch%3Atext%3Axml/conversion?properties=<conversions><conversion index="0"></conversion><conversion index="1"></conversion></conversions>'
+	}
+	if(value == "Schematron"){
+		uri = 'http://oxgarage.oucs.ox.ac.uk:8080/ege-webservice/Conversions/ODD%3Atext%3Axml/ODDC%3Atext%3Axml/sch%3Atext%3Axml/conversion?properties=<conversions><conversion index="0"></conversion><conversion index="1"></conversion></conversions>'
+	}
+	if(value == "DTD"){
+		uri = 'http://oxgarage.oucs.ox.ac.uk:8080/ege-webservice/Conversions/ODD%3Atext%3Axml/ODDC%3Atext%3Axml/dtd%3Aapplication%3Axml-dtd/conversion?properties=<conversions><conversion index="0"></conversion><conversion index="1"><property id="oxgarage.getImages">true</property><property id="oxgarage.getOnlineImages">true</property><property id="oxgarage.lang">en</property><property id="oxgarage.textOnly">false</property><property id="pl.psnc.dl.ege.tei.profileNames">default</property></conversion></conversions>'
+	}
+	if(value == "JSON"){
+		uri = "http://oxgarage.oucs.ox.ac.uk:8080/ege-webservice/Conversions/ODD%3Atext%3Axml/ODDC%3Atext%3Axml/oddjson%3Aapplication%3Ajson/"
+	}
+	setXML();
+	var f = document.createElement('form');
+	f.id="outputFormMulti";
     f.action = uri;
     f.method = "post";
     f.innerHTML = f.innerHTML + "<textarea name='input' style='display:none;'>default</textarea>";
@@ -414,9 +533,10 @@ data='<TEI xmlns="http://www.tei-c.org/ns/1.0" xml:lang="en"><teiHeader><fileDes
 	}
     document.getElementsByTagName("body")[0].appendChild(f);
     document.getElementsByName("input")[0].value=xml;
-    f.submit()
-	
+    f.submit();
+	$('#outputFormMulti').remove();
 })
+
 
 
 //CLICK BUTTON EVENT FOR ADDING/REMOVING ELEMENT
@@ -508,4 +628,41 @@ $(document).on("click","button.back", function(){
 		Back = "Modules"
 		Current = "Elements"
 	}
+})
+
+$(document).on("click","button.uploadProject", function(){
+	$('#startPage').hide();
+	$('#upload').show();
+})
+
+$(document).on("click","button.continueToLoad", function(){
+	var xmldata = $("#inputarea").val();
+	loadFile(xmldata);
+	$('#upload').hide();
+	$('#actions').show();
+	showmodules();
+	showNewModules();
+})
+
+$(document).on("click","button.loadCustomJSON", function(){
+	//TEI = eval($('#JSONinputarea').val());
+	eval($('#JSONinputarea').val());
+	$('#teiSelection').hide();
+	showmodules();
+	showNewModules();
+	$('#actions').show();
+})
+
+$(document).on("click","button.outputXML", function(){
+
+})
+
+$(document).on("click","button.removeJSON", function(){
+	var name = $("#jsontoRemove").val();
+	if(name == ''){
+	}
+	else{
+		localStorage.removeItem("tei%*$&#" + name);
+	}
+	doShowTEI();
 })
