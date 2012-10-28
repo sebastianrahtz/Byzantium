@@ -3,7 +3,7 @@
 <html>
 <head>
 <script src="jquery.js"></script>
-<script src="byzantium.js"></script>
+<script src="Roma.js"></script>
 <style type="text/css">
 #selected
 {
@@ -12,9 +12,8 @@ float:right;
 </style>
 </head>
 <body>
-<div id='startPage'>
-<h1>Welcome to Roma!</h1>
-<h2>Please make a selection:</h2>
+<div id='projectSelection'>
+<b>Select a project:</b><br/>
 <button class="newProject">New Project</button>
 <button class="loadProject">Load Project</button>
 <button class="uploadProject">Upload Project</button>
@@ -60,8 +59,7 @@ float:right;
 
   document.getElementById('files').addEventListener('change', handleFileSelect, false);
 </script>
-	   <input type="submit" value="go"/>
-	<input name="filename" value="myTEI"/>
+	<input name="filename" value="myTEI"/><br/>
 	<textarea rows="50" cols="75" name="XMLinput" id="inputarea"></textarea>
 
 </div>
@@ -88,7 +86,8 @@ float:right;
 </div>
 
 <div id="teiSelection">
-	TEI Specification:
+<h1>Welcome to Roma!</h1>
+<h2>Please Select Your TEI Database:</h2>
 	<p id="TEI_Selected"></p>
 	<button class="TEI_Default">Default</button>
 	<button class="TEI_Online">Use Online</button>
@@ -135,8 +134,7 @@ float:right;
 
 	  document.getElementById('JSONfiles').addEventListener('change', handleFileSelect, false);
 	</script>
-		   <input type="submit" value="go"/>
-		<input name="filename" value="myTEI"/>
+		<input name="filename" value="myTEI"/><br/>
 		<textarea rows="50" cols="75" name="JSONinput" id="JSONinputarea"></textarea>
 
 	</div>
@@ -157,8 +155,7 @@ float:right;
 		 <button class="removeJSON">Remove</button>
 		 <input type="text" id='JSONtoremove'/>
 	</div>
-	
-	<button class="SubmitTEI">Submit</button>
+
 </div>
 
 
@@ -177,7 +174,7 @@ float:right;
 Save Project:<input type="text" id='saveAs'/><br/>
 </form>
 <select id='outputSelection'>
-  <option>TEI ODD XML</option>
+  <option>XML</option>
   <option>RELAX NG Schema</option>
   <option>ISO Schematron</option>
   <option>Schematron</option>

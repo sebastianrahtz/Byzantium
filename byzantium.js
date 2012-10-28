@@ -11,6 +11,7 @@ var title = ""
 var filename = ""
 var author = ""
 var description = ""
+var givenXML = ""
 
 //SETS JSON OBJECT
 function teijs(data) {
@@ -74,7 +75,7 @@ function showelements(name  )
 
 function loadFile(xml){
 	AddedModules = [];
-	alert( xml);
+	//alert( xml);
 	xmlDoc = $.parseXML(xml);
 	$xml = $(xmlDoc);
 	$xml.find("moduleRef").each(function(i, item) {
@@ -136,7 +137,7 @@ function showattributes(name ) {
 
 //READY FUNCTION. DISPLAYS MODULES
 $(document).ready(function(){
-	//if(localStorage.getItem("tei%*$&#Default") === null){
+	if(localStorage.getItem("tei%*$&#Default") === null){
 		$.ajax({
 		url: 'http://users.ox.ac.uk/~rahtz/test.js',
 		dataType: 'jsonp',
@@ -145,12 +146,15 @@ $(document).ready(function(){
 		   localStorage.setItem("tei%*$&#Default", JSON.stringify(data, null, 2));
 		}
 		});
-	//}
+	}
 	$('#actions').hide();
 	$('#loadProjectTools').hide();
 	$('#startInfo').hide();
-	$('#teiSelection').hide();
+	$('#projectSelection').hide();
 	$('#upload').hide();
+	$('#UploadCustom').hide();
+	$('#OnlineSelector').hide();
+	$('#ExistingSelector').hide();
 })
 
 
@@ -198,7 +202,7 @@ function setXML(){
 	var attributesOutput = [];
 	var items = [];
 	xml = '<?xml version="1.0"?>' +
-'<TEI xml:lang="en" xmlns="http://www.tei-c.org/ns/1.0"><teiHeader><fileDesc><titleStmt><title>';
+		'<TEI xml:lang="en" xmlns="http://www.tei-c.org/ns/1.0"><teiHeader><fileDesc><titleStmt><title>';
 	if(title != ""){
 		xml = xml + title;
 	}
@@ -238,14 +242,9 @@ function setXML(){
 		$.each(ExcludedAttributes, function(k, attribute){
 			if(attribute.split(';')[0] == name){
 				if($.inArray((attribute.split(';')[0] + ":" + attribute.split(';')[1]), ExcludedElements) == -1){
-					currentElements = currentModule + ';' + attribute.split(';')[1] + ';' + attribute.split(';')[2];
+					//currentElements = attribute.split(';')[0] + ';' + attribute.split(';')[1] + ';' + attribute.split(';')[2];
+					attributesOutput.push(attribute);
 				}
-				else{
-					currentElements = currentElements + "";
-				}
-			}
-			if(currentElements.length > 0){
-				attributesOutput.push(currentElements);
 			}
 		})
 		output.push(currentModule);
@@ -269,21 +268,22 @@ function setXML(){
 	usedElements = [];
 	var finalAttributes = [];
 	var attributeString = "";
-	$.each(attributesOutput, function(i, element){
-		var currentModule = element.split(";")[0];
-		$.each(attributesOutput, function(j, element){
-			var currentElement = element.split(';')[1];
-			attributeString = currentModule + ";";
-			attributeString = attributeString + currentElement;
-			$.each(attributesOutput, function(k, element){
-				if(currentModule == element.split(';')[0]){
-					if(currentElement == element.split(';')[1]){
-						attributeString = attributeString + ";" + element.split(';')[2];
+	$.each(attributesOutput, function(i, AttribElement){
+		var currentModule = AttribElement.split(";")[0];
+		$.each(attributesOutput, function(j, AttribElement2){
+			var currentElement = AttribElement2.split(';')[1];
+			attributeString = currentModule + ";" + currentElement;
+			$.each(attributesOutput, function(k, AttribElement3){
+				if(currentModule == AttribElement3.split(';')[0]){
+					if(currentElement == AttribElement3.split(';')[1]){
+						attributeString = attributeString + ";" + AttribElement3.split(';')[2];
 					}
 				}
 			})
 			if($.inArray(attributeString, usedElements) == -1){
-				usedElements.push(attributeString);
+				if(attributeString.split(';').length > 2 ){
+					usedElements.push(attributeString);
+				}
 			}
 			attributeString = "";
 		})
@@ -307,6 +307,74 @@ function setXML(){
 		xml = xml + '<elementSpec ident="' + elementSpec + '" mode="change" module="' + module.split(':')[0] + '"> <attList>' + attributeString + '</attList></elementSpec>'
 	})
 	xml = xml + '</schemaSpec></body></text></TEI>';
+	
+	
+	if(givenXML != ""){
+		//alert("TOTALLY GOT HERE GUYS!");
+		xmlDoc = $.parseXML(givenXML);
+		$xml = $(xmlDoc);
+		//$xml.find("moduleRef")
+		$xml.find("moduleRef").remove();
+		$xml.find("elementSpec").remove();
+		$.each(AddedModules, function(i, item){
+			var mr = $.parseXML("<moduleRef/>").documentElement
+			var lvl = $.parseXML("<level2/>").documentElement
+			var currentModule = item;
+			var exceptions = "";
+			$.each(ExcludedElements, function(j, element){
+				if(element.split(":")[0] == item){
+					exceptions = exceptions + " " + element.split(":")[1]
+				}
+			})
+			$xml.find("schemaSpec").append($(mr).attr({key: currentModule, except: exceptions}));
+			//$xml.find("schemaSpec").append($(mr).attr({key: currentModule, except: exceptions}).append($(lvl)));
+		})
+		var es = $.parseXML("<elementSpec/>").documentElement;
+		var al = $.parseXML("<attList/>").documentElement;
+		$.each(usedElements, function(i, item){
+			currentModule = item.split(";")[0];
+			currentElement = item.split(";")[1];
+			attributeArray = item.split(";");
+			$xml.find("schemaSpec").append($(es).attr({ident: currentElement, module: currentModule, mode: "change"}).append($(al)));
+			$.each(attributeArray, function(j, item2){
+				if(j < 2){
+				}
+				else{
+					currentAttribute = item2;
+					var ad = $.parseXML("<attDef/>").documentElement;
+					$xml.find("elementSpec[ident=" + currentElement + "][module=" + currentModule + "]").children().append($(ad).attr({ident: currentAttribute, mode: "delete"}));
+				
+				}
+			})
+			
+		})
+		alert(usedElements);
+		/**$xml.find("moduleRef").each(function(i, item) {
+			//alert(item.getAttribute('except'));
+			//alert(item.getAttribute('key'));
+			key = item.getAttribute('key');
+			excepts = item.getAttribute('except');
+			AddedModules.push(key);
+			//ExcludedElements.push(key+":"+e);
+			var individualExcepts = excepts.split(" ");
+			$.each(individualExcepts, function(i, except){
+				if(except != ""){
+					ExcludedElements.push(key+":"+except);
+				}
+			})
+		})
+		$xml.find("elementSpec").each(function(i, item){
+			var module = item.getAttribute('module');
+			var element = item.getAttribute('ident');
+			$(this).find("attDef").each(function(i, test){
+				var attribute = test.getAttribute('ident');
+				ExcludedAttributes.push(module + ";" + element + ";" + attribute);
+			})
+		})*/
+		out = new XMLSerializer().serializeToString(xmlDoc);
+		alert(out);
+		xml = out;
+	}
 
 }
 
@@ -359,7 +427,7 @@ function setXML(){
 
 
  $(document).on("click","button.newProject", function(){
-	$('#startPage').hide();
+	$('#projectSelection').hide();
 	$('#startInfo').show();
 	//loadTEI();
 	//showNewModules();
@@ -367,15 +435,23 @@ function setXML(){
 });
 
 $(document).on("click","button.saveStartInfo", function(){
+	AddedModules.push("core");
+	AddedModules.push("tei");
+	AddedModules.push("header");
+	AddedModules.push("textstructure");
 	title = $("#title").val();
 	filename = $("#filename").val();
 	author = $("#author").val();
 	description = $("#description").val();
 	$('#startInfo').hide();
-	$('#teiSelection').show();
+	//$('#teiSelection').show();
 	$('#OnlineSelector').hide();
 	$('#ExistingSelector').hide();
 	$('#UploadCustom').hide();
+	showmodules();
+	showNewModules();
+	$('#actions').show();
+
 });
 
 $(document).on("click","button.TEI_Custom", function(){
@@ -393,9 +469,11 @@ $(document).on("click","button.TEI_Default", function(){
 	   localStorage.setItem("tei%*$&#"+name, JSON.stringify(data, null, 2));
 	}
 	});
-	$("#UploadCustom").hide();
+	/**$("#UploadCustom").hide();
 	$("#OnlineSelector").hide();
-	$("#ExistingSelector").hide();
+	$("#ExistingSelector").hide();*/
+	$("#teiSelection").hide();
+	$("#projectSelection").show();
 });
 
 $(document).on("click","button.TEI_Online", function(){
@@ -418,6 +496,8 @@ $(document).on("click","button.setOnline", function(){
 		}
 		});
 	}
+	$("#teiSelection").hide();
+	$("#projectSelection").show();
 })
 
 $(document).on("click","button.TEI_Existing", function(){
@@ -431,6 +511,8 @@ $(document).on("click","button.setExisting", function(){
 	var name = $('#loadTEI').val();
 	var getTEI = localStorage.getItem("tei%*$&#" + name);
 	TEI = JSON.parse(getTEI);
+	$("#teiSelection").hide();
+	$("#projectSelection").show();
 })
 
 
@@ -449,7 +531,7 @@ $(document).on("click","button.SubmitTEI", function(){
 });
 
 $(document).on("click","button.loadProject", function(){
-	$('#startPage').hide();
+	$('#projectSelection').hide();
 	url = 'http://users.ox.ac.uk/~rahtz/test.js';
 	loadTEI();
 	$('#modules').hide();
@@ -631,12 +713,15 @@ $(document).on("click","button.back", function(){
 })
 
 $(document).on("click","button.uploadProject", function(){
-	$('#startPage').hide();
+	$('#projectSelection').hide();
 	$('#upload').show();
 })
 
 $(document).on("click","button.continueToLoad", function(){
 	var xmldata = $("#inputarea").val();
+	xml = xmldata
+	givenXML = xmldata
+	//alert(givenXML);
 	loadFile(xmldata);
 	$('#upload').hide();
 	$('#actions').show();
@@ -648,9 +733,10 @@ $(document).on("click","button.loadCustomJSON", function(){
 	//TEI = eval($('#JSONinputarea').val());
 	eval($('#JSONinputarea').val());
 	$('#teiSelection').hide();
-	showmodules();
+	/**showmodules();
 	showNewModules();
-	$('#actions').show();
+	$('#actions').show();*/
+	$('#projectSelection').show();
 })
 
 $(document).on("click","button.outputXML", function(){
@@ -658,7 +744,7 @@ $(document).on("click","button.outputXML", function(){
 })
 
 $(document).on("click","button.removeJSON", function(){
-	var name = $("#jsontoRemove").val();
+	var name = $("#JSONtoremove").val();
 	if(name == ''){
 	}
 	else{
