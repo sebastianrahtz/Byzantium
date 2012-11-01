@@ -28,7 +28,7 @@ function teijs(data) {
 
 //DISPLAYS INITIAL MODULES
 function showmodules() {
-	if(teiName != ""){
+	if(teiName != "" && teiName != "undefined"){
 		localStorage.setItem(("tei%*$&#" + teiName), JSON.stringify(TEI, null, 2));
 	}
     var items = [];
@@ -88,7 +88,7 @@ function loadFile(xml){
 	xmlDoc = $.parseXML(xml);
 	$xml = $(xmlDoc);
 	teiName = $xml.find("schemaSpec").attr("teiName");
-	if(teiName == "undefined"){
+	if(teiName == "undefined" || teiName == null){
 		teiName = "";
 	}
 	$xml.find("moduleRef").each(function(i, item) {
@@ -468,6 +468,8 @@ $(document).on("click","button.TEI_Default", function(){
 	showmodules();
 	showNewModules();
 	$("#actions").show();
+	$('#message').html('<p>Default database loaded</p>')
+	$("#message").delay(1000).fadeOut();
 	//$("#projectSelection").show();
 });
 
@@ -499,6 +501,8 @@ $(document).on("click","button.setOnline", function(){
 			$("#actions").show();
 		});
 	}
+	$('#message').html('<p>' + teiName + ' database loaded</p>')
+	$("#message").delay(1000).fadeOut();
 	//$("#projectSelection").show();
 })
 
@@ -518,6 +522,8 @@ $(document).on("click","button.setExisting", function(){
 	showmodules();
 	showNewModules();
 	$("#actions").show();
+	$('#message').html('<p>' + teiName + ' database loaded</p>')
+	$("#message").delay(1000).fadeOut();
 	//$("#projectSelection").show();
 })
 
@@ -759,6 +765,8 @@ $(document).on("click","button.loadCustomJSON", function(){
 	showmodules();
 	showNewModules();
 	$('#actions').show();
+	$('#message').html('<p>' + teiName + ' database loaded</p>')
+	$("#message").delay(1000).fadeOut();
 	//$('#projectSelection').show();
 })
 
@@ -774,4 +782,38 @@ $(document).on("click","button.removeJSON", function(){
 		localStorage.removeItem("tei%*$&#" + name);
 	}
 	doShowTEI();
+})
+$(document).on("click", "button.restart", function(){
+	$('#projectSelection').show();
+	$('#actions').hide();
+	$('#loadProjectTools').hide();
+	$('#startInfo').hide();
+	//$('#projectSelection').hide();
+	$('#teiSelection').hide();
+	$('#upload').hide();
+	$('#UploadCustom').hide();
+	$('#UploadCustom').hide();
+	$('#OnlineSelector').hide();
+	$('#ExistingSelector').hide();
+	$('#modules').empty();
+	$('#modules').show();
+	$('#elements').hide();
+	$('#attributes').hide();
+	$('#selected').empty();
+	$('#selected').show();
+	url='';
+	TEI=[];
+	AddedModules=[];
+	ExcludedElements=[];
+	ExcludedAttributes=[];
+	Back = ""
+	Current = ""
+	currentModule = ""
+	xml = ""
+	title = ""
+	filename = ""
+	author = ""
+	description = ""
+	givenXML = ""
+	teiName = ""
 })
