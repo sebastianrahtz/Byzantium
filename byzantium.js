@@ -1,3 +1,9 @@
+/**
+Roma Revised Version .1
+Created: 11/1/2012
+Programmed By: Sebastian Rahtz and Nicholas Burlingame
+*/
+
 var url='';
 var TEI=[];
 var AddedModules=[];
@@ -12,6 +18,10 @@ var filename = ""
 var author = ""
 var description = ""
 var givenXML = ""
+<<<<<<< HEAD
+=======
+var teiName = ""
+>>>>>>> latest from nick
 
 //SETS JSON OBJECT
 function teijs(data) {
@@ -21,7 +31,9 @@ function teijs(data) {
 
 //DISPLAYS INITIAL MODULES
 function showmodules() {
-
+	if(teiName != ""){
+		localStorage.setItem(("tei%*$&#" + teiName), JSON.stringify(TEI, null, 2));
+	}
     var items = [];
 	var moduleCounter = 0;
     $.each(TEI.modules, function(i, module) {
@@ -78,6 +90,10 @@ function loadFile(xml){
 	//alert( xml);
 	xmlDoc = $.parseXML(xml);
 	$xml = $(xmlDoc);
+	teiName = $xml.find("schemaSpec").attr("teiName");
+	if(teiName == "undefined"){
+		teiName = "";
+	}
 	$xml.find("moduleRef").each(function(i, item) {
 		//alert(item.getAttribute('except'));
 		//alert(item.getAttribute('key'));
@@ -100,6 +116,8 @@ function loadFile(xml){
 			ExcludedAttributes.push(module + ";" + element + ";" + attribute);
 		})
 	})
+	//alert(xml);
+	//alert("Got here");
 	//alert($xml.find("moduleRef").except());
 	//$title = $xml.find("title");
 	
@@ -150,9 +168,17 @@ $(document).ready(function(){
 	$('#actions').hide();
 	$('#loadProjectTools').hide();
 	$('#startInfo').hide();
+<<<<<<< HEAD
 	$('#projectSelection').hide();
 	$('#upload').hide();
 	$('#UploadCustom').hide();
+=======
+	//$('#projectSelection').hide();
+	$('#teiSelection').hide();
+	$('#upload').hide();
+	$('#UploadCustom').hide();
+	$('#UploadCustom').hide();
+>>>>>>> latest from nick
 	$('#OnlineSelector').hide();
 	$('#ExistingSelector').hide();
 })
@@ -177,23 +203,6 @@ function loadTEI(){
    /**showNewModules();*/
    //doShowAll();
 }
-//CLICK BUTTON EVENT FOR SAVE
-/*$(document).on("click","button.save", function(){
-	$.ajax({
-		type: "POST",
-		url: "http://oxgarage.oucs.ox.ac.uk:8080/ege-webservice/Conversions/ODD%3Atext%3Axml/ODDC%3Atext%3Axml/relaxng%3Aapplication%3Axml-relaxng/",
-		data: xml,
-		dataType: "xml",
-		success: function(msg) {
-			alert("Success");
-		},
-		error: function (xhr, ajaxOptions, thrownError) {
-			alert(xhr.status);
-			alert("Failure");
-			alert(thrownError + ".");
-		}
-	});
-})*/
 
 
 //Sets the XML to be outputted.
@@ -228,9 +237,13 @@ function setXML(){
 		xml = xml + filename;
 	}
 	else{
-		xml = xml + 'myTEI'
+		xml = xml + 'myTEI';
 	}
-	xml = xml + '">';
+	xml = xml + '" ';
+	if(teiName != ""){
+		xml = xml + 'teiName="' + teiName + '"';
+	}
+	xml = xml + '>';
 	$.each(AddedModules, function(i, name) {
 		var currentModule = name;
 		var currentElements = "";
@@ -316,9 +329,17 @@ function setXML(){
 		//$xml.find("moduleRef")
 		$xml.find("moduleRef").remove();
 		$xml.find("elementSpec").remove();
+<<<<<<< HEAD
 		$.each(AddedModules, function(i, item){
 			var mr = $.parseXML("<moduleRef/>").documentElement
 			var lvl = $.parseXML("<level2/>").documentElement
+=======
+		if(teiName != ""){
+			$xml.find("schemaSpec").attr({teiName: teiName});
+		}
+		$.each(AddedModules, function(i, item){
+			var mr = $.parseXML("<moduleRef/>").documentElement
+>>>>>>> latest from nick
 			var currentModule = item;
 			var exceptions = "";
 			$.each(ExcludedElements, function(j, element){
@@ -348,6 +369,7 @@ function setXML(){
 			})
 			
 		})
+<<<<<<< HEAD
 		alert(usedElements);
 		/**$xml.find("moduleRef").each(function(i, item) {
 			//alert(item.getAttribute('except'));
@@ -375,6 +397,13 @@ function setXML(){
 		alert(out);
 		xml = out;
 	}
+=======
+		//alert(usedElements);
+		out = new XMLSerializer().serializeToString(xmlDoc);
+		xml = out;
+	}
+	//alert(xml);
+>>>>>>> latest from nick
 
 }
 
@@ -415,7 +444,22 @@ function setXML(){
    document.getElementById('teipairs').innerHTML = pairs;
  }
  
+ function loadDefaultTEI(){
+ 	if(localStorage.getItem("tei%*$&#Default") === null){
+		$.ajax({
+		url: 'http://users.ox.ac.uk/~rahtz/test.js',
+		dataType: 'jsonp',
+		jsonpCallback: 'teijs',
+		success: function(data) {
+		   localStorage.setItem("tei%*$&#Default", JSON.stringify(data, null, 2));
+		}
+		});
+	}
+	else{
+		TEI = JSON.parse(localStorage.getItem("tei%*$&#Default"));
+	}
  
+ }
  
  
 
@@ -448,9 +492,15 @@ $(document).on("click","button.saveStartInfo", function(){
 	$('#OnlineSelector').hide();
 	$('#ExistingSelector').hide();
 	$('#UploadCustom').hide();
+<<<<<<< HEAD
 	showmodules();
 	showNewModules();
 	$('#actions').show();
+=======
+	/*showmodules();
+	showNewModules();
+	$('#actions').show();*/
+>>>>>>> latest from nick
 
 });
 
@@ -461,6 +511,7 @@ $(document).on("click","button.TEI_Custom", function(){
 })
 
 $(document).on("click","button.TEI_Default", function(){
+<<<<<<< HEAD
 	$.ajax({
 	url: 'http://users.ox.ac.uk/~rahtz/test.js',
 	dataType: 'jsonp',
@@ -469,12 +520,24 @@ $(document).on("click","button.TEI_Default", function(){
 	   localStorage.setItem("tei%*$&#"+name, JSON.stringify(data, null, 2));
 	}
 	});
+=======
+	loadDefaultTEI()
+>>>>>>> latest from nick
 	/**$("#UploadCustom").hide();
 	$("#OnlineSelector").hide();
 	$("#ExistingSelector").hide();*/
 	$("#teiSelection").hide();
+<<<<<<< HEAD
 	$("#projectSelection").show();
+=======
+	showmodules();
+	showNewModules();
+	$("#actions").show();
+	//$("#projectSelection").show();
+>>>>>>> latest from nick
 });
+
+
 
 $(document).on("click","button.TEI_Online", function(){
 	$("#UploadCustom").hide();
@@ -486,18 +549,28 @@ $(document).on("click","button.TEI_Online", function(){
 $(document).on("click","button.setOnline", function(){
 	var TEIurl= $('#TEI_OnlineSelector').val();
 	var name = $('#TEI_OnlineName').val();
+	teiName = name;
 	if((TEIurl != "") && (name != "")){
-		$.ajax({
+		$.when($.ajax({
 		url: TEIurl,
 		dataType: 'jsonp',
 		jsonpCallback: 'teijs',
 		success: function(data) {
 		   localStorage.setItem("tei%*$&#"+name, JSON.stringify(data, null, 2));
 		}
+		})).done(function(){
+			$("#teiSelection").hide();
+			showmodules();
+			showNewModules();
+			$("#actions").show();
 		});
 	}
+<<<<<<< HEAD
 	$("#teiSelection").hide();
 	$("#projectSelection").show();
+=======
+	//$("#projectSelection").show();
+>>>>>>> latest from nick
 })
 
 $(document).on("click","button.TEI_Existing", function(){
@@ -509,10 +582,18 @@ $(document).on("click","button.TEI_Existing", function(){
 
 $(document).on("click","button.setExisting", function(){
 	var name = $('#loadTEI').val();
+	teiName = name;
 	var getTEI = localStorage.getItem("tei%*$&#" + name);
 	TEI = JSON.parse(getTEI);
 	$("#teiSelection").hide();
+<<<<<<< HEAD
 	$("#projectSelection").show();
+=======
+	showmodules();
+	showNewModules();
+	$("#actions").show();
+	//$("#projectSelection").show();
+>>>>>>> latest from nick
 })
 
 
@@ -562,6 +643,13 @@ $(document).on("click","button.load", function(){
 	else{
 		var data = localStorage.getItem('proj%*$&#'+name);
 		loadFile(data);
+	}
+	if(teiName != "undefined" && teiName != null){
+		//alert(localStorage.getItem("tei%*$&#" + teiName));
+		TEI = JSON.parse(localStorage.getItem("tei%*$&#" + teiName));
+	}
+	else{
+		loadDefaultTEI();
 	}
 	showNewModules();
 	showmodules();
@@ -723,6 +811,15 @@ $(document).on("click","button.continueToLoad", function(){
 	givenXML = xmldata
 	//alert(givenXML);
 	loadFile(xmldata);
+	//alert(teiName);
+	if(teiName != "undefined" && teiName != null){
+		//alert(localStorage.getItem("tei%*$&#" + teiName));
+		TEI = JSON.parse(localStorage.getItem("tei%*$&#" + teiName));
+	}
+	else{
+		loadDefaultTEI();
+	}
+	//loadDefaultTEI();
 	$('#upload').hide();
 	$('#actions').show();
 	showmodules();
@@ -732,11 +829,17 @@ $(document).on("click","button.continueToLoad", function(){
 $(document).on("click","button.loadCustomJSON", function(){
 	//TEI = eval($('#JSONinputarea').val());
 	eval($('#JSONinputarea').val());
+	teiName = $("#JSONname").val();
 	$('#teiSelection').hide();
 	/**showmodules();
 	showNewModules();
+<<<<<<< HEAD
 	$('#actions').show();*/
 	$('#projectSelection').show();
+=======
+	$('#actions').show();
+	//$('#projectSelection').show();
+>>>>>>> latest from nick
 })
 
 $(document).on("click","button.outputXML", function(){
