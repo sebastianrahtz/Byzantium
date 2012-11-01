@@ -18,10 +18,7 @@ var filename = ""
 var author = ""
 var description = ""
 var givenXML = ""
-<<<<<<< HEAD
-=======
 var teiName = ""
->>>>>>> latest from nick
 
 //SETS JSON OBJECT
 function teijs(data) {
@@ -168,17 +165,11 @@ $(document).ready(function(){
 	$('#actions').hide();
 	$('#loadProjectTools').hide();
 	$('#startInfo').hide();
-<<<<<<< HEAD
-	$('#projectSelection').hide();
-	$('#upload').hide();
-	$('#UploadCustom').hide();
-=======
 	//$('#projectSelection').hide();
 	$('#teiSelection').hide();
 	$('#upload').hide();
 	$('#UploadCustom').hide();
 	$('#UploadCustom').hide();
->>>>>>> latest from nick
 	$('#OnlineSelector').hide();
 	$('#ExistingSelector').hide();
 })
@@ -329,17 +320,11 @@ function setXML(){
 		//$xml.find("moduleRef")
 		$xml.find("moduleRef").remove();
 		$xml.find("elementSpec").remove();
-<<<<<<< HEAD
-		$.each(AddedModules, function(i, item){
-			var mr = $.parseXML("<moduleRef/>").documentElement
-			var lvl = $.parseXML("<level2/>").documentElement
-=======
 		if(teiName != ""){
 			$xml.find("schemaSpec").attr({teiName: teiName});
 		}
 		$.each(AddedModules, function(i, item){
 			var mr = $.parseXML("<moduleRef/>").documentElement
->>>>>>> latest from nick
 			var currentModule = item;
 			var exceptions = "";
 			$.each(ExcludedElements, function(j, element){
@@ -369,41 +354,11 @@ function setXML(){
 			})
 			
 		})
-<<<<<<< HEAD
-		alert(usedElements);
-		/**$xml.find("moduleRef").each(function(i, item) {
-			//alert(item.getAttribute('except'));
-			//alert(item.getAttribute('key'));
-			key = item.getAttribute('key');
-			excepts = item.getAttribute('except');
-			AddedModules.push(key);
-			//ExcludedElements.push(key+":"+e);
-			var individualExcepts = excepts.split(" ");
-			$.each(individualExcepts, function(i, except){
-				if(except != ""){
-					ExcludedElements.push(key+":"+except);
-				}
-			})
-		})
-		$xml.find("elementSpec").each(function(i, item){
-			var module = item.getAttribute('module');
-			var element = item.getAttribute('ident');
-			$(this).find("attDef").each(function(i, test){
-				var attribute = test.getAttribute('ident');
-				ExcludedAttributes.push(module + ";" + element + ";" + attribute);
-			})
-		})*/
-		out = new XMLSerializer().serializeToString(xmlDoc);
-		alert(out);
-		xml = out;
-	}
-=======
 		//alert(usedElements);
 		out = new XMLSerializer().serializeToString(xmlDoc);
 		xml = out;
 	}
 	//alert(xml);
->>>>>>> latest from nick
 
 }
 
@@ -488,19 +443,13 @@ $(document).on("click","button.saveStartInfo", function(){
 	author = $("#author").val();
 	description = $("#description").val();
 	$('#startInfo').hide();
-	//$('#teiSelection').show();
+	$('#teiSelection').show();
 	$('#OnlineSelector').hide();
 	$('#ExistingSelector').hide();
 	$('#UploadCustom').hide();
-<<<<<<< HEAD
-	showmodules();
-	showNewModules();
-	$('#actions').show();
-=======
 	/*showmodules();
 	showNewModules();
 	$('#actions').show();*/
->>>>>>> latest from nick
 
 });
 
@@ -511,30 +460,15 @@ $(document).on("click","button.TEI_Custom", function(){
 })
 
 $(document).on("click","button.TEI_Default", function(){
-<<<<<<< HEAD
-	$.ajax({
-	url: 'http://users.ox.ac.uk/~rahtz/test.js',
-	dataType: 'jsonp',
-	jsonpCallback: 'teijs',
-	success: function(data) {
-	   localStorage.setItem("tei%*$&#"+name, JSON.stringify(data, null, 2));
-	}
-	});
-=======
 	loadDefaultTEI()
->>>>>>> latest from nick
 	/**$("#UploadCustom").hide();
 	$("#OnlineSelector").hide();
 	$("#ExistingSelector").hide();*/
 	$("#teiSelection").hide();
-<<<<<<< HEAD
-	$("#projectSelection").show();
-=======
 	showmodules();
 	showNewModules();
 	$("#actions").show();
 	//$("#projectSelection").show();
->>>>>>> latest from nick
 });
 
 
@@ -565,12 +499,7 @@ $(document).on("click","button.setOnline", function(){
 			$("#actions").show();
 		});
 	}
-<<<<<<< HEAD
-	$("#teiSelection").hide();
-	$("#projectSelection").show();
-=======
 	//$("#projectSelection").show();
->>>>>>> latest from nick
 })
 
 $(document).on("click","button.TEI_Existing", function(){
@@ -586,14 +515,10 @@ $(document).on("click","button.setExisting", function(){
 	var getTEI = localStorage.getItem("tei%*$&#" + name);
 	TEI = JSON.parse(getTEI);
 	$("#teiSelection").hide();
-<<<<<<< HEAD
-	$("#projectSelection").show();
-=======
 	showmodules();
 	showNewModules();
 	$("#actions").show();
 	//$("#projectSelection").show();
->>>>>>> latest from nick
 })
 
 
@@ -831,15 +756,10 @@ $(document).on("click","button.loadCustomJSON", function(){
 	eval($('#JSONinputarea').val());
 	teiName = $("#JSONname").val();
 	$('#teiSelection').hide();
-	/**showmodules();
+	showmodules();
 	showNewModules();
-<<<<<<< HEAD
-	$('#actions').show();*/
-	$('#projectSelection').show();
-=======
 	$('#actions').show();
 	//$('#projectSelection').show();
->>>>>>> latest from nick
 })
 
 $(document).on("click","button.outputXML", function(){
