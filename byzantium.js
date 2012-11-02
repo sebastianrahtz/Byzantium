@@ -516,8 +516,13 @@ $(document).on("click","button.TEI_Existing", function(){
 $(document).on("click","button.setExisting", function(){
 	var name = $('#loadTEI').val();
 	teiName = name;
-	var getTEI = localStorage.getItem("tei%*$&#" + name);
-	TEI = JSON.parse(getTEI);
+	if(localStorage.getItem("tei%*$&#" + name) == null){
+		loadDefault();
+	}
+	else{
+		var getTEI = localStorage.getItem("tei%*$&#" + name);
+		TEI = JSON.parse(getTEI);
+	}
 	$("#teiSelection").hide();
 	showmodules();
 	showNewModules();
@@ -577,11 +582,22 @@ $(document).on("click","button.load", function(){
 	}
 	if(teiName != "undefined" && teiName != null){
 		//alert(localStorage.getItem("tei%*$&#" + teiName));
-		TEI = JSON.parse(localStorage.getItem("tei%*$&#" + teiName));
+		var L = localStorage.getItem("tei%*$&#" + teiName);
+		//alert(L);
+		if (L != null) {
+			//alert("GOT HERE");
+			TEI = JSON.parse(L);
+		
+		}
+		else{
+			loadDefaultTEI();
+			//loadDefaultTEI();
+		}
 	}
 	else{
 		loadDefaultTEI();
 	}
+	//alert(TEI)
 	showNewModules();
 	showmodules();
 	$('#modules').show();
