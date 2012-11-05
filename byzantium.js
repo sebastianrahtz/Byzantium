@@ -127,13 +127,51 @@ function showattributes(name ) {
 	$('#elements').hide();
 	Back = "Elements";
 	Current = "Attributes";
-	var items = [];
+	var addableitems = [];
+	var unaddableitems = [];
 	var bigString = ""
 	$('#attributes').html($('<h2/>', {html: "Attributes in element " + name }));
 	$.each(TEI.elements, function(i, element){
 		if(element.module == currentModule){
 			if(element.ident == name){
-				$.each(element.attributes, function(i, attribute){
+				$.each(element.classattributes, function(i, classattribute){
+					var classAttributeModule = classattribute.module;
+					var classAttributeClass  = classattribute.class;
+
+					//alert("THIS MODULE: " + classAttributeModule);
+					//alert("THIS CLASS: " + classAttributeClass);
+					$.each(TEI.attclasses, function(i, attclass){
+						//alert(attclass.ident);
+						if(attclass.ident == classAttributeClass){
+							$.each(attclass.attributes, function(i, attribute){
+								if($.inArray(classAttributeModule, AddedModules) != -1){
+									addableitems.push('<tr><td><button class="addRemoveAttribute" id="' + classAttributeModule + ";" + name + ";" + attribute.ident + '">');
+									if($.inArray((classAttributeModule + ";" + name + ";" + attribute.ident), ExcludedAttributes) == -1){
+										addableitems.push("Exclude");
+									}
+									else{
+										addableitems.push("Include");
+									}
+									addableitems.push('</button>' + "  " + attribute.ident + "    "  + attribute.desc + '</td></tr>');
+								}
+								else{
+									unaddableitems.push('<tr><td><button disabled="disabled">Requires Module: ' + classAttributeModule + "</button>"+ attribute.ident + '        ' + attribute.desc + '</td></tr>');
+								}
+								//alert(attribute.ident);
+								
+							})
+						}
+					});
+					
+				});
+				
+				/*$.each(TEI.attclasses, function(i, attclass){
+					alert(attclass.ident);
+					$.each(attclass.attributes, function(i, attribute){
+						alert(attribute.ident);
+					})
+				})*/
+				/*$.each(element.attributes, function(i, attribute){
 					items.push('<td><button class="addRemoveAttribute" id="' + currentModule + ";" + name + ";" + attribute.ident + '">');
 					if($.inArray((currentModule + ";" + name + ";" + attribute.ident), ExcludedAttributes) == -1){
 						items.push("Exclude");
@@ -142,11 +180,11 @@ function showattributes(name ) {
 						items.push("Include");
 					}
 					items.push('</button>' + "  " + attribute.ident + "    "  + attribute.desc + '</td></tr>');
-				});
+				});*/
 			}
 		}
 	});
-	$('#attributes').append($('<table/>', {'class': 'attributes',html: '<tr><td>Include/Exclude</td></tr>' + items.join('') }));
+	$('#attributes').append($('<table/>', {'class': 'attributes',html: '<tr><td>Include/Exclude</td></tr>' + addableitems.join('') + unaddableitems.join('')}));
 }
 
 
@@ -154,7 +192,7 @@ function showattributes(name ) {
 $(document).ready(function(){
 	if(localStorage.getItem("tei%*$&#Default") === null){
 		$.ajax({
-		url: 'http://users.ox.ac.uk/~rahtz/test.js',
+		url: 'http://users.ox.ac.uk/~rahtz/new.js',
 		dataType: 'jsonp',
 		jsonpCallback: 'teijs',
 		success: function(data) {
@@ -402,7 +440,7 @@ function setXML(){
  function loadDefaultTEI(){
  	if(localStorage.getItem("tei%*$&#Default") === null){
 		$.ajax({
-		url: 'http://users.ox.ac.uk/~rahtz/test.js',
+		url: 'http://users.ox.ac.uk/~rahtz/new.js',
 		dataType: 'jsonp',
 		jsonpCallback: 'teijs',
 		success: function(data) {
@@ -549,7 +587,7 @@ $(document).on("click","button.SubmitTEI", function(){
 
 $(document).on("click","button.loadProject", function(){
 	$('#projectSelection').hide();
-	url = 'http://users.ox.ac.uk/~rahtz/test.js';
+	url = 'http://users.ox.ac.uk/~rahtz/new.js';
 	loadTEI();
 	$('#modules').hide();
 	$('#loadProjectTools').show();
