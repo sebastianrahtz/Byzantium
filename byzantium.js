@@ -23,7 +23,6 @@ var teiName = ""
 //SETS JSON OBJECT
 function teijs(data) {
     TEI=data;
-    //showmodules();
 }
 
 //DISPLAYS INITIAL MODULES
@@ -87,17 +86,18 @@ function loadFile(xml){
 	//alert( xml);
 	xmlDoc = $.parseXML(xml);
 	$xml = $(xmlDoc);
+	title = $xml.find("title").text();
+	filename = $xml.find("schemaSpec").attr("ident");
+	author = $xml.find("author").text();
+	description = "Sorry, but descriptions do not currently work for loaded files";
 	teiName = $xml.find("schemaSpec").attr("teiName");
 	if(teiName == "undefined" || teiName == null){
 		teiName = "";
 	}
 	$xml.find("moduleRef").each(function(i, item) {
-		//alert(item.getAttribute('except'));
-		//alert(item.getAttribute('key'));
 		key = item.getAttribute('key');
 		excepts = item.getAttribute('except');
 		AddedModules.push(key);
-		//ExcludedElements.push(key+":"+e);
 		var individualExcepts = excepts.split(" ");
 		$.each(individualExcepts, function(i, except){
 			if(except != ""){
@@ -113,10 +113,6 @@ function loadFile(xml){
 			ExcludedAttributes.push(module + ";" + element + ";" + attribute);
 		})
 	})
-	//alert(xml);
-	//alert("Got here");
-	//alert($xml.find("moduleRef").except());
-	//$title = $xml.find("title");
 	
 }
 
@@ -137,16 +133,12 @@ function showattributes(name ) {
 				$.each(element.classattributes, function(i, classattribute){
 					var classAttributeModule = classattribute.module;
 					var classAttributeClass  = classattribute.class;
-
-					//alert("THIS MODULE: " + classAttributeModule);
-					//alert("THIS CLASS: " + classAttributeClass);
 					$.each(TEI.attclasses, function(i, attclass){
-						//alert(attclass.ident);
 						if(attclass.ident == classAttributeClass){
 							$.each(attclass.attributes, function(i, attribute){
 								if($.inArray(classAttributeModule, AddedModules) != -1){
-									addableitems.push('<tr><td><button class="addRemoveAttribute" id="' + classAttributeModule + ";" + name + ";" + attribute.ident + '">');
-									if($.inArray((classAttributeModule + ";" + name + ";" + attribute.ident), ExcludedAttributes) == -1){
+									addableitems.push('<tr><td><button class="addRemoveAttribute" id="' + currentModule + ";" + name + ";" + attribute.ident + '">');
+									if($.inArray((currentModule + ";" + name + ";" + attribute.ident), ExcludedAttributes) == -1){
 										addableitems.push("Exclude");
 									}
 									else{
@@ -157,7 +149,6 @@ function showattributes(name ) {
 								else{
 									unaddableitems.push('<tr><td><button disabled="disabled">Requires Module: ' + classAttributeModule + "</button>"+ attribute.ident + '        ' + attribute.desc + '</td></tr>');
 								}
-								//alert(attribute.ident);
 								
 							})
 						}
@@ -165,22 +156,6 @@ function showattributes(name ) {
 					
 				});
 				
-				/*$.each(TEI.attclasses, function(i, attclass){
-					alert(attclass.ident);
-					$.each(attclass.attributes, function(i, attribute){
-						alert(attribute.ident);
-					})
-				})*/
-				/*$.each(element.attributes, function(i, attribute){
-					items.push('<td><button class="addRemoveAttribute" id="' + currentModule + ";" + name + ";" + attribute.ident + '">');
-					if($.inArray((currentModule + ";" + name + ";" + attribute.ident), ExcludedAttributes) == -1){
-						items.push("Exclude");
-					}
-					else{
-						items.push("Include");
-					}
-					items.push('</button>' + "  " + attribute.ident + "    "  + attribute.desc + '</td></tr>');
-				});*/
 			}
 		}
 	});
@@ -210,6 +185,7 @@ $(document).ready(function(){
 	$('#UploadCustom').hide();
 	$('#OnlineSelector').hide();
 	$('#ExistingSelector').hide();
+	$('#reportPage').hide();
 })
 
 
@@ -284,7 +260,6 @@ function setXML(){
 		$.each(ExcludedAttributes, function(k, attribute){
 			if(attribute.split(';')[0] == name){
 				if($.inArray((attribute.split(';')[0] + ":" + attribute.split(';')[1]), ExcludedElements) == -1){
-					//currentElements = attribute.split(';')[0] + ';' + attribute.split(';')[1] + ';' + attribute.split(';')[2];
 					attributesOutput.push(attribute);
 				}
 			}
@@ -352,17 +327,15 @@ function setXML(){
 	
 	
 	if(givenXML != ""){
-		//alert("TOTALLY GOT HERE GUYS!");
 		xmlDoc = $.parseXML(givenXML);
 		$xml = $(xmlDoc);
-		//$xml.find("moduleRef")
 		$xml.find("moduleRef").remove();
 		$xml.find("elementSpec").remove();
 		if(teiName != ""){
 			$xml.find("schemaSpec").attr({teiName: teiName});
 		}
 		$.each(AddedModules, function(i, item){
-			var mr = $.parseXML("<moduleRef/>").documentElement
+			var mr = $.parseXML("<moduleRef/>").documentElement;
 			var currentModule = item;
 			var exceptions = "";
 			$.each(ExcludedElements, function(j, element){
@@ -371,15 +344,20 @@ function setXML(){
 				}
 			})
 			$xml.find("schemaSpec").append($(mr).attr({key: currentModule, except: exceptions}));
-			//$xml.find("schemaSpec").append($(mr).attr({key: currentModule, except: exceptions}).append($(lvl)));
 		})
-		var es = $.parseXML("<elementSpec/>").documentElement;
-		var al = $.parseXML("<attList/>").documentElement;
+		//alert(usedElements);
 		$.each(usedElements, function(i, item){
+			var es = $.parseXML("<elementSpec/>").documentElement;
+			var al = $.parseXML("<attList/>").documentElement;
+			var change = "change";
 			currentModule = item.split(";")[0];
 			currentElement = item.split(";")[1];
 			attributeArray = item.split(";");
-			$xml.find("schemaSpec").append($(es).attr({ident: currentElement, module: currentModule, mode: "change"}).append($(al)));
+			//alert(currentModule);
+			//alert(currentElement);
+			$xml.find("schemaSpec").append($(es).attr({ident: currentElement, module: currentModule, mode: change}));
+			$xml.find("elementSpec[ident=" + currentElement + "][module=" + currentModule + "]").append($(al));
+			//alert("XML:               " + new XMLSerializer().serializeToString(xmlDoc));
 			$.each(attributeArray, function(j, item2){
 				if(j < 2){
 				}
@@ -387,16 +365,14 @@ function setXML(){
 					currentAttribute = item2;
 					var ad = $.parseXML("<attDef/>").documentElement;
 					$xml.find("elementSpec[ident=" + currentElement + "][module=" + currentModule + "]").children().append($(ad).attr({ident: currentAttribute, mode: "delete"}));
-				
+					//alert("XML:               " + new XMLSerializer().serializeToString(xmlDoc));
 				}
 			})
 			
 		})
-		//alert(usedElements);
 		out = new XMLSerializer().serializeToString(xmlDoc);
 		xml = out;
 	}
-	//alert(xml);
 
 }
 
@@ -619,29 +595,22 @@ $(document).on("click","button.load", function(){
 		loadFile(data);
 	}
 	if(teiName != "undefined" && teiName != null){
-		//alert(localStorage.getItem("tei%*$&#" + teiName));
 		var L = localStorage.getItem("tei%*$&#" + teiName);
-		//alert(L);
 		if (L != null) {
-			//alert("GOT HERE");
 			TEI = JSON.parse(L);
-		
 		}
 		else{
 			loadDefaultTEI();
-			//loadDefaultTEI();
 		}
 	}
 	else{
 		loadDefaultTEI();
 	}
-	//alert(TEI)
 	showNewModules();
 	showmodules();
 	$('#modules').show();
 	$('#actions').show();
 	$('#loadProjectTools').hide();
-	//doShowAll();
 })
 
 $(document).on("click","button.delete", function(){
@@ -713,6 +682,7 @@ $(document).on("click","button.addRemove", function(){
 //CLICK BUTTON EVENT FOR ADDING/REMOVING ATTRIBUTE
 $(document).on("click","button.addRemoveAttribute", function(){
 	name = $(this).attr('id');
+	//alert(name);
 	action = $(this).html();
 	if(action == "Exclude"){
 		ExcludedAttributes.push(name);
@@ -794,17 +764,19 @@ $(document).on("click","button.continueToLoad", function(){
 	var xmldata = $("#inputarea").val();
 	xml = xmldata
 	givenXML = xmldata
-	//alert(givenXML);
 	loadFile(xmldata);
-	//alert(teiName);
 	if(teiName != "undefined" && teiName != null){
-		//alert(localStorage.getItem("tei%*$&#" + teiName));
-		TEI = JSON.parse(localStorage.getItem("tei%*$&#" + teiName));
+		var L = localStorage.getItem("tei%*$&#" + teiName);
+		if (L != null) {
+			TEI = JSON.parse(L);
+		}
+		else{
+			loadDefaultTEI();
+		}
 	}
 	else{
 		loadDefaultTEI();
 	}
-	//loadDefaultTEI();
 	$('#upload').hide();
 	$('#actions').show();
 	showmodules();
@@ -821,11 +793,115 @@ $(document).on("click","button.loadCustomJSON", function(){
 	$('#actions').show();
 	$('#message').html('<p>' + teiName + ' database loaded</p>')
 	$("#message").delay(1000).fadeOut();
-	//$('#projectSelection').show();
 })
 
 $(document).on("click","button.outputXML", function(){
 
+})
+
+$(document).on("click","button.returnToModules", function(){
+	$('#reportPage').hide();
+	$("#modules").show();
+	$("#elements").show();
+	$("#attributes").show();
+	$("#actions").show();
+	$("#selected").show();
+	showmodules();
+})
+
+$(document).on("click","button.report", function(){
+	$("#modules").hide();
+	$("#elements").hide();
+	$("#attributes").hide();
+	$("#actions").hide();
+	$("#selected").hide();
+	$("#reportPage").show();
+	if(filename != ""){
+		$("#repFilename").text("Filename: " + filename);
+	}
+	if(title != ""){
+		$("#repTitle").text("Title: " + title);
+	}
+	if(author != ""){
+		$("#repAuthor").text("Author: " + author);
+	}
+	if(description != ""){
+		$("#repDescription").text("Description: " + description);
+	}
+	if(AddedModules.length > 0){
+		$("#repModulesTag").text("Modules Added:");
+		
+		var items = [];
+		setXML();
+		xmlDoc = $.parseXML(xml);
+		$xml = $(xmlDoc);
+		
+		$xml.find("moduleRef").each(function(i, element) {
+			module = element.getAttribute('key');
+			items.push('<li>' + module + '</li>');
+		});
+		
+		$('#repModules').append($('<ul/>', {
+			'class': 'repModules',
+			html: items.join('')
+		}));
+		
+
+	}
+	if(ExcludedElements.length > 0){
+		$("#repElementsTag").text("Elements Excluded:");
+		
+		var items = [];
+		setXML();
+		xmlDoc = $.parseXML(xml);
+		$xml = $(xmlDoc);
+		
+		$xml.find("moduleRef").each(function(i, element){
+			var module = element.getAttribute('key');
+			var elementList = element.getAttribute("except");
+			var elementArray = elementList.split(" ");
+			if(elementArray.length > 1){
+				items.push('<dl><dt>Elements excluded in ' + module + ":</dt>");
+				$.each(elementArray, function(i, singleElement) {
+					if(singleElement != ""){
+						items.push('<dd>- ' + singleElement + '</dd>');
+					}
+				})
+				items.push('</dl>');
+			}
+		
+		})
+		$('#repElements').append($('<ul/>', {
+			'class': 'repElements',
+			html: items.join('')
+		}));
+		
+	}
+	if (ExcludedAttributes.length > 0){
+		$("#repAttributesTag").text("Attributes Excluded:");
+		var items = [];
+		setXML();
+		xmlDoc = $.parseXML(xml);
+		$xml = $(xmlDoc);
+		//alert(xml);
+		$xml.find("elementSpec").each(function(i, layer){
+			//alert("Got here");
+			var module = layer.getAttribute('module');
+			var element = layer.getAttribute('ident');
+			items.push('<dl><dt>Attributes excluded in element: ' + element + ' in module: ' + module + '</dt>');
+			$(this).find("attDef").each(function(i, attributeLayer){
+				var attribute = attributeLayer.getAttribute("ident");
+				items.push('<dd>- ' + attribute + '</dd>');
+			})
+			items.push('</dl>');
+		})
+		$('#repAttributes').append($('<ul/>', {
+			'class': 'repAttributes',
+			html: items.join('')
+		}));
+	}
+	
+	
 })
 
 $(document).on("click","button.removeJSON", function(){
@@ -842,7 +918,6 @@ $(document).on("click", "button.restart", function(){
 	$('#actions').hide();
 	$('#loadProjectTools').hide();
 	$('#startInfo').hide();
-	//$('#projectSelection').hide();
 	$('#teiSelection').hide();
 	$('#upload').hide();
 	$('#UploadCustom').hide();
@@ -855,6 +930,7 @@ $(document).on("click", "button.restart", function(){
 	$('#attributes').hide();
 	$('#selected').empty();
 	$('#selected').show();
+	$("#reportPage").hide();
 	url='';
 	TEI=[];
 	AddedModules=[];
