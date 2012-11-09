@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<meta charset="UTF-8"/>
 <html>
+<meta charset="UTF-8"/>
 <head>
 <script src="jquery.js"></script>
 <script src="byzantium.js"></script>
@@ -175,12 +175,13 @@ float:right;
 Save Project:<input type="text" id='saveAs'/><br/>
 </form>
 <select id='outputSelection'>
-  <option>XML</option>
+  <option>TEI ODD</option>
   <option>RELAX NG Schema</option>
   <option>ISO Schematron</option>
   <option>Schematron</option>
   <option>DTD</option>
   <option>JSON</option>
+  <option>HTML documentation</option>
 </select>
 <button class="output">Export</button>
 <button class="report">Report</button>
@@ -215,5 +216,8 @@ Save Project:<input type="text" id='saveAs'/><br/>
 	<button class="delete">Delete</button>
 </div>
 <button class="restart">Restart</button>
+<div class="trailer">
+  <p id="colophon"/>
+</div>
 </body>
 </html>
