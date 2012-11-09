@@ -32,16 +32,27 @@ function showmodules() {
 	}
     var items = [];
 	var moduleCounter = 0;
+	$.each(TEI.modules, function(i, module){
+		moduleCounter += 1;
+	});
+	items.push('<div align="right" border="1"><span class="moduleSparkline"></span><ul><li>Red: Added Modules</li><li>Blue: Unadded Modules</li></div>');
     $.each(TEI.modules, function(i, module) {
-            items.push('<li><button class="addModule" id="' + module.ident + 'A">Add</button><button class="removeModule" id="'+module.ident+'R">Remove<button class="modulelink" style="border:none; color:blue; cursor: pointer;">' + module.ident + '</button>' + module.desc + '</li>');
-			moduleCounter += 1;
-        });
+            items.push('<div id="div' + module.ident + '"><button class="addModule" id="' + module.ident + 'A">Add</button><button class="removeModule" id="'+module.ident+'R">Remove<button class="modulelink" style="border:none; color:blue; cursor: pointer;">' + module.ident + '</button>' + module.desc + '</div>');
+     });
     $('#modules').html($('<p/>', { html: "Found " + TEI.modules.length + " modules"}));
 
     $('#modules').append($('<ul/>', {
         'class': 'modules',
         html: items.join('')
     }));
+
+	
+	$(".moduleSparkline").sparkline([(moduleCounter-AddedModules.length),AddedModules.length], {
+    type: 'pie',
+    width: '100',
+    height: '100',
+    sliceColors: ['#3366cc','#dc3912','#7f7f7f','#109618','#66aa00','#dd4477','#0099c6','#990099 '],
+    borderColor: '#7f7f7f'});
 }
 
 //SHOWS ADDED OR SUBTRACTED MODULES
@@ -175,6 +186,8 @@ $(document).ready(function(){
 		}
 		});
 	}
+	
+	
 	$('#actions').hide();
 	$('#loadProjectTools').hide();
 	$('#startInfo').hide();
@@ -722,6 +735,7 @@ $(document).on("click","button.addModule",function() {
 		AddedModules.push(name.substring(0, name.length - 1));
 	}
 	showNewModules();
+	showmodules();
 })
 
 //CLICK BUTTON EVENT FOR REMOVING MODULE
@@ -732,6 +746,7 @@ $(document).on("click","button.removeModule",function(){
 		AddedModules.splice($.inArray(name.substring(0, name.length - 1), AddedModules),1);
 	}
 	showNewModules();
+	showmodules();
 })
 
 
@@ -802,8 +817,8 @@ $(document).on("click","button.outputXML", function(){
 $(document).on("click","button.returnToModules", function(){
 	$('#reportPage').hide();
 	$("#modules").show();
-	$("#elements").show();
-	$("#attributes").show();
+	$("#elements").hide();
+	$("#attributes").hide();
 	$("#actions").show();
 	$("#selected").show();
 	showmodules();
