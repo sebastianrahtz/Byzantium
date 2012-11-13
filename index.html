@@ -1,7 +1,8 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <meta charset="UTF-8">
 <html>
 <head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <script src="jquery.js"></script>
 <script src="byzantium.js"></script>
 <script src="sparkline.js"></script>
@@ -13,6 +14,15 @@ float:right;
 </style>
 </head>
 <body>
+<div id='banner'>
+<table>
+<td>
+<img src="http://www.tei-c.org/Roma/TEI-glow.png"/>
+</td>
+<td>
+<h1>Roma: generating customizations for the TEI</h1><br clear="all"/>
+</td>
+</table>
 <div id='projectSelection'>
 <h1>Welcome to Roma!</h1>
 <h2>Select a project:</h2><br/>
@@ -68,6 +78,23 @@ float:right;
 
 <div id='message'></div>
 
+<div id='actions'>
+Save Project:<input type="text" id='saveAs'/>
+<button class="save">Save</button>
+<select id='outputSelection'>
+  <option>TEI ODD</option>
+  <option>RELAX NG Schema</option>
+  <option>ISO Schematron</option>
+  <option>Schematron</option>
+  <option>DTD</option>
+  <option>JSON</option>
+  <option>HTML documentation</option>
+</select>
+<button class="output">Export</button>
+<button class="report">Report</button>
+<button class="back">Back</button>
+</div>
+
 <div id='selected'></div>
 
 <div id='startInfo'>
@@ -83,6 +110,18 @@ float:right;
 	<form>
 	Description:<textarea rows="4" cols="40" id='description'></textarea><br/>
 	</form>
+	Language:<select id='languageSelect'>
+		<option>English</option>
+		<option>Deutsch</option>
+		<option>Italiano</option>
+		<option>Español</option>
+		<option>Français</option>
+		<option>Portugues</option>
+		<option>Russian</option>
+		<option>Svenska</option>
+		<option>日本語</option>
+		<option>中文</option>
+	</select><br/>
 	<button class="saveStartInfo">Next</button>
 
 </div>
@@ -166,31 +205,25 @@ float:right;
 
 <div id='attributes'></div>
 
-<div id='output'></div>
+<div id='alterAttributes'>
 
-<div id='actions'>
-<button class="back">Back</button> 
-<button class="save">Save</button>
-<form>
-Save Project:<input type="text" id='saveAs'/><br/>
-</form>
-<select id='outputSelection'>
-  <option>XML</option>
-  <option>RELAX NG Schema</option>
-  <option>ISO Schematron</option>
-  <option>Schematron</option>
-  <option>DTD</option>
-  <option>JSON</option>
-</select>
-<button class="output">Export</button>
-<button class="report">Report</button>
+	<p id="attAlterName"/>
+
+	<p id='attributeIdent' style="display:none"/>
+	<form>
+		List of Values:<input type="text" id='listOfValues'/><br/>
+	</form>
+	<button class="saveAttributeInfo">Save</button>
 </div>
+
+<div id='output'></div>
 
 <div id='reportPage'>
 	<p id="repTitle"></p>
 	<p id="repFilename"></p>
 	<p id="repAuthor"></p>
 	<p id="repDescription"></p>
+	<p id="repLanguage"></p>
 	<p id="repModulesTag"></p>
 	<div id="repModules"></div>
 	<p id="repElementsTag"></p>
@@ -215,5 +248,8 @@ Save Project:<input type="text" id='saveAs'/><br/>
 	<button class="delete">Delete</button>
 </div>
 <button class="restart">Restart</button>
+<div class="trailer">	
+	<p id="colophon"/>
+</div>
 </body>
 </html>
