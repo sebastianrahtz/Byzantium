@@ -106,6 +106,7 @@ function loadFile(xml){
 	author = $xml.find("author").text();
 	description = "Sorry, but descriptions do not currently work for loaded files";
 	teiName = $xml.find("schemaSpec").attr("teiName");
+	language = $xml.find("schemaSpec").attr("docLang");
 	if(teiName == "undefined" || teiName == null){
 		teiName = "";
 	}
@@ -239,15 +240,15 @@ function loadTEI(){
 function setXML(){
 	if(givenXML == ""){
 		xml = '<?xml version="1.0"?><TEI xml:lang="en" xmlns="http://www.tei-c.org/ns/1.0"><teiHeader><fileDesc><titleStmt><title/><author/></titleStmt>'
-			+ '<publicationStmt><p>for use by whoever wants it</p></publicationStmt><notesStmt><note type="ns">http://www.example.org/ns/nonTEI</note></notesStmt><sourceDesc><p>created on Sunday 30th September 2012 12:40:50 PM</p></sourceDesc>'
-			+ '</fileDesc></teiHeader><text><front><divGen type="toc"/></front><body><p>';
+		+ '<publicationStmt><p>for use by whoever wants it</p></publicationStmt><sourceDesc><p>created on ' + today + '</p></sourceDesc>'
+		+ '</fileDesc></teiHeader><text><front><divGen type="toc"/></front><body><p>';
 		if (description != ""){
 			xml = xml + description;
 		}
 		else{
 			xml = xml + "My TEI Customization starts with modules tei, core, textstructure and header";
 		}
-		xml = xml + '</p><schemaSpec xml:lang="en" prefix="tei_" docLang="en" ident="" source=""></schemaSpec></body></text></TEI>';
+		xml = xml + '</p><schemaSpec xml:lang="en" prefix="tei_" docLang="en" ident=""></schemaSpec></body></text></TEI>';
 	}
 	else{
 		xml = givenXML;
@@ -269,9 +270,12 @@ function setXML(){
 	if(teiName!=""){
 		$xml.find("schemaSpec").attr({source: teiName});
 	}
+	if(language!=""){
+		$xml.find("schemaSpec").attr({docLang: language});
+	}
 	
 	$.each(AddedModules, function(i, name) {
-		var mr = $.parseXML("<moduleRef/>").documentElement;
+	    var mr = document.createElementNS("http://www.tei-c.org/ns/1.0", 'moduleRef');
 		var excludeString = "";
 		var currentModule = name;
 		$.each(ExcludedElements, function(j, element){
@@ -347,7 +351,6 @@ function setXML(){
 			}
 		}
 	})
-	alert(excludes);
 	
 	$.each(ListofValues, function(i, value){
 		var es = $.parseXML("<elementSpec/>").documentElement;

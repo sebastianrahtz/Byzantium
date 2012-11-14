@@ -20,11 +20,11 @@ float:right;
 <img src="http://www.tei-c.org/Roma/TEI-glow.png"/>
 </td>
 <td>
-<h1>Roma: generating customizations for the TEI</h1><br clear="all"/>
+<h1>Byzantium: generating customizations for the TEI</h1><br clear="all"/>
 </td>
 </table>
 <div id='projectSelection'>
-<h1>Welcome to Roma!</h1>
+<h1>Welcome to Byzantium!</h1>
 <h2>Select a project:</h2><br/>
 <button class="newProject">New Project</button>
 <button class="loadProject">Load Project</button>
@@ -79,7 +79,7 @@ float:right;
 <div id='message'></div>
 
 <div id='actions'>
-Save Project:<input type="text" id='saveAs'/>
+Project name:<input type="text" id='saveAs'/>
 <button class="save">Save</button>
 <select id='outputSelection'>
   <option>TEI ODD</option>
@@ -90,7 +90,7 @@ Save Project:<input type="text" id='saveAs'/>
   <option>JSON</option>
   <option>HTML documentation</option>
 </select>
-<button class="output">Export</button>
+<button class="output">Generate</button>
 <button class="report">Report</button>
 <button class="back">Back</button>
 </div>
@@ -111,16 +111,14 @@ Save Project:<input type="text" id='saveAs'/>
 	Description:<textarea rows="4" cols="40" id='description'></textarea><br/>
 	</form>
 	Language:<select id='languageSelect'>
-		<option>English</option>
-		<option>Deutsch</option>
-		<option>Italiano</option>
-		<option>Español</option>
-		<option>Français</option>
-		<option>Portugues</option>
-		<option>Russian</option>
-		<option>Svenska</option>
-		<option>日本語</option>
-		<option>中文</option>
+		<option value="en">English</option>
+		<option value="de">Deutsch</option>
+		<option value="it">Italiano</option>
+		<option value="es">Español</option>
+		<option value="fr">Français</option>
+		<option value="pt">Portugues</option>
+		<option value="ja">日本語</option>
+		<option value="zh">中文</option>
 	</select><br/>
 	<button class="saveStartInfo">Next</button>
 
