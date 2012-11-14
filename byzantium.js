@@ -10,6 +10,7 @@ var TEI=[];
 var AddedModules=[];
 var ExcludedElements=[];
 var ExcludedAttributes=[];
+var ListofValues=[];
 var Back = ""
 var Current = ""
 var currentModule = ""
@@ -18,6 +19,7 @@ var title = ""
 var filename = ""
 var author = ""
 var description = ""
+var language = ""
 var givenXML = ""
 var teiName = ""
 var VERSION = "0.1"
@@ -80,8 +82,8 @@ function showelements(name  )
     $.each(TEI.elements, function(i, element) {
         if (element.module == name) {
 			currentModule = name;
-            items.push('<td><button class="addRemove" id="' + name + ":" + element.ident + '">');
-			if($.inArray((name + ":" + element.ident), ExcludedElements) == -1){
+            items.push('<td><button class="addRemove" id="' + name + "," + element.ident + '">');
+			if($.inArray((name + "," + element.ident), ExcludedElements) == -1){
 				items.push("Exclude");
 			}
 			else{
@@ -114,7 +116,7 @@ function loadFile(xml){
 		var individualExcepts = excepts.split(" ");
 		$.each(individualExcepts, function(i, except){
 			if(except != ""){
-				ExcludedElements.push(key+":"+except);
+				ExcludedElements.push(key+","+except);
 			}
 		})
 	})
@@ -123,7 +125,7 @@ function loadFile(xml){
 		var element = item.getAttribute('ident');
 		$(this).find("attDef").each(function(i, test){
 			var attribute = test.getAttribute('ident');
-			ExcludedAttributes.push(module + ";" + element + ";" + attribute);
+			ExcludedAttributes.push(module + "," + element + "," + attribute);
 		})
 	})
 	
@@ -144,20 +146,20 @@ function showattributes(name ) {
 		if(element.module == currentModule){
 			if(element.ident == name){
 				$.each(element.classattributes, function(i, classattribute){
-				var classAttributeModule = classattribute.module;
+					var classAttributeModule = classattribute.module;
 					var classAttributeClass  = classattribute.class;
 					$.each(TEI.attclasses, function(i, attclass){
 						if(attclass.ident == classAttributeClass){
 							$.each(attclass.attributes, function(i, attribute){
 								if($.inArray(classAttributeModule, AddedModules) != -1){
-									addableitems.push('<tr><td><button class="addRemoveAttribute" id="' + currentModule + ";" + name + ";" + attribute.ident + '">');
-									if($.inArray((currentModule + ";" + name + ";" + attribute.ident), ExcludedAttributes) == -1){
+									addableitems.push('<tr><td><button class="addRemoveAttribute" id="' + currentModule + "," + name + "," + attribute.ident + '">');
+									if($.inArray((currentModule + "," + name + "," + attribute.ident), ExcludedAttributes) == -1){
 										addableitems.push("Exclude");
 									}
 									else{
 										addableitems.push("Include");
 									}
-									addableitems.push('</button>' + "  " + attribute.ident + "    "  + attribute.desc + '</td></tr>');
+									addableitems.push('</button>' + '<button class="attributelink" id="att,' + currentModule + "," + name + "," + attribute.ident + '" style="border:none; color:blue; cursor: pointer;">'+ attribute.ident + "</button>"  + attribute.desc + '</td></tr>');
 								}
 								else{
 									unaddableitems.push('<tr><td><button disabled="disabled">Requires Module: ' + classAttributeModule + "</button>"+ attribute.ident + '        ' + attribute.desc + '</td></tr>');
@@ -174,7 +176,13 @@ function showattributes(name ) {
 	});
 	$('#attributes').append($('<table/>', {'class': 'attributes',html: '<tr><td>Include/Exclude</td></tr>' + addableitems.join('') + unaddableitems.join('')}));
 }
-
+function alterattributes(id){
+	$("#attributes").hide();
+	$("#actions").hide();
+	$("#alterAttributes").show();
+	$("#attributeIdent").text(id);
+	$("#attAlterName").text("Attribute Name: " + id.split(',')[3]);
+}
 
 //READY FUNCTION. DISPLAYS MODULES
 $(document).ready(function(){
@@ -201,8 +209,8 @@ $(document).ready(function(){
 	$('#OnlineSelector').hide();
 	$('#ExistingSelector').hide();
 	$('#reportPage').hide();
-    document.getElementById('colophon').innerHTML = "Byzantium " + VERSION + " at " + today;
-
+	$('#alterAttributes').hide();
+	document.getElementById('colophon').innerHTML = "Byzantium " + VERSION + " at " + today;
 })
 
 
@@ -229,167 +237,132 @@ function loadTEI(){
 
 //Sets the XML to be outputted.
 function setXML(){
-	var output = [];
-	var attributesOutput = [];
-	var items = [];
-	xml = '<?xml version="1.0"?>' +
-		'<TEI xml:lang="en" xmlns="http://www.tei-c.org/ns/1.0"><teiHeader><fileDesc><titleStmt><title>';
-	if(title != ""){
-		xml = xml + title;
+	if(givenXML == ""){
+		xml = '<?xml version="1.0"?><TEI xml:lang="en" xmlns="http://www.tei-c.org/ns/1.0"><teiHeader><fileDesc><titleStmt><title/><author/></titleStmt>'
+			+ '<publicationStmt><p>for use by whoever wants it</p></publicationStmt><notesStmt><note type="ns">http://www.example.org/ns/nonTEI</note></notesStmt><sourceDesc><p>created on Sunday 30th September 2012 12:40:50 PM</p></sourceDesc>'
+			+ '</fileDesc></teiHeader><text><front><divGen type="toc"/></front><body><p>';
+		if (description != ""){
+			xml = xml + description;
+		}
+		else{
+			xml = xml + "My TEI Customization starts with modules tei, core, textstructure and header";
+		}
+		xml = xml + '</p><schemaSpec xml:lang="en" prefix="tei_" docLang="en" ident="" source=""></schemaSpec></body></text></TEI>';
 	}
 	else{
-		xml = xml + "My TEI Extension";
+		xml = givenXML;
+		xmlDoc = $.parseXML(xml);
+		$xml = $(xmlDoc);
+		$xml.find("moduleRef").remove();
+		$xml.find("elementSpec").remove();
+		$xml.find("title").empty();
+		$xml.find("author").empty();
+		out = new XMLSerializer().serializeToString(xmlDoc);
+		xml = out;
 	}
-	xml = xml + '</title><author>';
-	if(author != ""){
-		xml = xml + author;
+	
+	xmlDoc = $.parseXML(xml);
+	$xml = $(xmlDoc);
+	$xml.find("title").append(title);
+	$xml.find("author").append(author);
+	$xml.find("schemaSpec").attr({ident: filename})
+	if(teiName!=""){
+		$xml.find("schemaSpec").attr({source: teiName});
 	}
-	else{
-		xml = xml + 'generated by Byzantium ' + VERSION;
-	}
-	xml = xml + '</author></titleStmt><publicationStmt><p>for use by whoever wants it</p></publicationStmt><notesStmt><note type="ns">http://www.example.org/ns/nonTEI</note></notesStmt><sourceDesc><p>created on Sunday 30th September 2012 12:40:50 PM</p></sourceDesc></fileDesc></teiHeader><text><front><divGen type="toc"/></front><body><p>';
-	if(description != ""){
-		xml = xml + description;
-	}
-	else{
-		xml = xml + "My TEI Customization starts with modules tei, core, textstructure and header";
-	}
-	xml = xml + '</p><schemaSpec xml:lang="en" prefix="tei_" docLang="en" ident="';
-	if (filename != ""){
-		xml = xml + filename;
-	}
-	else{
-		xml = xml + 'myTEI';
-	}
-	xml = xml + '" ';
-	if(teiName != ""){
-		xml = xml + 'teiName="' + teiName + '"';
-	}
-	xml = xml + '>';
+	
 	$.each(AddedModules, function(i, name) {
+		var mr = $.parseXML("<moduleRef/>").documentElement;
+		var excludeString = "";
 		var currentModule = name;
-		var currentElements = "";
 		$.each(ExcludedElements, function(j, element){
-			if(element.split(':')[0] == name){
-				currentModule = currentModule + ':' + element.split(':')[1];
+			if(element.split(',')[0] == currentModule){
+				excludeString = excludeString + " " + element.split(',')[1];
 			}
 		})
-		$.each(ExcludedAttributes, function(k, attribute){
-			if(attribute.split(';')[0] == name){
-				if($.inArray((attribute.split(';')[0] + ":" + attribute.split(';')[1]), ExcludedElements) == -1){
-					attributesOutput.push(attribute);
-				}
-			}
-		})
-		output.push(currentModule);
+		$xml.find("schemaSpec").append($(mr).attr({key: currentModule, except: excludeString}));
 	})
-	$.each(output, function(i, module){
-		var splitOutput = module.split(":");
-		key = "";
-		excludes = "";
-		$.each(splitOutput, function(j, elements){
-			if(j == 0){
-				key = elements;
+	
+	var excludes = [];
+	$.each(ExcludedAttributes, function(i, attribute){
+		if($.inArray(attribute.split(',')[0], AddedModules) != -1){
+			if($.inArray((attribute.split(',')[0] + "," + attribute.split(',')[1]), ExcludedElements) == -1){
+				excludes.push(attribute);
 			}
-			else{
-				excludes = excludes + " "  + elements;
-			}
-		})
-		xml = xml + '<moduleRef except="' + excludes + '" key="' + key + '"/>';
-		items.push('<p>key="' + key + '" excludes="' + excludes + '"</p>');
+		}
 	})
 	usedModules = [];
 	usedElements = [];
 	var finalAttributes = [];
 	var attributeString = "";
-	$.each(attributesOutput, function(i, AttribElement){
-		var currentModule = AttribElement.split(";")[0];
-		$.each(attributesOutput, function(j, AttribElement2){
-			var currentElement = AttribElement2.split(';')[1];
-			attributeString = currentModule + ";" + currentElement;
-			$.each(attributesOutput, function(k, AttribElement3){
-				if(currentModule == AttribElement3.split(';')[0]){
-					if(currentElement == AttribElement3.split(';')[1]){
-						attributeString = attributeString + ";" + AttribElement3.split(';')[2];
+	$.each(excludes, function(i, AttribElement){
+		var currentModule = AttribElement.split(",")[0];
+		$.each(excludes, function(j, AttribElement2){
+			var currentElement = AttribElement2.split(',')[1];
+			attributeString = currentModule + "," + currentElement;
+			$.each(excludes, function(k, AttribElement3){
+				if(currentModule == AttribElement3.split(',')[0]){
+					if(currentElement == AttribElement3.split(',')[1]){
+						attributeString = attributeString + "," + AttribElement3.split(',')[2];
 					}
 				}
 			})
 			if($.inArray(attributeString, usedElements) == -1){
-				if(attributeString.split(';').length > 2 ){
+				if(attributeString.split(',').length > 2 ){
 					usedElements.push(attributeString);
 				}
 			}
 			attributeString = "";
 		})
 	})
-	$.each(usedElements, function(i, element){
-		var module = "";
-		var elementSpec = "";
-		var attributeString = "";
-		var currentElement = element.split(';');
-		$.each(currentElement, function(i, element){
-			if(i == 0){
-				module = element;
-			}
-			else if(i == 1){
-				elementSpec = element;
+	//alert(usedElements);
+	
+	$.each(usedElements, function(i, item){
+		var es = $.parseXML("<elementSpec/>").documentElement;
+		var al = $.parseXML("<attList/>").documentElement;
+		var change = "change";
+		currentModule = item.split(",")[0];
+		currentElement = item.split(",")[1];
+		attributeArray = item.split(",");
+		$xml.find("schemaSpec").append($(es).attr({ident: currentElement, module: currentModule, mode: change}));
+		$xml.find("elementSpec[ident=" + currentElement + "][module=" + currentModule + "]").append($(al));
+		$.each(attributeArray, function(j, item2){
+			if(j < 2){
 			}
 			else{
-				attributeString = attributeString + '<attDef ident="' + element + '" mode="delete"/>';
+				currentAttribute = item2;
+				var ad = $.parseXML("<attDef/>").documentElement;
+				$xml.find("elementSpec[ident=" + currentElement + "][module=" + currentModule + "]").children().append($(ad).attr({ident: currentAttribute, mode: "delete"}));
 			}
 		})
-		xml = xml + '<elementSpec ident="' + elementSpec + '" mode="change" module="' + module.split(':')[0] + '"> <attList>' + attributeString + '</attList></elementSpec>'
-	})
-	xml = xml + '</schemaSpec></body></text></TEI>';
-	
-	
-	if(givenXML != ""){
-		xmlDoc = $.parseXML(givenXML);
-		$xml = $(xmlDoc);
-		$xml.find("moduleRef").remove();
-		$xml.find("elementSpec").remove();
-		if(teiName != ""){
-			$xml.find("schemaSpec").attr({teiName: teiName});
-		}
-		$.each(AddedModules, function(i, item){
-			var mr = $.parseXML("<moduleRef/>").documentElement;
-			var currentModule = item;
-			var exceptions = "";
-			$.each(ExcludedElements, function(j, element){
-				if(element.split(":")[0] == item){
-					exceptions = exceptions + " " + element.split(":")[1]
-				}
-			})
-			$xml.find("schemaSpec").append($(mr).attr({key: currentModule, except: exceptions}));
-		})
-		//alert(usedElements);
-		$.each(usedElements, function(i, item){
-			var es = $.parseXML("<elementSpec/>").documentElement;
-			var al = $.parseXML("<attList/>").documentElement;
-			var change = "change";
-			currentModule = item.split(";")[0];
-			currentElement = item.split(";")[1];
-			attributeArray = item.split(";");
-			//alert(currentModule);
-			//alert(currentElement);
-			$xml.find("schemaSpec").append($(es).attr({ident: currentElement, module: currentModule, mode: change}));
-			$xml.find("elementSpec[ident=" + currentElement + "][module=" + currentModule + "]").append($(al));
-			//alert("XML:               " + new XMLSerializer().serializeToString(xmlDoc));
-			$.each(attributeArray, function(j, item2){
-				if(j < 2){
-				}
-				else{
-					currentAttribute = item2;
-					var ad = $.parseXML("<attDef/>").documentElement;
-					$xml.find("elementSpec[ident=" + currentElement + "][module=" + currentModule + "]").children().append($(ad).attr({ident: currentAttribute, mode: "delete"}));
-					//alert("XML:               " + new XMLSerializer().serializeToString(xmlDoc));
-				}
-			})
 			
-		})
-		out = new XMLSerializer().serializeToString(xmlDoc);
-		xml = out;
-	}
+	})	
+	var includedValue = [];
+	
+	$.each(ListofValues, function(i, value){
+		if($.inArray(value.split(',')[1], AddedModules) != -1){
+			if($.inArray((value.split(',')[1] + "," + value.split(',')[2]), ExcludedElements) == -1){
+				if($.inArray((value.split(',')[1] + "," + value.split(',')[2] + ',' + value.split(',')[3]), ExcludedAttributes) == -1){
+					excludes.push(value);
+				}
+			}
+		}
+	})
+	alert(excludes);
+	
+	$.each(ListofValues, function(i, value){
+		var es = $.parseXML("<elementSpec/>").documentElement;
+		var al = $.parseXML("<attList/>").documentElement;
+		var change = "change";
+		var module = value.split(",")[1];
+		var element = value.split(",")[2];
+		alert($xml.find("elementSpec[ident=" + element + "][module=" + module + "]"));
+		var exclusions = $xml.find("elementSpec[ident=" + element + "][module=" + module + "]");
+		//alert(value);
+	})
+	
+	out = new XMLSerializer().serializeToString(xmlDoc);
+	xml = out;
+	//alert(xml);
 
 }
 
@@ -469,10 +442,31 @@ $(document).on("click","button.saveStartInfo", function(){
 	AddedModules.push("tei");
 	AddedModules.push("header");
 	AddedModules.push("textstructure");
-	title = $("#title").val();
-	filename = $("#filename").val();
-	author = $("#author").val();
-	description = $("#description").val();
+	if($("#title").val() != ""){
+		title = $("#title").val();
+	}
+	else{
+		title = "My TEI Extension";
+	}
+	if($("#filename").val() != ""){
+		filename = $("#filename").val();
+	}
+	else{
+		filename = "myTEI"
+	}
+	if($("#author").val() != ""){
+		author = $("#author").val();
+	}
+	else{
+		author = 'generated by Roma 4.9';
+	}
+	if($("#description").val() != ""){
+		description = $("#description").val();
+	}
+	else{
+		description = "My TEI Customization starts with modules tei, core, textstructure and header";
+	}
+	language = $("#languageSelect").val();
 	$('#startInfo').hide();
 	$('#teiSelection').show();
 	$('#OnlineSelector').hide();
@@ -641,26 +635,26 @@ $(document).on("click","button.delete", function(){
 })
 
 $(document).on("click","button.output", function(){
-	var value = $("#outputSelection").val();
-    switch (value)
-    {
-    case "TEI ODD":	
-	target="TEI%3Atext%3Axml/xml%3Aapplication%3Axml"; break;
-    case "RELAX NG Schema":	
-	target = "ODD%3Atext%3Axml/ODDC%3Atext%3Axml/relaxng%3Aapplication%3Axml-relaxng"; break;
-    case "ISO Schematron":	
-	target = "ODD%3Atext%3Axml/ODDC%3Atext%3Axml/isosch%3Atext%3Axml"; break;
-    case "Schematron":	
-	target = "ODD%3Atext%3Axml/ODDC%3Atext%3Axml/sch%3Atext%3Axml"; break;
-    case "DTD":	
-	target = 'ODD%3Atext%3Axml/ODDC%3Atext%3Axml/dtd%3Aapplication%3Axml-dtd'; break;
-    case "HTML documentation":	
-	target = "ODD%3Atext%3Axml/ODDC%3Atext%3Axml/oddhtml%3Aapplication%3Axhtml%2Bxml"; break;
-    case "JSON":	
-	target = "ODD%3Atext%3Axml/ODDC%3Atext%3Axml/oddjson%3Aapplication%3Ajson"; break;
+	var value = $("#outputSelection").val();	
+    switch (value)	
+    {	
+    case "TEI ODD":  	
+  target="TEI%3Atext%3Axml/xml%3Aapplication%3Axml"; break;	
+    case "RELAX NG Schema":  	
+  target = "ODD%3Atext%3Axml/ODDC%3Atext%3Axml/relaxng%3Aapplication%3Axml-relaxng"; break;	
+    case "ISO Schematron":  	
+  target = "ODD%3Atext%3Axml/ODDC%3Atext%3Axml/isosch%3Atext%3Axml"; break;	
+    case "Schematron":  	
+  target = "ODD%3Atext%3Axml/ODDC%3Atext%3Axml/sch%3Atext%3Axml"; break;	
+    case "DTD":  	
+  target = 'ODD%3Atext%3Axml/ODDC%3Atext%3Axml/dtd%3Aapplication%3Axml-dtd'; break;
+    case "HTML documentation":  	
+  target = "ODD%3Atext%3Axml/ODDC%3Atext%3Axml/oddhtml%3Aapplication%3Axhtml%2Bxml"; break;
+    case "JSON":  	
+  target = "ODD%3Atext%3Axml/ODDC%3Atext%3Axml/oddjson%3Aapplication%3Ajson"; break;	
     }
-    setXML();
-    var f = document.createElement('form');
+    setXML();	
+    var f = document.createElement('form');	
     f.id="outputFormMulti";
     f.action = "http://oxgarage.oucs.ox.ac.uk:8080/ege-webservice/Conversions/" + target + "/";
     f.method = "post";
@@ -728,6 +722,10 @@ $(document).on("click","button.elementlink",function(){
 		return false;
 })
 
+$(document).on("click","button.attributelink", function(){
+	alterattributes($(this).attr("id"));
+		return false;
+})
 
 //CLICK BUTTON EVENT FOR ADDING MODULE
 $(document).on("click","button.addModule",function() {
@@ -846,6 +844,9 @@ $(document).on("click","button.report", function(){
 	if(description != ""){
 		$("#repDescription").text("Description: " + description);
 	}
+	if(language != ""){
+		$("#repLanguage").text("Language: " + language);
+	}
 	if(AddedModules.length > 0){
 		$("#repModulesTag").text("Modules Added:");
 		
@@ -922,6 +923,28 @@ $(document).on("click","button.report", function(){
 	
 })
 
+$(document).on("click", "button.saveAttributeInfo", function(){
+	if($("#listOfValues").val() != ""){
+		index = -1;
+		var values = $("#attributeIdent").text().replace(/;/g,",");
+		values = values + "," + $("#listOfValues").val();
+		$.each(ListofValues, function(i, listValue) {
+			if(values.split(',')[1] == listValue.split(',')[1] && values.split(',')[2] == listValue.split(',')[2] && values.split(',')[3] == listValue.split(',')[3]){
+				index = i;
+			}
+		})
+		if(index != -1){
+			ListofValues[index] = values;
+		}
+		else{
+			ListofValues.push(values);
+		}
+	}
+	$("#alterAttributes").hide();
+	$("#attributes").show();
+	$("#actions").show();
+})
+
 $(document).on("click","button.removeJSON", function(){
 	var name = $("#JSONtoremove").val();
 	if(name == ''){
@@ -949,6 +972,7 @@ $(document).on("click", "button.restart", function(){
 	$('#selected').empty();
 	$('#selected').show();
 	$("#reportPage").hide();
+	$("#alterAttributes").hide();
 	url='';
 	TEI=[];
 	AddedModules=[];
