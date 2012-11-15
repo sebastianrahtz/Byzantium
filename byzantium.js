@@ -4,25 +4,29 @@ Created: 11/1/2012
 Programmed By: Sebastian Rahtz and Nicholas Burlingame
 */
 
+var liveElements = 0;
 var url='';
+var defaultDatabase='http://bits.nsms.ox.ac.uk:8080/jenkins/job/TEIP5/lastSuccessfulBuild/artifact/release/xml/tei/odd/p5subset.json';
 var today=new Date();
 var TEI=[];
 var AddedModules=[];
 var ExcludedElements=[];
 var ExcludedAttributes=[];
 var ListofValues=[];
-var Back = ""
-var Current = ""
-var currentModule = ""
-var xml = ""
-var title = ""
-var filename = ""
-var author = ""
-var description = ""
-var language = ""
-var givenXML = ""
-var teiName = ""
-var VERSION = "0.1"
+var Back = "";
+var Current = "";
+var currentModule = "";
+var xml = "";
+var title = "";
+var filename = "";
+var author = "";
+var description = "";
+var language = "";
+var givenXML = "";
+var teiName = "";
+var VERSION = "0.1";
+var moduleCounter = 0;
+var totElements = 0;
 
 //SETS JSON OBJECT
 function teijs(data) {
@@ -34,30 +38,36 @@ function showmodules() {
 	if(teiName != "" && teiName != "undefined"){
 		localStorage.setItem(("tei%*$&#" + teiName), JSON.stringify(TEI, null, 2));
 	}
-    var items = [];
-	var moduleCounter = 0;
-	$.each(TEI.modules, function(i, module){
-		moduleCounter += 1;
+    moduleCounter=TEI.modules.length;
+    totElements = TEI.elements.length;
+    $.each(AddedModules, function(i, module){
+	$.each(TEI.elements, function(i, element){
+	    if (element.module == module) { liveElements +=1; }
 	});
-	items.push('<div align="right" border="1"><span class="moduleSparkline"></span><ul><li>Red: Added Modules</li><li>Blue: Unadded Modules</li></div>');
+    });
+    var items = [];
+    items.push('<div style="float:right" border="1"><span class="moduleSparkline"></span><ul><li>Red: Used elements</li><li>Blue: Unused elements</li></div>');
     $.each(TEI.modules, function(i, module) {
             items.push('<div id="div' + module.ident + '"><button class="addModule" id="' + module.ident + 'A">Add</button><button class="removeModule" id="'+module.ident+'R">Remove<button class="modulelink" style="border:none; color:blue; cursor: pointer;">' + module.ident + '</button>' + module.desc + '</div>');
      });
-    $('#modules').html($('<p/>', { html: "Found " + TEI.modules.length + " modules"}));
 
     $('#modules').append($('<ul/>', {
         'class': 'modules',
         html: items.join('')
     }));
-
-	
-	$(".moduleSparkline").sparkline([(moduleCounter-AddedModules.length),AddedModules.length], {
-    type: 'pie',
-    width: '100',
-    height: '100',
-    sliceColors: ['#3366cc','#dc3912','#7f7f7f','#109618','#66aa00','#dd4477','#0099c6','#990099 '],
-    borderColor: '#7f7f7f'});
+    $('#modules').append($('<p/>', { html: TEI.modules.length + " modules available, of which " + AddedModules.length + " are in use, containing " + liveElements + " elements, of which " +  ExcludedElements.length + " are excluded"}));
+    showPie();
 }
+
+function showPie () {
+    $(".moduleSparkline").sparkline([(totElements-liveElements),(liveElements-ExcludedElements.length),ExcludedElements.length], {
+	type: 'pie',
+	width: '200',
+	height: '200',
+	sliceColors: ['#3366cc','#dc3912','#7f7f7f','#109618','#66aa00','#dd4477','#0099c6','#990099 '],
+	borderColor: '#7f7f7f'});
+    }
+
 
 //SHOWS ADDED OR SUBTRACTED MODULES
 function showNewModules(){
@@ -98,7 +108,6 @@ function showelements(name  )
 
 function loadFile(xml){
 	AddedModules = [];
-	//alert( xml);
 	xmlDoc = $.parseXML(xml);
 	$xml = $(xmlDoc);
 	title = $xml.find("title").text();
@@ -189,12 +198,12 @@ function alterattributes(id){
 $(document).ready(function(){
 	if(localStorage.getItem("tei%*$&#Default") === null){
 		$.ajax({
-		url: 'http://users.ox.ac.uk/~rahtz/new.js',
-		dataType: 'jsonp',
-		jsonpCallback: 'teijs',
-		success: function(data) {
+		    url:  defaultDatabase,
+		    dataType: 'jsonp',
+		    jsonpCallback: 'teijs',
+		    success: function(data) {
 		   localStorage.setItem("tei%*$&#Default", JSON.stringify(data, null, 2));
-		}
+		    }
 		});
 	}
 	
@@ -409,7 +418,7 @@ function setXML(){
  function loadDefaultTEI(){
  	if(localStorage.getItem("tei%*$&#Default") === null){
 		$.ajax({
-		url: 'http://users.ox.ac.uk/~rahtz/new.js',
+		    url: defaultDatabase,
 		dataType: 'jsonp',
 		jsonpCallback: 'teijs',
 		success: function(data) {
@@ -445,6 +454,7 @@ $(document).on("click","button.saveStartInfo", function(){
 	AddedModules.push("tei");
 	AddedModules.push("header");
 	AddedModules.push("textstructure");
+
 	if($("#title").val() != ""){
 		title = $("#title").val();
 	}
@@ -577,7 +587,7 @@ $(document).on("click","button.SubmitTEI", function(){
 
 $(document).on("click","button.loadProject", function(){
 	$('#projectSelection').hide();
-	url = 'http://users.ox.ac.uk/~rahtz/new.js';
+    url = defaultDatabase,
 	loadTEI();
 	$('#modules').hide();
 	$('#loadProjectTools').show();
@@ -759,6 +769,7 @@ $(document).on("click","button.back", function(){
 	if(Back == "Modules"){
 		$('#modules').show();
 		$('#selected').show();
+	    showPie();
 	}
 	if(Back == "Elements"){
 		$('#elements').show();

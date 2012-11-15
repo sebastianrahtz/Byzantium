@@ -24,10 +24,10 @@ float:right;
 </table>
 <div id='projectSelection'>
 <h1>Welcome to Byzantium!</h1>
-<h2>Select a project:</h2><br/>
+<h2>Choose from:</h2><br/>
 <button class="newProject">New Project</button>
-<button class="loadProject">Load Project</button>
-<button class="uploadProject">Upload Project</button>
+<button class="loadProject">Load ODD from local storage</button>
+<button class="uploadProject">Upload ODD</button>
 </div>
 
 <div id='upload'>
@@ -79,7 +79,7 @@ float:right;
 
 <div id='actions'>
 Project name:<input type="text" id='saveAs'/>
-<button class="save">Save</button>
+<button class="save">Save to local storage</button>
 <select id='outputSelection'>
   <option>TEI ODD</option>
   <option>RELAX NG Schema</option>
@@ -97,25 +97,25 @@ Project name:<input type="text" id='saveAs'/>
 <div id='selected'></div>
 
 <div id='startInfo'>
-	<form>
+  <form>
   <table>
-<tr><td>	Title</td><td><input type="text" id='title'/></td></tr>
-<tr><td>	Filename</td><td><input type="text" id='filename'/></td></tr>
-<tr><td>	Author Name</td><td><input type="text" id='author'/></td></tr>
-<tr><td>	Description</td><td><textarea rows="4" cols="40" id='description'></textarea></td></tr>
-<tr><td>	Language</td><td><select id='languageSelect'>
-		<option value="en">English</option>
-		<option value="de">Deutsch</option>
-		<option value="it">Italiano</option>
-		<option value="es">Español</option>
-		<option value="fr">Français</option>
-		<option value="pt">Portugues</option>
-		<option value="ja">日本語</option>
-		<option value="zh">中文</option>
-	</select></td></tr>
-	</table>
-	</form>
-	<button class="saveStartInfo">Next</button>
+    <tr><td>Title</td><td><input type="text" id='title'/></td></tr>
+    <tr><td>Filename</td><td><input type="text" id='filename'/></td></tr>
+    <tr><td>Author Name</td><td><input type="text" id='author'/></td></tr>
+    <tr><td>Description</td><td><textarea rows="4" cols="40" id='description'></textarea></td></tr>
+    <tr><td>Language</td><td><select id='languageSelect'>
+      <option value="en">English</option>
+      <option value="de">Deutsch</option>
+      <option value="it">Italiano</option>
+      <option value="es">Español</option>
+      <option value="fr">Français</option>
+      <option value="pt">Portugues</option>
+      <option value="ja">日本語</option>
+      <option value="zh">中文</option>
+    </select></td></tr>
+  </table>
+  </form>
+  <button class="saveStartInfo">Next</button>
 
 </div>
 
@@ -123,9 +123,9 @@ Project name:<input type="text" id='saveAs'/>
 <h2>Please Select Your TEI Database:</h2>
 	<p id="TEI_Selected"></p>
 	<button class="TEI_Default">Default</button>
-	<button class="TEI_Online">Use Online</button>
-	<button class="TEI_Existing">Load Existing</button>
-	<button class="TEI_Custom">Load Custom</button><br/>
+	<button class="TEI_Online">Load from web</button>
+	<button class="TEI_Existing">Load from local storage</button>
+	<button class="TEI_Custom">Upload</button><br/>
 	
 	<div id='UploadCustom'>
 
