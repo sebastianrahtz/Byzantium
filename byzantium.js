@@ -40,33 +40,30 @@ function showmodules() {
 	}
     moduleCounter=TEI.modules.length;
     totElements = TEI.elements.length;
+    var items = [];
+    $.each(TEI.modules, function(i, module) {
+            items.push('<div id="div' + module.ident + '"><button class="addModule" id="' + module.ident + 'A">Add</button><button class="removeModule" id="'+module.ident+'R">Remove<button class="modulelink" style="border:none; color:blue; cursor: pointer;">' + module.ident + '</button>' + module.desc + '</div>');
+     });
+
+    $('#moduleList').html(items.join(''));
+    showPie();
+}
+
+function showPie () {
+    liveElements=0;
     $.each(AddedModules, function(i, module){
 	$.each(TEI.elements, function(i, element){
 	    if (element.module == module) { liveElements +=1; }
 	});
     });
-    var items = [];
-    items.push('<div style="float:right" border="1"><span class="moduleSparkline"></span><ul><li>Red: Used elements</li><li>Blue: Unused elements</li></div>');
-    $.each(TEI.modules, function(i, module) {
-            items.push('<div id="div' + module.ident + '"><button class="addModule" id="' + module.ident + 'A">Add</button><button class="removeModule" id="'+module.ident+'R">Remove<button class="modulelink" style="border:none; color:blue; cursor: pointer;">' + module.ident + '</button>' + module.desc + '</div>');
-     });
-
-    $('#modules').append($('<ul/>', {
-        'class': 'modules',
-        html: items.join('')
-    }));
-    $('#modules').append($('<p/>', { html: TEI.modules.length + " modules available, of which " + AddedModules.length + " are in use, containing " + liveElements + " elements, of which " +  ExcludedElements.length + " are excluded"}));
-    showPie();
-}
-
-function showPie () {
+    $('#message').html('<p>' + TEI.modules.length + " modules available, of which " + AddedModules.length + " are in use, containing " + liveElements + " elements, of which " +  ExcludedElements.length + " are excluded</p>");
     $(".moduleSparkline").sparkline([(totElements-liveElements),(liveElements-ExcludedElements.length),ExcludedElements.length], {
 	type: 'pie',
 	width: '200',
 	height: '200',
 	sliceColors: ['#3366cc','#dc3912','#7f7f7f','#109618','#66aa00','#dd4477','#0099c6','#990099 '],
 	borderColor: '#7f7f7f'});
-    }
+}
 
 
 //SHOWS ADDED OR SUBTRACTED MODULES
@@ -76,7 +73,7 @@ function showNewModules(){
 	$.each(AddedModules, function(i, module){
 		items.push('<li>' + AddedModules[i] + '</li>');
 	});
-	$('#selected').html($('<p/>', { html: "Items Selected:" }));
+	$('#selected').html($('<p/>', { html: "Modules Selected:" }));
 	$('#selected').append($('<ul/>', {
 		'class': 'selected',
 		html: items.join('')
@@ -233,7 +230,6 @@ function loadTEI(){
        jsonpCallback: 'teijs',
        success: function(data) {
            $('#message').html('<p>Successfuly read ' + url)
-		   $('#message').hide()
        }
    });
    AddedModules.push("core");
@@ -499,6 +495,7 @@ $(document).on("click","button.TEI_Custom", function(){
 
 $(document).on("click","button.TEI_Default", function(){
 	loadDefaultTEI()
+	$('#message').html('<p>Default database loaded</p>')
 	/**$("#UploadCustom").hide();
 	$("#OnlineSelector").hide();
 	$("#ExistingSelector").hide();*/
@@ -506,8 +503,7 @@ $(document).on("click","button.TEI_Default", function(){
 	showmodules();
 	showNewModules();
 	$("#actions").show();
-	$('#message').html('<p>Default database loaded</p>')
-	$("#message").delay(1000).fadeOut();
+    //	$("#message").delay(1000).fadeOut();
 	//$("#projectSelection").show();
 });
 
@@ -540,7 +536,7 @@ $(document).on("click","button.setOnline", function(){
 		});
 	}
 	$('#message').html('<p>' + teiName + ' database loaded</p>')
-	$("#message").delay(1000).fadeOut();
+//	$("#message").delay(1000).fadeOut();
 	//$("#projectSelection").show();
 })
 
@@ -566,7 +562,7 @@ $(document).on("click","button.setExisting", function(){
 	showNewModules();
 	$("#actions").show();
 	$('#message').html('<p>' + teiName + ' database loaded</p>')
-	$("#message").delay(1000).fadeOut();
+//	$("#message").delay(1000).fadeOut();
 	//$("#projectSelection").show();
 })
 
@@ -822,7 +818,7 @@ $(document).on("click","button.loadCustomJSON", function(){
 	showNewModules();
 	$('#actions').show();
 	$('#message').html('<p>' + teiName + ' database loaded</p>')
-	$("#message").delay(1000).fadeOut();
+//	$("#message").delay(1000).fadeOut();
 })
 
 $(document).on("click","button.outputXML", function(){

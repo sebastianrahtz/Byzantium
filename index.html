@@ -10,6 +10,10 @@
 {
 float:right;
 }
+#message {
+  border: solid green 1pt;
+  padding; 2pt;
+}
 </style>
 </head>
 <body>
@@ -22,6 +26,7 @@ float:right;
 <h1>Byzantium: generating customizations for the TEI</h1><br clear="all"/>
 </td>
 </table>
+</div>
 <div id='projectSelection'>
 <h1>Welcome to Byzantium!</h1>
 <h2>Choose from:</h2><br/>
@@ -192,7 +197,11 @@ Project name:<input type="text" id='saveAs'/>
 </div>
 
 
-<div id='modules'></div>
+<div id='modules'>
+  <div style="float:right" border="1"><span class="moduleSparkline"></span><ul><li>Red: Used elements</li><li>Blue: Unused elements</li></div>
+  <ul id='moduleList' class='modules'/>
+  <div id='moduleSummary'/>    
+</div>
 
 <div id='elements'></div>
 
@@ -242,7 +251,7 @@ Project name:<input type="text" id='saveAs'/>
 </div>
 <button class="restart">Restart</button>
 <div class="trailer">	
-	<p id="colophon"/>
+  <p id="colophon"/>
 </div>
 </body>
 </html>
