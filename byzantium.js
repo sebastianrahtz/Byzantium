@@ -4,35 +4,54 @@ Created: 11/1/2012
 Programmed By: Sebastian Rahtz and Nicholas Burlingame
 */
 
-var liveElements = 0;
-var url='';
+var VERSION = "0.1";
 var defaultDatabase='http://bits.nsms.ox.ac.uk:8080/jenkins/job/TEIP5/lastSuccessfulBuild/artifact/release/xml/tei/odd/p5subset.json';
-var today=new Date();
-var TEI=[];
+
+
 var AddedModules=[];
-var ExcludedElements=[];
-var ExcludedAttributes=[];
-var ListofValues=[];
 var Back = "";
 var Current = "";
-var currentModule = "";
-var xml = "";
-var title = "";
-var filename = "";
+var ExcludedAttributes=[];
+var ExcludedElements=[];
+var ListofValues=[];
+var TEI=[];
 var author = "";
+var currentModule = "";
 var description = "";
-var language = "";
+var filename = "";
 var givenXML = "";
-var teiName = "";
-var VERSION = "0.1";
+var language = "";
+var liveElements = 0;
 var moduleCounter = 0;
+var teiName = "";
+var title = "";
+var today=new Date();
 var totElements = 0;
+var url='';
+var xml = "";
 
 //SETS JSON OBJECT
 function teijs(data) {
     TEI=data;
 }
 
+function cleanSystem() {
+    AddedModules=[];
+    Back = "";
+    Current = "";
+    ExcludedAttributes=[];
+    ExcludedElements=[];
+    TEI=[];
+    author = "";
+    currentModule = "";
+    description = "";
+    filename = "";
+    givenXML = "";
+    teiName = "";
+    title = "";
+    url='';
+    xml = "";
+}
 //DISPLAYS INITIAL MODULES
 function showmodules() {
 	if(teiName != "" && teiName != "undefined"){
@@ -42,7 +61,17 @@ function showmodules() {
     totElements = TEI.elements.length;
     var items = [];
     $.each(TEI.modules, function(i, module) {
-            items.push('<div id="div' + module.ident + '"><button class="addModule" id="' + module.ident + 'A">Add</button><button class="removeModule" id="'+module.ident+'R">Remove<button class="modulelink" style="border:none; color:blue; cursor: pointer;">' + module.ident + '</button>' + module.desc + '</div>');
+	var mString ='<tr id="div' + module.ident + '"><td><button class="addModule" id="' + module.ident + 'A">Add</button><button class="removeModule" id="'+module.ident+'R">Remove</button></td>';
+	if($.inArray(module.ident, AddedModules) != -1)
+	{
+	    mString += '<td><button class="modulelink" style="border:none; color:blue; cursor: pointer;">' + module.ident + '</button></td>' 
+	}
+	else
+	{
+	    mString += '<td class="unselected">' + module.ident + '</td>';
+	}
+	mString += '<td>' + module.desc + '</td></tr>';
+	items.push(mString);
      });
 
     $('#moduleList').html(items.join(''));
@@ -56,7 +85,7 @@ function showPie () {
 	    if (element.module == module) { liveElements +=1; }
 	});
     });
-    $('#message').html('<p>' + TEI.modules.length + " modules available, of which " + AddedModules.length + " are in use, containing " + liveElements + " elements, of which " +  ExcludedElements.length + " are excluded</p>");
+    $("#moduleSummary").html('<p>' + TEI.modules.length + " modules available, of which " + AddedModules.length + " are in use, containing " + liveElements + " elements, of which " +  ExcludedElements.length + " are excluded</p>");
     $(".moduleSparkline").sparkline([(totElements-liveElements),(liveElements-ExcludedElements.length),ExcludedElements.length], {
 	type: 'pie',
 	width: '200',
@@ -89,18 +118,18 @@ function showelements(name  )
     $.each(TEI.elements, function(i, element) {
         if (element.module == name) {
 			currentModule = name;
-            items.push('<td><button class="addRemove" id="' + name + "," + element.ident + '">');
+            items.push('<tr><td><button class="addRemove" id="' + name + "," + element.ident + '">');
 			if($.inArray((name + "," + element.ident), ExcludedElements) == -1){
 				items.push("Exclude");
 			}
 			else{
 				items.push("Include");
 			}
-			items.push('</button><button class="elementlink" style="border:none; color:blue; cursor: pointer;">' + element.ident + '</button>' + element.desc + '</td></tr>');
+			items.push('</button></td><td><button class="elementlink" style="border:none; color:blue; cursor: pointer;">' + element.ident + '</button></td><td>' + element.desc + '</td></tr>');
           }
         });
 	
-    $('#elements').append($('<table/>', {'class': 'elements',html: '<tr><td>Include/Exclude</td></tr>' + items.join('') }));
+    $('#elements').append($('<table/>', {'class': 'elements',html:  items.join('') }));
 }
 
 function loadFile(xml){
@@ -166,10 +195,10 @@ function showattributes(name ) {
 									else{
 										addableitems.push("Include");
 									}
-									addableitems.push('</button>' + '<button class="attributelink" id="att,' + currentModule + "," + name + "," + attribute.ident + '" style="border:none; color:blue; cursor: pointer;">'+ attribute.ident + "</button>"  + attribute.desc + '</td></tr>');
+									addableitems.push('</button></td><td>' + '<button class="attributelink" id="att,' + currentModule + "," + name + "," + attribute.ident + '" style="border:none; color:blue; cursor: pointer;">'+ attribute.ident + "</button></td><td>"  + attribute.desc + '</td></tr>');
 								}
 								else{
-									unaddableitems.push('<tr><td><button disabled="disabled">Requires Module: ' + classAttributeModule + "</button>"+ attribute.ident + '        ' + attribute.desc + '</td></tr>');
+									unaddableitems.push('<tr><td><button disabled="disabled">Requires: ' + classAttributeModule + "</button></td><td>"+ attribute.ident + '</td><td> ' + attribute.desc + '</td></tr>');
 								}
 								
 							})
@@ -181,7 +210,7 @@ function showattributes(name ) {
 			}
 		}
 	});
-	$('#attributes').append($('<table/>', {'class': 'attributes',html: '<tr><td>Include/Exclude</td></tr>' + addableitems.join('') + unaddableitems.join('')}));
+	$('#attributes').append($('<table/>', {'class': 'attributes',html: addableitems.join('') + unaddableitems.join('')}));
 }
 function alterattributes(id){
 	$("#attributes").hide();
@@ -208,7 +237,6 @@ $(document).ready(function(){
 	$('#actions').hide();
 	$('#loadProjectTools').hide();
 	$('#startInfo').hide();
-	//$('#projectSelection').hide();
 	$('#teiSelection').hide();
 	$('#upload').hide();
 	$('#UploadCustom').hide();
@@ -217,7 +245,8 @@ $(document).ready(function(){
 	$('#ExistingSelector').hide();
 	$('#reportPage').hide();
 	$('#alterAttributes').hide();
-	document.getElementById('colophon').innerHTML = "Byzantium " + VERSION + " at " + today;
+        cleanSystem();
+	document.getElementById('colophon').innerHTML = "Byzantium " + VERSION + ". Written by Nick Burlingame. Date: " + today;
 })
 
 
@@ -429,6 +458,39 @@ function setXML(){
  }
  
  
+function checkFileSupport() {
+    if (window.File && window.FileReader && window.FileList && window.Blob) {
+        //  alert("Great success! All the File APIs are supported.");
+    } else {
+        alert('The File APIs are not fully supported in this browser.');
+    }
+}
+
+
+
+     function handleFileSelect(evt) {
+	 var files = evt.target.files; // FileList object
+
+	 // files is a FileList of File objects. List some properties.
+	 var output = [];
+	 for (var i = 0, f; f = files[i]; i++) {
+	     output.push('<li><strong>', escape(f.name), '</strong> (', f.type || 'n/a', ') - ',
+			 f.size, ' bytes, last modified: ',
+			 f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a',
+			 '</li>');
+	     var reader = new FileReader();
+	     // Closure to capture the file information.
+	     reader.onload = (function(theFile) {
+		 return function(e) {
+		     document.getElementById('inputarea').innerHTML=this.result;
+		 };
+	     })(f);
+	     // Read in the image file as a data URL.
+	     reader.readAsText(f);
+	 }
+	 document.getElementById('list').innerHTML = '<ul>' + output.join('') + '</ul>';
+     }
+
 
  
  
@@ -437,12 +499,14 @@ function setXML(){
 //--------------------------------------------------------------------------------------------------------------
 
 
- $(document).on("click","button.newProject", function(){
-	$('#projectSelection').hide();
-	$('#startInfo').show();
+$(document).on("click","button.newProject", function(){
+//	$('#projectSelection').hide();
+//	$('#startInfo').show();
 	//loadTEI();
 	//showNewModules();
 	//$('#actions').show();
+    cleanSystem();
+    $("#tabs").tabs("select", 1); 
 });
 
 $(document).on("click","button.saveStartInfo", function(){
@@ -484,6 +548,7 @@ $(document).on("click","button.saveStartInfo", function(){
 	/*showmodules();
 	showNewModules();
 	$('#actions').show();*/
+    $("#tabs").tabs("select", 2); 
 
 });
 
@@ -491,6 +556,7 @@ $(document).on("click","button.TEI_Custom", function(){
 	$('#UploadCustom').show();
 	$("#ExistingSelector").hide();
 	$("#OnlineSelector").hide();
+    $("#tabs").tabs("select", 2); 
 })
 
 $(document).on("click","button.TEI_Default", function(){
@@ -498,11 +564,12 @@ $(document).on("click","button.TEI_Default", function(){
 	$('#message').html('<p>Default database loaded</p>')
 	/**$("#UploadCustom").hide();
 	$("#OnlineSelector").hide();
-	$("#ExistingSelector").hide();*/
-	$("#teiSelection").hide();
+	$("#ExistingSelector").hide();
+	$("#teiSelection").hide();*/
 	showmodules();
 	showNewModules();
 	$("#actions").show();
+    $("#tabs").tabs("select", 3); 
     //	$("#message").delay(1000).fadeOut();
 	//$("#projectSelection").show();
 });
@@ -585,6 +652,7 @@ $(document).on("click","button.loadProject", function(){
 	$('#projectSelection').hide();
     url = defaultDatabase,
 	loadTEI();
+    $("#tabs").tabs("select", 2); 
 	$('#modules').hide();
 	$('#loadProjectTools').show();
 	doShowAll();
@@ -631,6 +699,8 @@ $(document).on("click","button.load", function(){
 	$('#modules').show();
 	$('#actions').show();
 	$('#loadProjectTools').hide();
+    $("#tabs").tabs("select", 2); 
+    
 })
 
 $(document).on("click","button.delete", function(){
@@ -715,24 +785,28 @@ $(document).on("click","button.addRemoveAttribute", function(){
 
 //CLICK BUTTON EVENT FOR VIEWING ELEMENTS
 $(document).on("click","button.modulelink",function() {
-	$('#modules').hide();
-	$('#selected').hide();
-	$('#elements').show();
+//	$('#modules').hide();
+//	$('#selected').hide();
+//	$('#elements').show();
 	Back = "Modules";
 	Current = "Elements";
     showelements($(this).text() );
+    $("#tabs").tabs("select", 4); 
         return false;
 })
 
 
 //CLICK BUTTON EVENT FOR VIEWING ATTRIBUTES
 $(document).on("click","button.elementlink",function(){
-	showattributes($(this).text() );
-		return false;
+    showattributes($(this).text() );
+    $("#tabs").tabs("select", 5); 
+    return false;
 })
 
 $(document).on("click","button.attributelink", function(){
 	alterattributes($(this).attr("id"));
+    $("#tabs").tabs("select", 6); 
+
 		return false;
 })
 
@@ -950,13 +1024,14 @@ $(document).on("click", "button.saveAttributeInfo", function(){
 			ListofValues.push(values);
 		}
 	}
-	$("#alterAttributes").hide();
+    /*	$("#alterAttributes").hide();
 	$("#attributes").show();
 	$("#actions").show();
+    */
 })
 
 $(document).on("click","button.removeJSON", function(){
-	var name = $("#JSONtoremove").val();
+	var name = $("JSONtoremove").val();
 	if(name == ''){
 	}
 	else{
@@ -983,19 +1058,6 @@ $(document).on("click", "button.restart", function(){
 	$('#selected').show();
 	$("#reportPage").hide();
 	$("#alterAttributes").hide();
-	url='';
-	TEI=[];
-	AddedModules=[];
-	ExcludedElements=[];
-	ExcludedAttributes=[];
-	Back = ""
-	Current = ""
-	currentModule = ""
-	xml = ""
-	title = ""
-	filename = ""
-	author = ""
-	description = ""
-	givenXML = ""
-	teiName = ""
+    cleanSystem();
 })
+

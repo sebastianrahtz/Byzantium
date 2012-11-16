@@ -1,5 +1,40 @@
-td#elements{font-size:90%; margin:5%;background-color:#EEE;padding:2%; border:1px dotted black;}
-td#attributes{font-size:90%; margin:5%;padding:2%;}
-td { vertical-align:top; }
-h2 {color:#900;}
-.modulelink, .elementlink, .attributelink {border:none; color:blue; cursor:pointer;}
+#selected
+{
+float:right;
+}
+#message {
+  border-bottom: solid green 1pt;
+  border-top: solid green 1pt;
+  padding; 2pt;
+   font-size: smaller;
+  font-style:italic;
+}
+
+td#elements{
+    font-size:90%;
+    margin:5%;
+    background-color:#EEE;
+    padding:2%;
+    border:1px dotted black;
+}
+td#attributes{
+    font-size:90%;
+    margin:5%;
+    padding:2%;
+}
+td{
+    vertical-align:top;
+}
+h2{
+    color:#900;
+}
+.modulelink,
+.elementlink,
+.attributelink{
+    border:none;
+    color:blue;
+    cursor:pointer;
+}
+td.unselected {
+    color: red;
+}
