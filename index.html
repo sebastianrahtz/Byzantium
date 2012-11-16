@@ -8,7 +8,14 @@
 <script src="sparkline.js"></script>
 <script>
     $(function() {
-        $( "#tabs" ).tabs();
+        $( "#tabs" ).tabs({
+       select: function(event, ui){
+            var tabNumber = ui.index;
+            var tabName = $(ui.tab).text();            
+            if (tabNumber == 7 ) { makeReport(); }
+            else if (tabNumber == 3 ) {	showmodules(); }
+
+        }});
     });
 </script>
 <link rel="stylesheet" href="byzantium.css"/>
@@ -39,7 +46,6 @@
 				<option>HTML documentation</option>
 			</select>
 			<button class="output">Generate</button>
-			<button class="report">Report</button>
 		</div>
 
 		<div id="tabs">
@@ -58,7 +64,26 @@
 			<h1>Welcome to Byzantium!</h1>
 			<button class="newProject">New Project</button>
 			<button class="loadProject">Load ODD from local storage</button>
-			<button class="uploadProject">Upload ODD</button>
+		  <button class="uploadProject">Upload ODD</button>
+		<div id="loadProjectTools">
+		  <form>
+				<b>Load Which Project:</b>
+				<input type="text" id="loadAs" />
+				<br />
+			</form>
+			<button class="load">Load</button>
+			<div id="items_table">
+				<h2>Saved Projects</h2>
+				<table id="pairs"></table>
+			</div>
+			<form>
+				<b>Delete Which Project:</b>
+				<input type="text" id="deleteProject" />
+				<br />
+			</form>
+			<button class="delete">Delete</button>
+		</div>
+
 		</div>
 
 		<div id="upload">
@@ -83,13 +108,13 @@
 					<tr>
 						<td>Title</td>
 						<td>
-							<input type="text" id="title" />
+							<input type="text" id="title" value="My TEI customization"/>
 						</td>
 					</tr>
 					<tr>
 						<td>Filename</td>
 						<td>
-							<input type="text" id="filename" />
+							<input type="text" id="filename" value="myTEI"/>
 						</td>
 					</tr>
 					<tr>
@@ -203,6 +228,7 @@
 		<div id="output"></div>
 
 		<div id="reportPage">
+		  <h2>Status report</h2>
 			<p id="repTitle"></p>
 			<p id="repFilename"></p>
 			<p id="repAuthor"></p>
@@ -214,28 +240,8 @@
 			<div id="repElements"></div>
 			<p id="repAttributesTag"></p>
 			<div id="repAttributes"></div>
-			<button class="returnToModules">Return to Modules</button>
 		</div>
 
-		<div id="loadProjectTools">
-			<form>
-				<b>Load Which Project:</b>
-				<input type="text" id="loadAs" />
-				<br />
-			</form>
-			<button class="load">Load</button>
-			<div id="items_table">
-				<h2>Saved Projects</h2>
-				<table id="pairs"></table>
-			</div>
-			<form>
-				<b>Delete Which Project:</b>
-				<input type="text" id="deleteProject" />
-				<br />
-			</form>
-			<button class="delete">Delete</button>
-		</div>
-<!--		<button class="restart">Restart</button>-->
 		</div>
 		<div class="trailer">
 			<p id="colophon"></p>
