@@ -5,7 +5,7 @@ Programmed By: Sebastian Rahtz and Nicholas Burlingame
 */
 
 var VERSION = "0.2";
-var defaultDatabase='http://bits.nsms.ox.ac.uk:8080/jenkins/job/TEIP5/lastSuccessfulBuild/artifact/release/xml/tei/odd/p5subset.json';
+var defaultDatabase='http://bits.nsms.ox.ac.uk:8080/jenkins/job/TEIP5/lastSuccessfulBuild/artifact/release/xml/tei/odd/p5subset.js';
 var today=new Date();
 
 
@@ -224,7 +224,7 @@ function alterattributes(id){
 	$("#attAlterName").text("Attribute Name: " + id.split(',')[3]);
 }
 
-//READY FUNCTION. DISPLAYS MODULES
+//READY FUNCTION. 
 $(document).ready(function(){
 	if(localStorage.getItem("tei%*$&#Default") === null){
 		$.ajax({
@@ -240,7 +240,8 @@ $(document).ready(function(){
 //	$('#OnlineSelector').hide();
 //	$('#ExistingSelector').hide();
         cleanSystem();
-	document.getElementById('colophon').innerHTML = "Byzantium " + VERSION + ". Written by Nick Burlingame. Date: " + today;
+    $('#defaultDatabase').html(defaultDatabase);
+    $('#colophon').html("Byzantium " + VERSION + ". Written by Nick Burlingame. Date: " + today);
 })
 
 
