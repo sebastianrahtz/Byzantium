@@ -240,6 +240,7 @@ $(document).ready(function(){
 //	$('#OnlineSelector').hide();
 //	$('#ExistingSelector').hide();
         cleanSystem();
+    doShowAll();
     $('#defaultDatabase').html(defaultDatabase);
     $('#colophon').html("Byzantium " + VERSION + ". Written by Nick Burlingame. Date: " + today);
 })
@@ -388,27 +389,24 @@ function setXML(){
 	
 	out = new XMLSerializer().serializeToString(xmlDoc);
 	xml = out;
-	//alert(xml);
-
 }
 
 //This function is used to show the name of all the projects that are saved to the browser.
  function doShowAll(){
    var key = "";
-   var pairs = "<tr><th>Name</th></tr>\n";
+   var pairs = "";
    var i=0;
    for (i=0; i<=localStorage.length-1; i++) {
 	 key = localStorage.key(i);
 	 if(key.split("%*$&#")[0] != "proj"){
 	 }
 	 else{
-		pairs += "<tr><td>"+key.split("%*$&#")[1]+"</td></tr>\n";
+		pairs += "<tr><td class='fname'>"+key.split("%*$&#")[1]+"</td><td><button class='load'>Load</button><td><button class='delete'>Delete</button></tr>\n";
 	 }
-   }
-   if (pairs == "<tr><th>Name</th><th>Value</th></tr>\n") {
-	 pairs += "<tr><td><i>empty</i></td>\n<td><i>empty</i></td></tr>\n";
-   }
-   document.getElementById('pairs').innerHTML = pairs;
+       }
+     if (pairs != "") {
+	 $('#items_table').html('<table><tr><th>Name</th><th>Action</th></tr>' + pairs + '</table>');
+     }
  }
  
   function doShowTEI(){
@@ -446,22 +444,19 @@ function setXML(){
  }
  
  
-function checkFileSupport() {
+   function checkFileSupport() {
     if (window.File && window.FileReader && window.FileList && window.Blob) {
         //  alert("Great success! All the File APIs are supported.");
     } else {
         alert('The File APIs are not fully supported in this browser.');
     }
-}
+    }
 
-
-
-     function handleFileSelect(evt) {
-	 var files = evt.target.files; // FileList object
-
+    function showFiles(files,listContainer) {
 	 // files is a FileList of File objects. List some properties.
 	 var output = [];
 	 for (var i = 0, f; f = files[i]; i++) {
+	     alert("found " + f.name);
 	     output.push('<li><strong>', escape(f.name), '</strong> (', f.type || 'n/a', ') - ',
 			 f.size, ' bytes, last modified: ',
 			 f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a',
@@ -476,13 +471,10 @@ function checkFileSupport() {
 	     // Read in the image file as a data URL.
 	     reader.readAsText(f);
 	 }
-	 document.getElementById('list').innerHTML = '<ul>' + output.join('') + '</ul>';
+	 document.getElementById(listContainer).innerHTML = '<ul>' + output.join('') + '</ul>';
      }
-
-
  
- 
-function makeReport () {
+    function makeReport () {
 	if(filename != ""){
 		$("#repFilename").text("Filename: " + filename);
 	}
@@ -705,7 +697,6 @@ $(document).on("click","button.SubmitTEI", function(){
 $(document).on("click","button.loadProject", function(){
     url = defaultDatabase,
 	loadTEI();
-	$('#loadProjectTools').show();
 	doShowAll();
         $("#tabs").tabs("select", 2); 
 });
@@ -727,14 +718,10 @@ $(document).on("click","button.save", function(){
 
 //Used to load a project from the browser.
 $(document).on("click","button.load", function(){
-	var name = $("#loadAs").val();
-	if(name == ''){
-	}
-	else{
-		var data = localStorage.getItem('proj%*$&#'+name);
-		loadFile(data);
-	}
-	if(teiName != "undefined" && teiName != null){
+    var name = $(this).parent().parent().children('td.fname').text();
+    var data = localStorage.getItem('proj%*$&#'+name);
+    loadFile(data);
+    if(teiName != "undefined" && teiName != null){
 		var L = localStorage.getItem("tei%*$&#" + teiName);
 		if (L != null) {
 			TEI = JSON.parse(L);
@@ -749,19 +736,14 @@ $(document).on("click","button.load", function(){
 	showNewModules();
 	$('#modules').show();
 	$('#actions').show();
-	$('#loadProjectTools').hide();
     $("#tabs").tabs("select", 2); 
     
 })
 
 $(document).on("click","button.delete", function(){
-	var name = $("#deleteProject").val();
-	if(name == ''){
-	}
-	else{
-		localStorage.removeItem("proj%*$&#" + name);
-	}
-	doShowAll();
+    var name = $(this).parent().parent().children('td.fname').text();
+    localStorage.removeItem("proj%*$&#" + name);
+    doShowAll();
 })
 
 $(document).on("click","button.output", function(){
@@ -948,7 +930,6 @@ $(document).on("click","button.removeJSON", function(){
 $(document).on("click", "button.restart", function(){
 	$('#projectSelection').show();
 	$('#actions').hide();
-	$('#loadProjectTools').hide();
 	$('#UploadCustom').hide();
 	$('#OnlineSelector').hide();
 	$('#ExistingSelector').hide();

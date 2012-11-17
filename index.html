@@ -83,30 +83,22 @@
 				  <script type="text/javascript">checkFileSupport();</script>
 				        <input type="file" id="files" name="files[]" multiple="multiple" />
 					<output id="list"></output>
-					<button	class="continueToLoad">Load file</button>
-					<script> document.getElementById('files').addEventListener('change', handleFileSelect, false);</script>
+					<button  class="continueToLoad">Load file</button>
+				  <script>
+				  function handleFileSelect(evt) {
+				  var files = evt.target.files;
+				    showFiles(files,'list')
+				  }
+				  document.getElementById('files').addEventListener('change',  handleFileSelect, false);
+				  </script>
 				</div>
 				</td></tr>
 				<tr>
-				  <td>Project from local storage</td>
+				  <td>Projects in local storage</td>
 				    <td>
 				    <div id="loadProjectTools">
-					<form>
-						<b>Load Which Project:</b>
-						<input type="text" id="loadAs" />
-						<br />
-					</form>
-					<button class="load">Load</button>
 					<div id="items_table">
-						<h2>Saved Projects</h2>
-						<table id="pairs"></table>
 					</div>
-					<form>
-						<b>Delete Which Project:</b>
-						<input type="text" id="deleteProject" />
-						<br />
-					</form>
-					<button class="delete">Delete</button>
 				</div>
 				</td>
 				</tr>
@@ -188,7 +180,7 @@
 				  <b>Load Which TEI:</b>
 				  <input type="text" id="loadTEI" />
 				<div id="tei_table">
-				  <h2>Saved Projects</h2>
+				  <h2>Saved Databases</h2>
 				  <table id="teipairs"></table>
 				</div>
 				<button class="setExisting">Load</button>
