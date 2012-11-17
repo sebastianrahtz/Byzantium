@@ -9,7 +9,7 @@ var defaultDatabase='http://bits.nsms.ox.ac.uk:8080/jenkins/job/TEIP5/lastSucces
 var today=new Date();
 
 
-var AddedModules=[];
+var AddedModules = [];
 var Back = "";
 var Current = "";
 var ExcludedAttributes=[];
@@ -36,7 +36,7 @@ function teijs(data) {
 }
 
 function cleanSystem() {
-    AddedModules=[];
+    AddedModules = [];
     Back = "";
     Current = "";
     ExcludedAttributes=[];
@@ -61,13 +61,15 @@ function showmodules() {
     totElements = TEI.elements.length;
     var items = [];
     $.each(TEI.modules, function(i, module) {
-	var mString ='<tr id="div' + module.ident + '"><td><button class="addModule" id="' + module.ident + 'A">Add</button><button class="removeModule" id="'+module.ident+'R">Remove</button></td>';
+	var mString ='<tr id="div' + module.ident + '">';
 	if($.inArray(module.ident, AddedModules) != -1)
 	{
-	    mString += '<td><button class="modulelink" style="border:none; color:blue; cursor: pointer;">' + module.ident + '</button></td>' 
+	    mString += '<td><button class="removeModule" id="'+module.ident+'R">Remove</button></td>';
+	    mString += '<td><button class="modulelink" style="border:none; color:blue; cursor: pointer;">' + module.ident + '</button></td>' ;
 	}
 	else
 	{
+            mString += '<td><button class="addModule" id="' + module.ident + 'A">Add</button></td>';
 	    mString += '<td class="unselected">' + module.ident + '</td>';
 	}
 	mString += '<td>' + module.desc + '</td></tr>';
@@ -136,8 +138,13 @@ function loadFile(xml){
 	filename = $xml.find("schemaSpec").attr("ident");
 	author = $xml.find("author").text();
 	description = "Sorry, but descriptions do not currently work for loaded files";
-	teiName = $xml.find("schemaSpec").attr("teiName");
+	teiName = $xml.find("schemaSpec").attr("source");
 	language = $xml.find("schemaSpec").attr("docLang");
+        $('#title').val(title);
+        $('#description').val(description);
+        $('#author').val(author);
+        $('#languageSelect').val(language);
+        $('#filename').val(filename);
 	if(teiName == "undefined" || teiName == null){
 		teiName = "";
 	}
@@ -145,12 +152,14 @@ function loadFile(xml){
 		key = item.getAttribute('key');
 		excepts = item.getAttribute('except');
 		AddedModules.push(key);
+	    if (excepts != null) {
 		var individualExcepts = excepts.split(" ");
 		$.each(individualExcepts, function(i, except){
 			if(except != ""){
 				ExcludedElements.push(key+","+except);
 			}
 		})
+		    }
 	})
 	$xml.find("elementSpec").each(function(i, item){
 		var module = item.getAttribute('module');
@@ -159,8 +168,7 @@ function loadFile(xml){
 			var attribute = test.getAttribute('ident');
 			ExcludedAttributes.push(module + "," + element + "," + attribute);
 		})
-	})
-	
+	})	
 }
 
 
@@ -223,8 +231,6 @@ $(document).ready(function(){
 		    }
 		});
 	}
-	$('#upload').hide();
-	$('#UploadCustom').hide();
 	$('#UploadCustom').hide();
 	$('#OnlineSelector').hide();
 	$('#ExistingSelector').hide();
@@ -431,11 +437,6 @@ function setXML(){
 	else{
 		TEI = JSON.parse(localStorage.getItem("tei%*$&#Default"));
 	}
-        AddedModules = [];
- 	AddedModules.push("core");
-	AddedModules.push("tei");
-	AddedModules.push("header");
-	AddedModules.push("textstructure");
  }
  
  
@@ -566,18 +567,8 @@ function makeReport () {
 	
 	
 }
-//--------------------------------------------------------------------------------------------------------------
-//------------------------------------------------BUTTON CLICKS HERE--------------------------------------------
-//--------------------------------------------------------------------------------------------------------------
 
-
-$(document).on("click","button.newProject", function(){
-    cleanSystem();
-    $("#tabs").tabs("select", 1); 
-});
-
-$(document).on("click","button.saveStartInfo", function(){
-
+function editinfo () {
 	if($("#title").val() != ""){
 		title = $("#title").val();
 	}
@@ -603,12 +594,27 @@ $(document).on("click","button.saveStartInfo", function(){
 		description = "My TEI Customization starts with modules tei, core, textstructure and header";
 	}
 	language = $("#languageSelect").val();
-	$('#OnlineSelector').hide();
-	$('#ExistingSelector').hide();
-	$('#UploadCustom').hide();
-        $("#tabs").tabs("select", 2); 
+}
 
+//--------------------------------------------------------------------------------------------------------------
+//------------------------------------------------BUTTON CLICKS HERE--------------------------------------------
+//--------------------------------------------------------------------------------------------------------------
+
+
+$(document).on("click","button.newProject", function(){
+    cleanSystem();
+    $("#tabs").tabs("select", 1); 
 });
+
+$(document).on("click","button.saveStartInfo", function(){
+    editinfo();
+    $('#OnlineSelector').hide();
+    $('#ExistingSelector').hide();
+    $('#UploadCustom').hide();
+    $("#tabs").tabs("select", 2); 
+});
+
+
 
 $(document).on("click","button.TEI_Custom", function(){
 	$('#UploadCustom').show();
@@ -620,6 +626,11 @@ $(document).on("click","button.TEI_Custom", function(){
 $(document).on("click","button.TEI_Default", function(){
 	loadDefaultTEI()
 	$('#message').html('<p>Default database loaded</p>')
+        AddedModules = [];
+	AddedModules.push("core");
+	AddedModules.push("tei");
+	AddedModules.push("header");
+	AddedModules.push("textstructure");
 	showNewModules();
         $("#tabs").tabs("select", 3); 
 });
@@ -668,12 +679,6 @@ $(document).on("click","button.setExisting", function(){
 		var getTEI = localStorage.getItem("tei%*$&#" + name);
 		TEI = JSON.parse(getTEI);
 	}
-        AddedModules = [];
-	AddedModules.push("core");
-	AddedModules.push("tei");
-	AddedModules.push("header");
-	AddedModules.push("textstructure");
-	showNewModules();
 	$("#actions").show();
 	$('#message').html('<p>' + teiName + ' database loaded</p>')
 })
@@ -892,9 +897,9 @@ $(document).on("click","button.continueToLoad", function(){
 	else{
 		loadDefaultTEI();
 	}
-	$('#upload').hide();
 	$('#actions').show();
 	showNewModules();
+        $("#tabs").tabs("select", 3); 
 })
 
 $(document).on("click","button.loadCustomJSON", function(){
@@ -943,7 +948,6 @@ $(document).on("click", "button.restart", function(){
 	$('#projectSelection').show();
 	$('#actions').hide();
 	$('#loadProjectTools').hide();
-	$('#upload').hide();
 	$('#UploadCustom').hide();
 	$('#UploadCustom').hide();
 	$('#OnlineSelector').hide();
