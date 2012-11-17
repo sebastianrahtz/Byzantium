@@ -105,11 +105,11 @@ function showNewModules(){
 	$.each(AddedModules, function(i, module){
 		items.push('<li>' + AddedModules[i] + '</li>');
 	});
-	$('#selected').html($('<p/>', { html: "Modules Selected:" }));
+/*	$('#selected').html($('<p/>', { html: "Modules Selected:" }));
 	$('#selected').append($('<ul/>', {
 		'class': 'selected',
 		html: items.join('')
-	}));
+	}));*/
 }
 
 //DISPLAYS ELEMENTS
