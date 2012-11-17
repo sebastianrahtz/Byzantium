@@ -41,7 +41,6 @@ function cleanSystem() {
     Current = "";
     ExcludedAttributes=[];
     ExcludedElements=[];
-    TEI=[];
     author = "";
     currentModule = "";
     description = "TEI customization made on " + today;
@@ -54,9 +53,14 @@ function cleanSystem() {
 }
 //DISPLAYS INITIAL MODULES
 function showmodules() {
-	if(teiName != "" && teiName != "undefined"){
-		localStorage.setItem(("tei%*$&#" + teiName), JSON.stringify(TEI, null, 2));
-	}
+    if(teiName != "" && teiName != "undefined"){
+	localStorage.setItem(("tei%*$&#" + teiName), JSON.stringify(TEI, null, 2));
+    }
+    if (TEI.modules === undefined ) {
+	//alert("NO DATABASE LOADED");
+    }
+    else
+    {
     moduleCounter=TEI.modules.length;
     totElements = TEI.elements.length;
     var items = [];
@@ -90,6 +94,7 @@ function showmodules() {
 	height: '200',
 	sliceColors: ['#3366cc','#dc3912','#7f7f7f','#109618','#66aa00','#dd4477','#0099c6','#990099 '],
 	borderColor: '#7f7f7f'});
+    }
 }
 
 
@@ -231,9 +236,9 @@ $(document).ready(function(){
 		    }
 		});
 	}
-	$('#UploadCustom').hide();
-	$('#OnlineSelector').hide();
-	$('#ExistingSelector').hide();
+//	$('#UploadCustom').hide();
+//	$('#OnlineSelector').hide();
+//	$('#ExistingSelector').hide();
         cleanSystem();
 	document.getElementById('colophon').innerHTML = "Byzantium " + VERSION + ". Written by Nick Burlingame. Date: " + today;
 })
@@ -603,14 +608,20 @@ function editinfo () {
 
 $(document).on("click","button.newProject", function(){
     cleanSystem();
+    AddedModules = [];
+    AddedModules.push("core");
+    AddedModules.push("tei");
+    AddedModules.push("header");
+    AddedModules.push("textstructure");
+    showNewModules();
     $("#tabs").tabs("select", 1); 
 });
 
 $(document).on("click","button.saveStartInfo", function(){
     editinfo();
-    $('#OnlineSelector').hide();
-    $('#ExistingSelector').hide();
-    $('#UploadCustom').hide();
+//    $('#OnlineSelector').hide();
+//    $('#ExistingSelector').hide();
+//    $('#UploadCustom').hide();
     $("#tabs").tabs("select", 2); 
 });
 
@@ -620,28 +631,23 @@ $(document).on("click","button.TEI_Custom", function(){
 	$('#UploadCustom').show();
 	$("#ExistingSelector").hide();
 	$("#OnlineSelector").hide();
-    $("#tabs").tabs("select", 2); 
+        $("#tabs").tabs("select", 2); 
 })
 
 $(document).on("click","button.TEI_Default", function(){
 	loadDefaultTEI()
 	$('#message').html('<p>Default database loaded</p>')
-        AddedModules = [];
-	AddedModules.push("core");
-	AddedModules.push("tei");
-	AddedModules.push("header");
-	AddedModules.push("textstructure");
-	showNewModules();
         $("#tabs").tabs("select", 3); 
 });
 
 
 
 $(document).on("click","button.TEI_Online", function(){
-	$("#UploadCustom").hide();
-	$("#OnlineSelector").show();
-	$("#ExistingSelector").hide();
+//	$("#UploadCustom").hide();
+//	$("#OnlineSelector").show();
+//	$("#ExistingSelector").hide();
 })
+
 $(document).on("click","button.setOnline", function(){
 	var TEIurl= $('#TEI_OnlineSelector').val();
 	var name = $('#TEI_OnlineName').val();
@@ -663,9 +669,9 @@ $(document).on("click","button.setOnline", function(){
 })
 
 $(document).on("click","button.TEI_Existing", function(){
-	$("#ExistingSelector").show();
-	$("#OnlineSelector").hide();
-	$("#UploadCustom").hide();
+//	$("#ExistingSelector").show();
+//	$("#OnlineSelector").hide();
+//	$("#UploadCustom").hide();
 	doShowTEI();
 })
 
@@ -875,11 +881,6 @@ $(document).on("click","button.removeModule",function(){
 })
 
 
-$(document).on("click","button.uploadProject", function(){
-	$('#projectSelection').hide();
-	$('#upload').show();
-})
-
 $(document).on("click","button.continueToLoad", function(){
 	var xmldata = $("#inputarea").val();
 	xml = xmldata
@@ -903,13 +904,12 @@ $(document).on("click","button.continueToLoad", function(){
 })
 
 $(document).on("click","button.loadCustomJSON", function(){
-	//TEI = eval($('#JSONinputarea').val());
-	eval($('#JSONinputarea').val());
-	teiName = $("#JSONname").val();
+	eval($('#inputarea').val());
+	teiName = $("#JSONfile").val();
 	showNewModules();
 	$('#actions').show();
 	$('#message').html('<p>' + teiName + ' database loaded</p>')
-//	$("#message").delay(1000).fadeOut();
+        $("#tabs").tabs("select", 3); 
 })
 
 $(document).on("click","button.outputXML", function(){
@@ -948,7 +948,6 @@ $(document).on("click", "button.restart", function(){
 	$('#projectSelection').show();
 	$('#actions').hide();
 	$('#loadProjectTools').hide();
-	$('#UploadCustom').hide();
 	$('#UploadCustom').hide();
 	$('#OnlineSelector').hide();
 	$('#ExistingSelector').hide();

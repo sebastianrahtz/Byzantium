@@ -6,7 +6,7 @@ float:right;
   border-bottom: solid green 1pt;
   border-top: solid green 1pt;
   padding; 2pt;
-   font-size: smaller;
+  font-size: smaller;
   font-style:italic;
 }
 
@@ -24,6 +24,10 @@ td#attributes{
 }
 td{
     vertical-align:top;
+}
+tr.choice >td {
+    padding: 12pt;
+    border-bottom: solid blue 2pt;
 }
 h2{
     color:#900;

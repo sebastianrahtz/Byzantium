@@ -77,11 +77,21 @@
 			</ul>
 
 			<div id="projectSelection">
-				<h1>Welcome to Byzantium!</h1>
-				<button class="newProject">New Project</button>
-				<button class="loadProject">Load ODD from local storage</button>
-				<button class="uploadProject">Upload ODD</button>
-				<div id="loadProjectTools">
+			  <table>
+			    <tr class="choice"><td>New project</td><td><button class="newProject">Create</button></td></tr>
+			    <tr class="choice"><td>Upload ODD</td><td>
+				<div id="upload">
+				  <script type="text/javascript">checkFileSupport();</script>
+				        <input type="file" id="files" name="files[]" multiple="multiple" />
+					<output id="list"></output>
+					<button	class="continueToLoad">Load file</button>
+					<script> document.getElementById('files').addEventListener('change', handleFileSelect, false);</script>
+				</div>
+				</td></tr>
+				<tr>
+				  <td>Project from local storage</td>
+				    <td>
+				    <div id="loadProjectTools">
 					<form>
 						<b>Load Which Project:</b>
 						<input type="text" id="loadAs" />
@@ -99,18 +109,9 @@
 					</form>
 					<button class="delete">Delete</button>
 				</div>
-
-				<div id="upload">
-					<script	type="text/javascript">checkFileSupport();</script>
-				        <input type="file" id="files" name="files[]" multiple="multiple" />
-					<output id="list"></output>
-					<button class="continueToLoad">Continue</button>
-					<script> document.getElementById('files').addEventListener('change', handleFileSelect, false);</script>
-					<br />
-					<textarea rows="50" cols="75"
-					style="display:none" name="XMLinput" id="inputarea"></textarea> 
-
-				</div>
+				</td>
+				</tr>
+				</table>
 
 			</div>
 			<div id="selected"></div>
@@ -166,40 +167,50 @@
 			<div id="teiSelection">
 				<h2>Please Select Your TEI Database:</h2>
 				<p id="TEI_Selected"></p>
-				<button class="TEI_Default">Default</button>
-				<button class="TEI_Online">Load from web</button>
-				<button class="TEI_Existing">Load from local storage</button>
-				<br />
-
-				<div id="UploadCustom">
-
-					<script type="text/javascript">checkFileSupport();</script>
-					<input type="file" id="JSONfiles" name="files[]" multiple="multiple" />
-					<output id="JSONlist"></output>
-					<button class="loadCustomJSON">Load</button>
-					<script>document.getElementById('JSONfiles').addEventListener('change', handleFileSelect, false);</script>
-					<input name="filename" id="JSONname" value="myTEI" />
-					<br />
-					<textarea rows="50" cols="75" name="JSONinput" id="JSONinputarea"></textarea>
+			  <table>
+			    <tr class="choice">
+			      <td>Default</td>
+			      <td><button class="TEI_Default">Load</button></td>
+			    </tr>
+			    <tr class="choice">
+			      <td>From web</td>
+			      <td>
+			      <div id="OnlineSelector"> Enter URL:<input type="text" id="TEI_OnlineSelector"
+				/><br /> Name TEI:<input type="text" id="TEI_OnlineName" /><br />
+				<button class="setOnline">Load</button>
 				</div>
-
-				<div id="OnlineSelector"> Enter URL:<input type="text" id="TEI_OnlineSelector"
-					 /><br /> Name TEI:<input type="text" id="TEI_OnlineName" /><br />
-					<button class="setOnline">Continue</button>
-				</div>
-
+				</td>
+			      </tr>
+			      <tr class="choice">
+				<td>From local storage
+				</td>
+				<td>
 				<div id="ExistingSelector">
-					<b>Load Which TEI:</b>
-					<input type="text" id="loadTEI" />
-					<div id="tei_table">
-						<h2>Saved Projects</h2>
-						<table id="teipairs"></table>
-					</div>
-					<button class="setExisting">Set</button>
-					<button class="removeJSON">Remove</button>
-					<input type="text" id="JSONtoremove" />
+				  <b>Load Which TEI:</b>
+				  <input type="text" id="loadTEI" />
+				<div id="tei_table">
+				  <h2>Saved Projects</h2>
+				  <table id="teipairs"></table>
 				</div>
-
+				<button class="setExisting">Load</button>
+				<button class="removeJSON">Remove</button>
+				<input type="text" id="JSONtoremove" />
+				</div>
+				</td>
+			      </tr>
+			      <tr class="choice">
+				<td>Upload file</td>
+				<td>
+				<div id="UploadCustom">
+				  <script type="text/javascript">checkFileSupport();</script>
+				  <input type="file" id="JSONfiles" name="files[]" multiple="multiple" />
+				  <output id="JSONlist"></output>
+				  <button class="loadCustomJSON">Load</button>
+				  <script>document.getElementById('JSONfiles').addEventListener('change', handleFileSelect, false);</script>
+				</div>
+				</td>
+			      </tr>
+			    </table>
 			</div>
 
 
@@ -257,6 +268,8 @@
 			</div>
 
 		</div>
+		<textarea rows="50" cols="75" style="display:none" id="inputarea"></textarea> 
+		
 		<div class="trailer">
 			<p id="colophon"></p>
 		</div>
