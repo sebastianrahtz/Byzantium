@@ -22,6 +22,7 @@ var description = "";
 var filename = "";
 var givenXML = "";
 var language = "";
+var method = "except";
 var liveElements = 0;
 var moduleCounter = 0;
 var teiName = "";
@@ -149,6 +150,7 @@ function loadFile(xml){
         $('#description').val(description);
         $('#author').val(author);
         $('#languageSelect').val(language);
+        $('#methodSelect').val(method);
         $('#filename').val(filename);
 	if(teiName == "undefined" || teiName == null){
 		teiName = "";
@@ -592,6 +594,7 @@ function editinfo () {
 		description = "My TEI Customization starts with modules tei, core, textstructure and header";
 	}
 	language = $("#languageSelect").val();
+	method = $("#methodSelect").val();
 }
 
 //--------------------------------------------------------------------------------------------------------------
