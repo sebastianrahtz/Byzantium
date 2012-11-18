@@ -34,7 +34,7 @@
 			</table>
 		</div>
 		<div id="actions"> Project name:<input type="text" id="saveAs" />
-			<button class="save">Save to local storage</button>
+			<span class="button save">Save to local storage</span>
 			<select id="outputSelection">
 				<option>TEI ODD</option>
 				<option>RELAX NG Schema</option>
@@ -44,7 +44,7 @@
 				<option>JSON</option>
 				<option>HTML documentation</option>
 			</select>
-			<button class="output">Generate</button>
+			<span class="button output">Generate</span>
 		</div>
 
 		<div id="tabs">
@@ -77,13 +77,13 @@
 
 			<div id="projectSelection">
 			  <table>
-			    <tr class="choice"><td>New project</td><td><button class="newProject">Create</button></td></tr>
+			    <tr class="choice"><td>New project</td><td><span class="button newProject">Create</span></td></tr>
 			    <tr class="choice"><td>Upload ODD</td><td>
 				<div id="upload">
 				  <script type="text/javascript">checkFileSupport();</script>
 				        <input type="file" id="files" name="files[]" multiple="multiple" />
 					<output id="list"></output>
-					<button  class="continueToLoad">Load file</button>
+					<span class="button continueToLoad">Load file</span>
 				  <script>
 				  function handleFileSelect(evt) {
 				  var files = evt.target.files;
@@ -92,18 +92,16 @@
 				  document.getElementById('files').addEventListener('change',  handleFileSelect, false);
 				  </script>
 				</div>
-				</td></tr>
-				<tr>
-				  <td>Projects in local storage</td>
-				    <td>
-				    <div id="loadProjectTools">
-					<div id="items_table">
-					</div>
-				</div>
 				</td>
-				</tr>
-				</table>
-
+			      </tr>
+			      <tr>
+				<td>Projects in local storage</td>
+				<td>
+				<div id="loadProjectTools"/>
+				<div id="items_table"></div>
+				</td>
+			      </tr>
+			    </table>
 			</div>
 
 			<div id="startInfo">
@@ -150,7 +148,7 @@
 						</tr>
 					</table>
 				</form>
-				<button class="saveStartInfo">Save</button>
+				<span class="button saveStartInfo">Save</span>
 
 			</div>
 
@@ -160,7 +158,7 @@
 			  <table>
 			    <tr>
 			      <td>Default</td>
-			      <td><button class="TEI_Default">Load</button></td>
+			      <td><span class="button TEI_Default">Load</span></td>
 			    </tr>
 			    <tr class="choice"> <td colspan="2"><span id="defaultDatabase"/></td></tr>
 			    <tr class="choice">
@@ -168,7 +166,7 @@
 			      <td>
 			      <div id="OnlineSelector"> Enter URL:<input type="text" id="TEI_OnlineSelector"
 				/><br /> Name TEI:<input type="text" id="TEI_OnlineName" /><br />
-				<button class="setOnline">Load</button>
+				<span class="button setOnline">Load</span>
 				</div>
 				</td>
 			      </tr>
@@ -183,8 +181,8 @@
 				  <h2>Saved Databases</h2>
 				  <table id="teipairs"></table>
 				</div>
-				<button class="setExisting">Load</button>
-				<button class="removeJSON">Remove</button>
+				<span class="button setExisting">Load</span>
+				<span class="button removeJSON">Remove</span>
 				<input type="text" id="JSONtoremove" />
 				</div>
 				</td>
@@ -196,7 +194,7 @@
 				  <script type="text/javascript">checkFileSupport();</script>
 				  <input type="file" id="JSONfiles" name="files[]" multiple="multiple" />
 				  <output id="JSONlist"></output>
-				  <button class="loadCustomJSON">Load</button>
+				  <span class="button loadCustomJSON">Load</span>
 				  <script>document.getElementById('JSONfiles').addEventListener('change', handleFileSelect, false);</script>
 				</div>
 				</td>
@@ -240,7 +238,7 @@
 				<p id="attributeIdent" style="display:none"></p>
 				<form> List of Values:<input type="text" id="listOfValues" /><br />
 				</form>
-				<button class="saveAttributeInfo">Save</button>
+				<span class="button saveAttributeInfo">Save</span>
 			</div>
 
 			<div id="output"></div>

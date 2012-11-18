@@ -68,12 +68,12 @@ function showmodules() {
 	var mString ='<tr id="div' + module.ident + '">';
 	if($.inArray(module.ident, AddedModules) != -1)
 	{
-	    mString += '<td><button class="removeModule" id="'+module.ident+'R">Remove</button></td>';
-	    mString += '<td><button class="modulelink" style="border:none; color:blue; cursor: pointer;">' + module.ident + '</button></td>' ;
+	    mString += '<td><span class="button removeModule" id="'+module.ident+'R">Remove</span></td>';
+	    mString += '<td><span class="button modulelink" style="border:none; color:blue; cursor: pointer;">' + module.ident + '</span></td>' ;
 	}
 	else
 	{
-            mString += '<td><button class="addModule" id="' + module.ident + 'A">Add</button></td>';
+            mString += '<td><span class="button addModule" id="' + module.ident + 'A">Add</span></td>';
 	    mString += '<td class="unselected">' + module.ident + '</td>';
 	}
 	mString += '<td>' + module.desc + '</td></tr>';
@@ -121,14 +121,14 @@ function showelements(name  )
     $.each(TEI.elements, function(i, element) {
         if (element.module == name) {
 			currentModule = name;
-            items.push('<tr><td><button class="addRemove" id="' + name + "," + element.ident + '">');
+            items.push('<tr><td><span class="button addRemove" id="' + name + "," + element.ident + '">');
 			if($.inArray((name + "," + element.ident), ExcludedElements) == -1){
 				items.push("Exclude");
 			}
 			else{
 				items.push("Include");
 			}
-			items.push('</button></td><td><button class="elementlink" style="border:none; color:blue; cursor: pointer;">' + element.ident + '</button></td><td>' + element.desc + '</td></tr>');
+			items.push('</span></td><td><span class="button elementlink" style="border:none; color:blue; cursor: pointer;">' + element.ident + '</span></td><td>' + element.desc + '</td></tr>');
           }
         });
 	
@@ -195,17 +195,17 @@ function showattributes(name ) {
 						if(attclass.ident == classAttributeClass){
 							$.each(attclass.attributes, function(i, attribute){
 								if($.inArray(classAttributeModule, AddedModules) != -1){
-									addableitems.push('<tr><td><button class="addRemoveAttribute" id="' + currentModule + "," + name + "," + attribute.ident + '">');
+									addableitems.push('<tr><td><span class="button addRemoveAttribute" id="' + currentModule + "," + name + "," + attribute.ident + '">');
 									if($.inArray((currentModule + "," + name + "," + attribute.ident), ExcludedAttributes) == -1){
 										addableitems.push("Exclude");
 									}
 									else{
 										addableitems.push("Include");
 									}
-									addableitems.push('</button></td><td>' + '<button class="attributelink" id="att,' + currentModule + "," + name + "," + attribute.ident + '" style="border:none; color:blue; cursor: pointer;">'+ attribute.ident + "</button></td><td>"  + attribute.desc + '</td></tr>');
+									addableitems.push('</span></td><td>' + '<span class="button attributelink" id="att,' + currentModule + "," + name + "," + attribute.ident + '" style="border:none; color:blue; cursor: pointer;">'+ attribute.ident + "</span></td><td>"  + attribute.desc + '</td></tr>');
 								}
 								else{
-									unaddableitems.push('<tr><td><button disabled="disabled">Requires: ' + classAttributeModule + "</button></td><td>"+ attribute.ident + '</td><td> ' + attribute.desc + '</td></tr>');
+									unaddableitems.push('<tr><td><button disabled="disabled">Requires: ' + classAttributeModule + "</span></td><td>"+ attribute.ident + '</td><td> ' + attribute.desc + '</td></tr>');
 								}
 								
 							})
@@ -401,11 +401,11 @@ function setXML(){
 	 if(key.split("%*$&#")[0] != "proj"){
 	 }
 	 else{
-		pairs += "<tr><td class='fname'>"+key.split("%*$&#")[1]+"</td><td><button class='load'>Load</button><td><button class='delete'>Delete</button></tr>\n";
+		pairs += "<tr class='filetable'><td class='fname'>"+key.split("%*$&#")[1]+"</td><td><span class='button load'>Load</span><td><span class='button delete'>Delete</span></tr>\n";
 	 }
        }
      if (pairs != "") {
-	 $('#items_table').html('<table><tr><th>Name</th><th>Action</th></tr>' + pairs + '</table>');
+	 $('#items_table').html('<table>' + pairs + '</table>');
      }
  }
  
@@ -599,7 +599,7 @@ function editinfo () {
 //--------------------------------------------------------------------------------------------------------------
 
 
-$(document).on("click","button.newProject", function(){
+$(document).on("click","span.newProject", function(){
     cleanSystem();
     AddedModules = [];
     AddedModules.push("core");
@@ -610,7 +610,7 @@ $(document).on("click","button.newProject", function(){
     $("#tabs").tabs("select", 1); 
 });
 
-$(document).on("click","button.saveStartInfo", function(){
+$(document).on("click","span.saveStartInfo", function(){
     editinfo();
 //    $('#OnlineSelector').hide();
 //    $('#ExistingSelector').hide();
@@ -620,14 +620,14 @@ $(document).on("click","button.saveStartInfo", function(){
 
 
 
-$(document).on("click","button.TEI_Custom", function(){
+$(document).on("click","span.TEI_Custom", function(){
 	$('#UploadCustom').show();
 	$("#ExistingSelector").hide();
 	$("#OnlineSelector").hide();
         $("#tabs").tabs("select", 2); 
 })
 
-$(document).on("click","button.TEI_Default", function(){
+$(document).on("click","span.TEI_Default", function(){
 	loadDefaultTEI()
 	$('#message').html('<p>Default database loaded</p>')
         $("#tabs").tabs("select", 3); 
@@ -635,13 +635,13 @@ $(document).on("click","button.TEI_Default", function(){
 
 
 
-$(document).on("click","button.TEI_Online", function(){
+$(document).on("click","span.TEI_Online", function(){
 //	$("#UploadCustom").hide();
 //	$("#OnlineSelector").show();
 //	$("#ExistingSelector").hide();
 })
 
-$(document).on("click","button.setOnline", function(){
+$(document).on("click","span.setOnline", function(){
 	var TEIurl= $('#TEI_OnlineSelector').val();
 	var name = $('#TEI_OnlineName').val();
 	teiName = name;
@@ -661,14 +661,14 @@ $(document).on("click","button.setOnline", function(){
 	$('#message').html('<p>' + teiName + ' database loaded</p>')
 })
 
-$(document).on("click","button.TEI_Existing", function(){
+$(document).on("click","span.TEI_Existing", function(){
 //	$("#ExistingSelector").show();
 //	$("#OnlineSelector").hide();
 //	$("#UploadCustom").hide();
 	doShowTEI();
 })
 
-$(document).on("click","button.setExisting", function(){
+$(document).on("click","span.setExisting", function(){
 	var name = $('#loadTEI').val();
 	teiName = name;
 	if(localStorage.getItem("tei%*$&#" + name) == null){
@@ -684,7 +684,7 @@ $(document).on("click","button.setExisting", function(){
 
 
 
-$(document).on("click","button.SubmitTEI", function(){
+$(document).on("click","span.SubmitTEI", function(){
 	showNewModules();
 	if(TEI == []){
 	}
@@ -694,7 +694,7 @@ $(document).on("click","button.SubmitTEI", function(){
 	}
 });
 
-$(document).on("click","button.loadProject", function(){
+$(document).on("click","span.loadProject", function(){
     url = defaultDatabase,
 	loadTEI();
 	doShowAll();
@@ -702,7 +702,7 @@ $(document).on("click","button.loadProject", function(){
 });
 
 //Used to save a project to the browser.
-$(document).on("click","button.save", function(){
+$(document).on("click","span.save", function(){
 	var name = $("#saveAs").val(); 
 	//alert(name);
 	if(name == ''){
@@ -717,7 +717,7 @@ $(document).on("click","button.save", function(){
 })
 
 //Used to load a project from the browser.
-$(document).on("click","button.load", function(){
+$(document).on("click","span.load", function(){
     var name = $(this).parent().parent().children('td.fname').text();
     var data = localStorage.getItem('proj%*$&#'+name);
     loadFile(data);
@@ -740,13 +740,13 @@ $(document).on("click","button.load", function(){
     
 })
 
-$(document).on("click","button.delete", function(){
+$(document).on("click","span.delete", function(){
     var name = $(this).parent().parent().children('td.fname').text();
     localStorage.removeItem("proj%*$&#" + name);
     doShowAll();
 })
 
-$(document).on("click","button.output", function(){
+$(document).on("click","span.output", function(){
 	var value = $("#outputSelection").val();	
     switch (value)	
     {	
@@ -786,7 +786,7 @@ $(document).on("click","button.output", function(){
 
 
 //CLICK BUTTON EVENT FOR ADDING/REMOVING ELEMENT
-$(document).on("click","button.addRemove", function(){
+$(document).on("click","span.addRemove", function(){
 	name = $(this).attr('id');
 	action = $(this).html();
 	if(action == "Exclude"){
@@ -802,7 +802,7 @@ $(document).on("click","button.addRemove", function(){
 
 
 //CLICK BUTTON EVENT FOR ADDING/REMOVING ATTRIBUTE
-$(document).on("click","button.addRemoveAttribute", function(){
+$(document).on("click","span.addRemoveAttribute", function(){
 	name = $(this).attr('id');
 	//alert(name);
 	action = $(this).html();
@@ -817,7 +817,7 @@ $(document).on("click","button.addRemoveAttribute", function(){
 })
 
 //CLICK BUTTON EVENT FOR VIEWING ELEMENTS
-$(document).on("click","button.modulelink",function() {
+$(document).on("click","span.modulelink",function() {
 	Back = "Modules";
 	Current = "Elements";
     showelements($(this).text() );
@@ -827,13 +827,13 @@ $(document).on("click","button.modulelink",function() {
 
 
 //CLICK BUTTON EVENT FOR VIEWING ATTRIBUTES
-$(document).on("click","button.elementlink",function(){
+$(document).on("click","span.elementlink",function(){
     showattributes($(this).text() );
     $("#tabs").tabs("select", 5); 
     return false;
 })
 
-$(document).on("click","button.attributelink", function(){
+$(document).on("click","span.attributelink", function(){
 	alterattributes($(this).attr("id"));
     $("#tabs").tabs("select", 6); 
 
@@ -841,7 +841,7 @@ $(document).on("click","button.attributelink", function(){
 })
 
 //CLICK BUTTON EVENT FOR ADDING MODULE
-$(document).on("click","button.addModule",function() {
+$(document).on("click","span.addModule",function() {
 	name = $(this).attr('id');
 	var exists = false;
 	var index = $.inArray(name.substring(0, name.length - 1), AddedModules);
@@ -853,7 +853,7 @@ $(document).on("click","button.addModule",function() {
 })
 
 //CLICK BUTTON EVENT FOR REMOVING MODULE
-$(document).on("click","button.removeModule",function(){
+$(document).on("click","span.removeModule",function(){
 	name = $(this).attr('id');
 	var exists = false;
 	if($.inArray(name.substring(0, name.length - 1), AddedModules) != -1){
@@ -864,7 +864,7 @@ $(document).on("click","button.removeModule",function(){
 })
 
 
-$(document).on("click","button.continueToLoad", function(){
+$(document).on("click","span.continueToLoad", function(){
 	var xmldata = $("#inputarea").val();
 	xml = xmldata
 	givenXML = xmldata
@@ -886,7 +886,7 @@ $(document).on("click","button.continueToLoad", function(){
         $("#tabs").tabs("select", 3); 
 })
 
-$(document).on("click","button.loadCustomJSON", function(){
+$(document).on("click","span.loadCustomJSON", function(){
 	eval($('#inputarea').val());
 	teiName = $("#JSONfile").val();
 	showNewModules();
@@ -895,11 +895,11 @@ $(document).on("click","button.loadCustomJSON", function(){
         $("#tabs").tabs("select", 3); 
 })
 
-$(document).on("click","button.outputXML", function(){
+$(document).on("click","span.outputXML", function(){
 
 })
 
-$(document).on("click", "button.saveAttributeInfo", function(){
+$(document).on("click", "span.saveAttributeInfo", function(){
 	if($("#listOfValues").val() != ""){
 		index = -1;
 		var values = $("#attributeIdent").text().replace(/;/g,",");
@@ -918,7 +918,7 @@ $(document).on("click", "button.saveAttributeInfo", function(){
 	}
 })
 
-$(document).on("click","button.removeJSON", function(){
+$(document).on("click","span.removeJSON", function(){
 	var name = $("JSONtoremove").val();
 	if(name == ''){
 	}
@@ -927,7 +927,7 @@ $(document).on("click","button.removeJSON", function(){
 	}
 	doShowTEI();
 })
-$(document).on("click", "button.restart", function(){
+$(document).on("click", "span.restart", function(){
 	$('#projectSelection').show();
 	$('#actions').hide();
 	$('#UploadCustom').hide();

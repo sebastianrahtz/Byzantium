@@ -32,21 +32,39 @@ tr.choice >td {
     padding: 12pt;
     border-bottom: solid blue 2pt;
 }
+tr.filetable >td {
+    padding: 4pt;
+    border-bottom: solid green 2pt;
+}
 h2{
     color:#900;
 }
-/* Byzantium */
+/* tabs */
 .ui-widget { font-family: Verdana,Arial,sans-serif/*{ffDefault}*/; font-size: 0.9em/*{fsDefault}*/; }
 .ui-widget .ui-widget { font-size: 0.9em; }
 .ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget { font-family: Verdana,Arial,sans-serif/*{ffDefault}*/; font-size: 0.9em; }
 
+/* buttons */
 .modulelink,
 .elementlink,
 .attributelink{
-    border:none;
     color:blue;
-    cursor:pointer;
 }
+
+span.button {
+    font-family: Verdana, Arial, Helvetica, sans-serif; 
+    font-size: smaller; 
+    margin: 3px;
+    color: #003366
+    border: #00ffff;
+    border-style: solid;
+    border-width: 1px;
+    cursor:pointer;
+    padding: 2pt;
+    border-radius: 5px;
+    background-color:#E0E0E0;
+}
+
 td.unselected {
     color: red;
 }
