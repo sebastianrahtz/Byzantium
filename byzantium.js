@@ -69,7 +69,7 @@ function showmodules() {
 	if($.inArray(module.ident, AddedModules) != -1)
 	{
 	    mString += '<td><span class="button removeModule" id="'+module.ident+'R">Remove</span></td>';
-	    mString += '<td><span class="button modulelink" style="border:none; color:blue; cursor: pointer;">' + module.ident + '</span></td>' ;
+	    mString += '<td><span class="button modulelink" >' + module.ident + '</span></td>' ;
 	}
 	else
 	{
@@ -128,7 +128,7 @@ function showelements(name  )
 			else{
 				items.push("Include");
 			}
-			items.push('</span></td><td><span class="button elementlink" style="border:none; color:blue; cursor: pointer;">' + element.ident + '</span></td><td>' + element.desc + '</td></tr>');
+			items.push('</span></td><td><span class="button elementlink">' + element.ident + '</span></td><td>' + element.desc + '</td></tr>');
           }
         });
 	
@@ -202,7 +202,7 @@ function showattributes(name ) {
 									else{
 										addableitems.push("Include");
 									}
-									addableitems.push('</span></td><td>' + '<span class="button attributelink" id="att,' + currentModule + "," + name + "," + attribute.ident + '" style="border:none; color:blue; cursor: pointer;">'+ attribute.ident + "</span></td><td>"  + attribute.desc + '</td></tr>');
+									addableitems.push('</span></td><td>' + '<span class="button attributelink" id="att,' + currentModule + "," + name + "," + attribute.ident + '" >'+ attribute.ident + "</span></td><td>"  + attribute.desc + '</td></tr>');
 								}
 								else{
 									unaddableitems.push('<tr><td><button disabled="disabled">Requires: ' + classAttributeModule + "</span></td><td>"+ attribute.ident + '</td><td> ' + attribute.desc + '</td></tr>');

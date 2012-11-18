@@ -28,9 +28,12 @@ td#attributes{
 td{
     vertical-align:top;
 }
+table#moduleList td {
+    padding: 2pt;
+}
 tr.choice >td {
     padding: 12pt;
-    border-bottom: solid blue 2pt;
+    border-bottom: solid red 2pt;
 }
 tr.filetable >td {
     padding: 4pt;
