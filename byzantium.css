@@ -36,8 +36,8 @@ tr.choice >td {
     border-bottom: solid red 2pt;
 }
 tr.filetable >td {
+    font-family: monospace;
     padding: 4pt;
-    border-bottom: solid green 2pt;
 }
 h2{
     color:#900;
