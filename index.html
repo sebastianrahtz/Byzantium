@@ -1,255 +1,274 @@
-﻿<!DOCTYPE html>
-<meta charset="UTF-8">
+<!DOCTYPE html>
 <html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<script src="jquery.js"></script>
-<script src="byzantium.js"></script>
-<script src="sparkline.js"></script>
-<style type="text/css">
-#selected
-{
-float:right;
-}
-</style>
-</head>
-<body>
-<div id='banner'>
-<table>
-<td>
-<img src="http://www.tei-c.org/Roma/TEI-glow.png"/>
-</td>
-<td>
-<h1>Roma: generating customizations for the TEI</h1><br clear="all"/>
-</td>
-</table>
-<div id='projectSelection'>
-<h1>Welcome to Roma!</h1>
-<h2>Select a project:</h2><br/>
-<button class="newProject">New Project</button>
-<button class="loadProject">Load Project</button>
-<button class="uploadProject">Upload Project</button>
-</div>
-
-<div id='upload'>
-
-	<script type="text/javascript">
-		// Check for the various File API support.
-		if (window.File && window.FileReader && window.FileList && window.Blob) {
-		//  alert("Great success! All the File APIs are supported.");
-		} else {
-		  alert('The File APIs are not fully supported in this browser.');
-		}
-	</script>
-	<input type="file" id="files" name="files[]" multiple />
-	<output id="list"></output>
-	<button class="continueToLoad">Continue</button>
-	<script>
-  function handleFileSelect(evt) {
-    var files = evt.target.files; // FileList object
-
-    // files is a FileList of File objects. List some properties.
-    var output = [];
-    for (var i = 0, f; f = files[i]; i++) {
-      output.push('<li><strong>', escape(f.name), '</strong> (', f.type || 'n/a', ') - ',
-                  f.size, ' bytes, last modified: ',
-                  f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a',
-                  '</li>');
-		  var reader = new FileReader();
-		  // Closure to capture the file information.
-      reader.onload = (function(theFile) {
-        return function(e) {
-          document.getElementById('inputarea').innerHTML=this.result;
-        };
-      })(f);
-
-      // Read in the image file as a data URL.
-      reader.readAsText(f);
-    }
-    document.getElementById('list').innerHTML = '<ul>' + output.join('') + '</ul>';
-  }
-
-  document.getElementById('files').addEventListener('change', handleFileSelect, false);
-</script>
-	<input name="filename" value="myTEI"/><br/>
-	<textarea rows="50" cols="75" name="XMLinput" id="inputarea"></textarea>
-
-</div>
-
-<div id='message'></div>
-
-<div id='actions'>
-Save Project:<input type="text" id='saveAs'/>
-<button class="save">Save</button>
-<select id='outputSelection'>
-  <option>TEI ODD</option>
-  <option>RELAX NG Schema</option>
-  <option>ISO Schematron</option>
-  <option>Schematron</option>
-  <option>DTD</option>
-  <option>JSON</option>
-  <option>HTML documentation</option>
-</select>
-<button class="output">Export</button>
-<button class="report">Report</button>
-<button class="back">Back</button>
-</div>
-
-<div id='selected'></div>
-
-<div id='startInfo'>
-	<form>
-	Title:<input type="text" id='title'/><br/>
-	</form>
-	<form>
-	Filename:<input type="text" id='filename'/><br/>
-	</form>
-	<form>
-	Author Name:<input type="text" id='author'/><br/>
-	</form>
-	<form>
-	Description:<textarea rows="4" cols="40" id='description'></textarea><br/>
-	</form>
-	Language:<select id='languageSelect'>
-		<option>English</option>
-		<option>Deutsch</option>
-		<option>Italiano</option>
-		<option>Español</option>
-		<option>Français</option>
-		<option>Portugues</option>
-		<option>Russian</option>
-		<option>Svenska</option>
-		<option>日本語</option>
-		<option>中文</option>
-	</select><br/>
-	<button class="saveStartInfo">Next</button>
-
-</div>
-
-<div id="teiSelection">
-<h2>Please Select Your TEI Database:</h2>
-	<p id="TEI_Selected"></p>
-	<button class="TEI_Default">Default</button>
-	<button class="TEI_Online">Use Online</button>
-	<button class="TEI_Existing">Load Existing</button>
-	<button class="TEI_Custom">Load Custom</button><br/>
-	
-	<div id='UploadCustom'>
-
-		<script type="text/javascript">
-			// Check for the various File API support.
-			if (window.File && window.FileReader && window.FileList && window.Blob) {
-			//  alert("Great success! All the File APIs are supported.");
-			} else {
-			  alert('The File APIs are not fully supported in this browser.');
-			}
-		</script>
-		<input type="file" id="JSONfiles" name="files[]" multiple />
-		<output id="JSONlist"></output>
-		<button class="loadCustomJSON">Load</button>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<script src="jquery.js"></script>
+		<script src="jquery-ui.js"></script>
+		<script src="byzantium.js"></script>
+		<script src="sparkline.js"></script>
 		<script>
-	  function handleFileSelect(evt) {
-		var files = evt.target.files; // FileList object
+    $(function() {
+        $( "#tabs" ).tabs({
+       select: function(event, ui){
+            var tabNumber = ui.index;
+            var tabName = $(ui.tab).text();            
+            if      (tabNumber == 1 ) {	editinfo(); }
+            else if (tabNumber == 3 ) {	showmodules(); }
+            else if (tabNumber == 7 ) { makeReport(); }
+        }});
+    });
+</script>
+		<link rel="stylesheet" href="jquery-ui.css" />
+		<link rel="stylesheet" href="byzantium.css" />
+	</head>
+	<body>
+		<div id="banner">
+			<table>
+				<td>
+					<img src="http://www.tei-c.org/Roma/TEI-glow.png" />
+				</td>
+				<td>
+					<h1>Byzantium: generating customizations for the TEI</h1>
+					<br clear="all" />
+				</td>
+			</table>
+		</div>
+		<div id="actions"> Project name:<input type="text" id="saveAs" />
+			<button class="save">Save to local storage</button>
+			<select id="outputSelection">
+				<option>TEI ODD</option>
+				<option>RELAX NG Schema</option>
+				<option>ISO Schematron</option>
+				<option>Schematron</option>
+				<option>DTD</option>
+				<option>JSON</option>
+				<option>HTML documentation</option>
+			</select>
+			<button class="output">Generate</button>
+		</div>
 
-		// files is a FileList of File objects. List some properties.
-		var output = [];
-		for (var i = 0, f; f = files[i]; i++) {
-		  output.push('<li><strong>', escape(f.name), '</strong> (', f.type || 'n/a', ') - ',
-					  f.size, ' bytes, last modified: ',
-					  f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a',
-					  '</li>');
-			  var reader = new FileReader();
-			  // Closure to capture the file information.
-		  reader.onload = (function(theFile) {
-			return function(e) {
-			  document.getElementById('JSONinputarea').innerHTML=this.result;
-			};
-		  })(f);
+		<div id="tabs">
+			<ul>
+				<li>
+					<a href="#projectSelection">Start</a>
+				</li>
+				<li>
+					<a href="#startInfo">Info</a>
+				</li>
+				<li>
+					<a href="#teiSelection">Database</a>
+				</li>
+				<li>
+					<a href="#modules">Modules</a>
+				</li>
+				<li>
+					<a href="#elements">Current Module</a>
+				</li>
+				<li>
+					<a href="#attributes">Attributes</a>
+				</li>
+				<li>
+					<a href="#alterAttributes">Current Attribute</a>
+				</li>
+				<li>
+					<a href="#reportPage">Report</a>
+				</li>
+			</ul>
 
-		  // Read in the image file as a data URL.
-		  reader.readAsText(f);
-		}
-		document.getElementById('JSONlist').innerHTML = '<ul>' + output.join('') + '</ul>';
-	  }
+			<div id="projectSelection">
+			  <table>
+			    <tr class="choice"><td>New project</td><td><button class="newProject">Create</button></td></tr>
+			    <tr class="choice"><td>Upload ODD</td><td>
+				<div id="upload">
+				  <script type="text/javascript">checkFileSupport();</script>
+				        <input type="file" id="files" name="files[]" multiple="multiple" />
+					<output id="list"></output>
+					<button  class="continueToLoad">Load file</button>
+				  <script>
+				  function handleFileSelect(evt) {
+				  var files = evt.target.files;
+				    showFiles(files,'list')
+				  }
+				  document.getElementById('files').addEventListener('change',  handleFileSelect, false);
+				  </script>
+				</div>
+				</td></tr>
+				<tr>
+				  <td>Projects in local storage</td>
+				    <td>
+				    <div id="loadProjectTools">
+					<div id="items_table">
+					</div>
+				</div>
+				</td>
+				</tr>
+				</table>
 
-	  document.getElementById('JSONfiles').addEventListener('change', handleFileSelect, false);
-	</script>
-		<input name="filename" id="JSONname" value="myTEI"/><br/>
-		<textarea rows="50" cols="75" name="JSONinput" id="JSONinputarea"></textarea>
+			</div>
 
-	</div>
-	
-	<div id="OnlineSelector">
-		Enter URL:<input type="text" id='TEI_OnlineSelector'/><br/>
-		Name TEI:<input type="text" id='TEI_OnlineName'/><br/>
-		<button class="setOnline">Continue</button>
-	</div>
-	
-	<div id="ExistingSelector">
-		<b>Load Which TEI:</b><input type="text" id='loadTEI'/>
-		 <div id="tei_table">
-		 <h2>Saved Projects</h2>
-		 <table id='teipairs'></table>
-		 </div>
-		 <button class="setExisting">Set</button>
-		 <button class="removeJSON">Remove</button>
-		 <input type="text" id='JSONtoremove'/>
-	</div>
+			<div id="startInfo">
+				<form>
+					<table>
+						<tr>
+							<td>Title</td>
+							<td>
+								<input type="text" id="title" value="My TEI customization" />
+							</td>
+						</tr>
+						<tr>
+							<td>Filename</td>
+							<td>
+								<input type="text" id="filename" value="myTEI" />
+							</td>
+						</tr>
+						<tr>
+							<td>Author Name</td>
+							<td>
+								<input type="text" id="author" />
+							</td>
+						</tr>
+						<tr>
+							<td>Description</td>
+							<td>
+								<textarea rows="4" cols="40" id="description"></textarea>
+							</td>
+						</tr>
+						<tr>
+							<td>Language</td>
+							<td>
+								<select id="languageSelect">
+									<option value="en">English</option>
+									<option value="de">Deutsch</option>
+									<option value="it">Italiano</option>
+									<option value="es">Español</option>
+									<option value="fr">Français</option>
+									<option value="pt">Portugues</option>
+									<option value="ja">日本語</option>
+									<option value="zh">中文</option>
+								</select>
+							</td>
+						</tr>
+					</table>
+				</form>
+				<button class="saveStartInfo">Save</button>
 
-</div>
+			</div>
+
+			<div id="teiSelection">
+				<h2>Please Select Your TEI Database:</h2>
+				<p id="TEI_Selected"></p>
+			  <table>
+			    <tr>
+			      <td>Default</td>
+			      <td><button class="TEI_Default">Load</button></td>
+			    </tr>
+			    <tr class="choice"> <td colspan="2"><span id="defaultDatabase"/></td></tr>
+			    <tr class="choice">
+			      <td>From web</td>
+			      <td>
+			      <div id="OnlineSelector"> Enter URL:<input type="text" id="TEI_OnlineSelector"
+				/><br /> Name TEI:<input type="text" id="TEI_OnlineName" /><br />
+				<button class="setOnline">Load</button>
+				</div>
+				</td>
+			      </tr>
+			      <tr class="choice">
+				<td>From local storage
+				</td>
+				<td>
+				<div id="ExistingSelector">
+				  <b>Load Which TEI:</b>
+				  <input type="text" id="loadTEI" />
+				<div id="tei_table">
+				  <h2>Saved Databases</h2>
+				  <table id="teipairs"></table>
+				</div>
+				<button class="setExisting">Load</button>
+				<button class="removeJSON">Remove</button>
+				<input type="text" id="JSONtoremove" />
+				</div>
+				</td>
+			      </tr>
+			      <tr class="choice">
+				<td>Upload file</td>
+				<td>
+				<div id="UploadCustom">
+				  <script type="text/javascript">checkFileSupport();</script>
+				  <input type="file" id="JSONfiles" name="files[]" multiple="multiple" />
+				  <output id="JSONlist"></output>
+				  <button class="loadCustomJSON">Load</button>
+				  <script>document.getElementById('JSONfiles').addEventListener('change', handleFileSelect, false);</script>
+				</div>
+				</td>
+			      </tr>
+			    </table>
+			</div>
 
 
-<div id='modules'></div>
+			<div id="modules">
+				<div id="sparkline" style="float:right" border="1">
+					<span class="moduleSparkline"></span>
+					<ul>
+						<li>Red: Used elements</li>
+						<li>Blue: Unused elements</li>
+					</ul>
+				</div>
+				<div id="moduleSummary">
+					<p></p>
+				</div>
+				<table id="moduleList" class="modules">
+					<tr>
+						<td>NO DATABASE LOADED</td>
+					</tr>
+				</table>
+				<!--			      <div id="selected"></div>-->
 
-<div id='elements'></div>
+			</div>
 
-<div id='attributes'></div>
+			<div id="elements">
+				<p>NO MODULE SELECTED YET</p>
+			</div>
 
-<div id='alterAttributes'>
+			<div id="attributes">
+				<p>NO ELEMENT SELECTED YET</p>
+			</div>
 
-	<p id="attAlterName"/>
+			<div id="alterAttributes">
 
-	<p id='attributeIdent' style="display:none"/>
-	<form>
-		List of Values:<input type="text" id='listOfValues'/><br/>
-	</form>
-	<button class="saveAttributeInfo">Save</button>
-</div>
+				<p id="attAlterName"></p>
 
-<div id='output'></div>
+				<p id="attributeIdent" style="display:none"></p>
+				<button class="closedOrOpen">Open List</button>
+				<form> List of Values:<input type="text" id="listOfValues" /><br />
+				</form>
+				<button class="saveAttributeInfo">Save</button>
+			</div>
 
-<div id='reportPage'>
-	<p id="repTitle"></p>
-	<p id="repFilename"></p>
-	<p id="repAuthor"></p>
-	<p id="repDescription"></p>
-	<p id="repLanguage"></p>
-	<p id="repModulesTag"></p>
-	<div id="repModules"></div>
-	<p id="repElementsTag"></p>
-	<div id="repElements"></div>
-	<p id="repAttributesTag"></p>
-	<div id="repAttributes"></div>
-	<button class="returnToModules">Return to Modules</button>
-</div>
+			<div id="output"></div>
 
-<div id='loadProjectTools'>
-	<form>
-	<b>Load Which Project:</b><input type="text" id='loadAs'/><br/>
-	</form>
-	<button class="load">Load</button>
-	<div id="items_table">
-		 <h2>Saved Projects</h2>
-		 <table id="pairs"></table>
-	</div>
-	<form>
-	<b>Delete Which Project:</b><input type="text" id="deleteProject"/><br/>
-	</form>
-	<button class="delete">Delete</button>
-</div>
-<button class="restart">Restart</button>
-<div class="trailer">	
-	<p id="colophon"/>
-</div>
-</body>
+			<div id="reportPage">
+				<h2>Status report</h2>
+				<p id="repTitle"></p>
+				<p id="repFilename"></p>
+				<p id="repAuthor"></p>
+				<p id="repDescription"></p>
+				<p id="repLanguage"></p>
+				<p id="repModulesTag"></p>
+				<div id="repModules"></div>
+				<p id="repElementsTag"></p>
+				<div id="repElements"></div>
+				<p id="repAttributesTag"></p>
+				<div id="repAttributes"></div>
+			</div>
+
+		</div>
+
+		<div id="message"></div>
+
+		<textarea rows="50" cols="75" style="display:none" id="inputarea"></textarea> 
+		
+		<div class="trailer">
+			<p id="colophon"></p>
+		</div>
+	</body>
 </html>
