@@ -167,6 +167,15 @@ function loadFile(xml){
 			}
 		})
 		    }
+		includes = item.getAttribute('include');
+	    if (includes != null) {
+		var individualIncludes = includes.split(" ");
+		$.each(TEI.elements, function(i, element){
+		    if(element.module == currentModule && $.inArray(element.ident, individualIncludes) == -1) {
+			ExcludedElements.push(key+","+element.ident);
+		    }
+		})
+		    }
 	})
 	$xml.find("elementSpec").each(function(i, item){
 		var module = item.getAttribute('module');
@@ -478,7 +487,6 @@ function setXML(){
 	 // files is a FileList of File objects. List some properties.
 	 var output = [];
 	 for (var i = 0, f; f = files[i]; i++) {
-	     alert("found " + f.name);
 	     output.push('<li><strong>', escape(f.name), '</strong> (', f.type || 'n/a', ') - ',
 			 f.size, ' bytes, last modified: ',
 			 f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a',
