@@ -157,8 +157,8 @@ function loadFile(xml){
 	}
 	$xml.find("moduleRef").each(function(i, item) {
 		key = item.getAttribute('key');
-		excepts = item.getAttribute('except');
 		AddedModules.push(key);
+		excepts = item.getAttribute('except');
 	    if (excepts != null) {
 		var individualExcepts = excepts.split(" ");
 		$.each(individualExcepts, function(i, except){
@@ -303,14 +303,34 @@ function setXML(){
 	$.each(AddedModules, function(i, name) {
 	    var mr = document.createElementNS("http://www.tei-c.org/ns/1.0", 'moduleRef');
 		var excludeString = "";
+		var includeString = "";
 		var currentModule = name;
+	        $.each(TEI.elements, function(i, element) {
+		    if (element.module == currentModule && $.inArray((currentModule + "," + element.ident), ExcludedElements) == -1) {
+			includeString += " " + element.ident;
+		    }
+		})
 		$.each(ExcludedElements, function(j, element){
 			if(element.split(',')[0] == currentModule){
-				excludeString = excludeString + " " + element.split(',')[1];
+			    excludeString += " " + element.split(',')[1];
 			}
 		})
-		$xml.find("schemaSpec").append($(mr).attr({key: currentModule, except: excludeString}));
-	})
+		    alert("module " + currentModule + " = " + method);
+		    if (excludeString == '') 
+			{
+			    $xml.find("schemaSpec").append($(mr).attr({key: currentModule}));
+			}
+			else 
+			{
+			    if (method == 'include') {
+				$xml.find("schemaSpec").append($(mr).attr({key: currentModule, include: includeString}));
+			    }
+			    else
+			    {
+				$xml.find("schemaSpec").append($(mr).attr({key: currentModule, except: excludeString}));
+			    }
+			}
+		    })
 	
 	var excludes = [];
 	$.each(ExcludedAttributes, function(i, attribute){
@@ -492,6 +512,7 @@ function setXML(){
 	if(language != ""){
 		$("#repLanguage").text("Language: " + language);
 	}
+	$("#repMethod").text("Method " + method);
 	if(AddedModules.length > 0){
 		$("#repModulesTag").text("Modules Added:");
 		
