@@ -15,6 +15,7 @@ var Current = "";
 var ExcludedAttributes=[];
 var ExcludedElements=[];
 var ListofValues=[];
+var closedAndOpen = [];
 var TEI=[];
 var author = "";
 var currentModule = "";
@@ -89,11 +90,11 @@ function showmodules() {
 	});
     });
     $("#moduleSummary").html('<p>' + TEI.modules.length + " modules available, of which " + AddedModules.length + " are in use, containing " + liveElements + " elements, of which " +  ExcludedElements.length + " are excluded</p>");
-    $(".moduleSparkline").sparkline([(totElements-liveElements),(liveElements-ExcludedElements.length),ExcludedElements.length], {
+	$(".moduleSparkline").sparkline([(totElements-liveElements),(liveElements-ExcludedElements.length),ExcludedElements.length], {
 	type: 'pie',
 	width: '200',
 	height: '200',
-	sliceColors: ['#3366cc','#dc3912','#7f7f7f','#109618','#66aa00','#dd4477','#0099c6','#990099 '],
+	sliceColors: ['#dc3912','#3366cc','#7f7f7f','#109618','#66aa00','#dd4477','#0099c6','#990099 '],
 	borderColor: '#7f7f7f'});
     }
 }
@@ -115,25 +116,35 @@ function showNewModules(){
 
 //DISPLAYS ELEMENTS
 function showelements(name  )
-{
-	
+{	
+	var totalElements = 0;
+	var usedElements = 0;
     var items = [];
     $('#elements').html($('<h2/>', {html: "Elements in module " + name }));
     $.each(TEI.elements, function(i, element) {
         if (element.module == name) {
+			totalElements += 1;
 			currentModule = name;
-            items.push('<tr><td><span class="button addRemove" id="' + name + "," + element.ident + '">');
+            items.push('<tr class="filetable"><td><span class="button addRemove" id="' + name + "," + element.ident + '">');
 			if($.inArray((name + "," + element.ident), ExcludedElements) == -1){
-				items.push("Exclude");
+				items.push("Included");
+				usedElements+=1;
 			}
 			else{
-				items.push("Include");
+				items.push("Excluded");
 			}
 			items.push('</span></td><td><span class="button elementlink">' + element.ident + '</span></td><td>' + element.desc + '</td></tr>');
           }
         });
 	
+    $('#elements').append('<div id="sparkline" style="float:right" border="1"><span class="elementSparkline"></span><ul><li>Red: Unsed elements</li><li>Blue: Used elements</li></ul></div>');
     $('#elements').append($('<table/>', {'class': 'elements',html:  items.join('') }));
+	$(".elementSparkline").sparkline([(totalElements-usedElements),usedElements], {
+	type: 'pie',
+	width: '200',
+	height: '200',
+	sliceColors: ['#dc3912','#3366cc','#7f7f7f','#109618','#66aa00','#dd4477','#0099c6','#990099 '],
+	borderColor: '#7f7f7f'});
 }
 
 function loadFile(xml){
@@ -180,12 +191,25 @@ function loadFile(xml){
 	$xml.find("elementSpec").each(function(i, item){
 		var module = item.getAttribute('module');
 		var element = item.getAttribute('ident');
-		$(this).find("attDef").each(function(i, test){
+		$(this).find('attDef[mode="delete"]').each(function(i, test){
 			var attribute = test.getAttribute('ident');
 			ExcludedAttributes.push(module + "," + element + "," + attribute);
 		})
+		$(this).find('attDef[mode="change"]').each(function(i, test){
+			var attribute = test.getAttribute('ident');
+			var data = "att," + module + "," + element + "," + attribute;
+			var openClose = "att," + module + "," + element + "," + attribute;
+			$(test).find('valList').each(function(i, test2){
+				openClose = test2.getAttribute('type') + "," + openClose;
+				$(test2).find("valItem").each(function(i, test3){
+					data = data + "," + test3.getAttribute("ident");
+				})
+			})
+			closedAndOpen.push(openClose);
+			ListofValues.push(data);
+		})
 	})	
-}
+	    }
 
 
 //DISPLAYS ATTRIBUTES
@@ -195,6 +219,10 @@ function showattributes(name ) {
 	var addableitems = [];
 	var unaddableitems = [];
 	var bigString = ""
+	var totalAttributes = 0;
+	var usedAttributes = 0;
+	var excludedAttributes = 0;
+	var unavailableAttributes = 0;
 	$('#attributes').html($('<h2/>', {html: "Attributes in element " + name }));
 	$.each(TEI.elements, function(i, element){
 		if(element.module == currentModule){
@@ -205,18 +233,22 @@ function showattributes(name ) {
 					$.each(TEI.attclasses, function(i, attclass){
 						if(attclass.ident == classAttributeClass){
 							$.each(attclass.attributes, function(i, attribute){
+								totalAttributes+=1;
 								if($.inArray(classAttributeModule, AddedModules) != -1){
 									addableitems.push('<tr><td><span class="button addRemoveAttribute" id="' + currentModule + "," + name + "," + attribute.ident + '">');
 									if($.inArray((currentModule + "," + name + "," + attribute.ident), ExcludedAttributes) == -1){
-										addableitems.push("Exclude");
+										addableitems.push("Included");
+										usedAttributes += 1;
 									}
 									else{
-										addableitems.push("Include");
+										addableitems.push("Excluded");
+										excludedAttributes += 1;
 									}
 									addableitems.push('</span></td><td>' + '<span class="button attributelink" id="att,' + currentModule + "," + name + "," + attribute.ident + '" >'+ attribute.ident + "</span></td><td>"  + attribute.desc + '</td></tr>');
 								}
 								else{
 									unaddableitems.push('<tr><td><button disabled="disabled">Requires: ' + classAttributeModule + "</span></td><td>"+ attribute.ident + '</td><td> ' + attribute.desc + '</td></tr>');
+									unavailableAttributes +=1;
 								}
 								
 							})
@@ -228,11 +260,44 @@ function showattributes(name ) {
 			}
 		}
 	});
+	$('#attributes').append('<div id="sparkline" style="float:right" border="1"><span class="attributeSparkline"></span><ul><li>Red: Unused attributes</li><li>Blue: Used attributes</li><li>Gray: Unavailable Attributes</li></ul></div>');
 	$('#attributes').append($('<table/>', {'class': 'attributes',html: addableitems.join('') + unaddableitems.join('')}));
+	$(".attributeSparkline").sparkline([excludedAttributes,usedAttributes,unavailableAttributes], {
+	type: 'pie',
+	width: '200',
+	height: '200',
+	sliceColors: ['#dc3912','#3366cc','#7f7f7f','#109618','#66aa00','#dd4477','#0099c6','#990099 '],
+	borderColor: '#7f7f7f'});
 }
 function alterattributes(id){
 	$("#attributeIdent").text(id);
 	$("#attAlterName").text("Attribute Name: " + id.split(',')[3]);
+	$(".closedOrOpen").html("Open List");
+	$.each(closedAndOpen, function(i, closeOpen){
+		if(closeOpen.split(',')[2] + closeOpen.split(',')[3] + closeOpen.split(',')[4] == id.split(',')[1] + id.split(',')[2] + id.split(',')[3]){
+			if(closeOpen.split(',')[0] == 'closed'){
+				$(".closedOrOpen").html("Closed List");
+			}
+			if(closeOpen.split(',')[0] == 'open'){
+				$(".closedOrOpen").html("Open List");
+			}
+		}
+	})
+	$("#listOfValues").val("");
+	$.each(ListofValues, function(i, value){
+		if(value.split(',')[1] + value.split(',')[2] + value.split(',')[3] == id.split(',')[1] + id.split(',')[2] + id.split(',')[3]){
+			var values = value.split(',')[4];
+			var valueList = value.split(',');
+			$.each(valueList, function(i, value){
+				if(i > (valueList.length-6)){
+				}
+				else{
+					values = values + ',' + valueList[i+5];
+				}
+			})
+			$("#listOfValues").val(values);
+		}
+	})
 }
 
 //READY FUNCTION. 
@@ -247,9 +312,6 @@ $(document).ready(function(){
 		    }
 		});
 	}
-//	$('#UploadCustom').hide();
-//	$('#OnlineSelector').hide();
-//	$('#ExistingSelector').hide();
         cleanSystem();
     doShowAll();
     $('#defaultDatabase').html(defaultDatabase);
@@ -273,6 +335,7 @@ function loadTEI(){
 
 //Sets the XML to be outputted.
 function setXML(){
+	//alert(ListofValues);
 	if(givenXML == ""){
 		xml = '<?xml version="1.0"?><TEI xml:lang="en" xmlns="http://www.tei-c.org/ns/1.0"><teiHeader><fileDesc><titleStmt><title/><author/></titleStmt>'
 		+ '<publicationStmt><p>for use by whoever wants it</p></publicationStmt><sourceDesc><p>created on ' + today + '</p></sourceDesc>'
@@ -324,7 +387,6 @@ function setXML(){
 			    excludeString += " " + element.split(',')[1];
 			}
 		})
-		    alert("module " + currentModule + " = " + method);
 		    if (excludeString == '') 
 			{
 			    $xml.find("schemaSpec").append($(mr).attr({key: currentModule}));
@@ -376,8 +438,8 @@ function setXML(){
 	//alert(usedElements);
 	
 	$.each(usedElements, function(i, item){
-		var es = $.parseXML("<elementSpec/>").documentElement;
-		var al = $.parseXML("<attList/>").documentElement;
+		var es = document.createElementNS("http://www.tei-c.org/ns/1.0", 'elementSpec');
+		var al = document.createElementNS("http://www.tei-c.org/ns/1.0", 'attList');
 		var change = "change";
 		currentModule = item.split(",")[0];
 		currentElement = item.split(",")[1];
@@ -389,11 +451,12 @@ function setXML(){
 			}
 			else{
 				currentAttribute = item2;
-				var ad = $.parseXML("<attDef/>").documentElement;
+				var ad = document.createElementNS("http://www.tei-c.org/ns/1.0", 'attDef');
 				$xml.find("elementSpec[ident=" + currentElement + "][module=" + currentModule + "]").children().append($(ad).attr({ident: currentAttribute, mode: "delete"}));
 			}
 		})
-			
+		out = new XMLSerializer().serializeToString(xmlDoc);
+		xml = out;			
 	})	
 	var includedValue = [];
 	
@@ -401,21 +464,64 @@ function setXML(){
 		if($.inArray(value.split(',')[1], AddedModules) != -1){
 			if($.inArray((value.split(',')[1] + "," + value.split(',')[2]), ExcludedElements) == -1){
 				if($.inArray((value.split(',')[1] + "," + value.split(',')[2] + ',' + value.split(',')[3]), ExcludedAttributes) == -1){
-					excludes.push(value);
+					includedValue.push(value);
 				}
 			}
 		}
 	})
-	
+	var beenHereBefore = 0;
 	$.each(ListofValues, function(i, value){
 		var es = $.parseXML("<elementSpec/>").documentElement;
 		var al = $.parseXML("<attList/>").documentElement;
+		var vl = $.parseXML("<valList type='closed' mode='replace'/>").documentElement;
 		var change = "change";
 		var module = value.split(",")[1];
 		var element = value.split(",")[2];
-		alert($xml.find("elementSpec[ident=" + element + "][module=" + module + "]"));
 		var exclusions = $xml.find("elementSpec[ident=" + element + "][module=" + module + "]");
-		//alert(value);
+		if($.inArray(value, includedValue) != -1){
+			
+			var hasAtt = "false";
+			var data = '';
+			var closeOpen = '';
+			$.each(ExcludedAttributes, function(i, attribute){
+				if(value.split(',')[1] + "," + value.split(',')[2] == attribute.split(',')[0] + "," + attribute.split(',')[1]){
+					hasAtt = "true";
+				}
+			})
+			$.each(closedAndOpen, function(i, posCloseOpen){
+				if(value.split(',')[1] + value.split(',')[2] + value.split(',')[3] == posCloseOpen.split(',')[2] + posCloseOpen.split(',')[3] + posCloseOpen.split(',')[4]){
+					closeOpen = posCloseOpen.split(',')[0];
+				}
+			})
+			if(hasAtt == "true" || beenHereBefore > 0){
+				data = '<attDef ident="' + value.split(",")[3] + '" mode="change" xmlns="http://www.tei-c.org/ns/1.0"><valList type="' + closeOpen + '" mode="replace">';
+			}
+			else{
+				data = '<elementSpec xmlns="http://www.tei-c.org/ns/1.0" ident="'+element+'" module="' + module + '" mode="change"><attList><attDef ident="' + value.split(",")[3] + '" mode="change" xmlns="http://www.tei-c.org/ns/1.0"><valList type="' + closeOpen + '" mode="replace">';
+			}
+			var splitList = value.split(",");
+			$.each(splitList, function(i){
+				if(i > (splitList.length-5)){
+				}
+				else{
+					data = data + '<valItem ident="' + value.split(",")[i+4] + '"/>'
+				}
+			})
+			if(hasAtt == "true" || beenHereBefore > 0){
+				data = data + '</valList></attDef>'
+			}
+			else{
+				data = data + '</valList></attDef></attList></elementSpec>'
+				beenHereBefore = 1;
+			}
+			var at = $.parseXML(data).documentElement;
+			if(hasAtt == "true"){
+				$xml.find("elementSpec[ident=" + element + "][module=" + module + "]").find("attList").append($(at));
+			}
+			else{
+				$xml.find("schemaSpec").append($(at));
+			}
+		}
 	})
 	
 	out = new XMLSerializer().serializeToString(xmlDoc);
@@ -432,11 +538,11 @@ function setXML(){
 	 if(key.split("%*$&#")[0] != "proj"){
 	 }
 	 else{
-		pairs += "<tr class='filetable'><td class='fname'>"+key.split("%*$&#")[1]+"</td><td><span class='button load'>Load</span><td><span class='button delete'>Delete</span></tr>\n";
+		pairs += "<tr><td class='fname'>"+key.split("%*$&#")[1]+"</td><td><button class='load'>Load</button><td><button class='delete'>Delete</button></tr>\n";
 	 }
        }
      if (pairs != "") {
-	 $('#items_table').html('<table>' + pairs + '</table>');
+	 $('#items_table').html('<table><tr><th>Name</th><th>Action</th></tr>' + pairs + '</table>');
      }
  }
  
@@ -523,7 +629,7 @@ function setXML(){
 	$("#repMethod").text("Method " + method);
 	if(AddedModules.length > 0){
 		$("#repModulesTag").text("Modules Added:");
-		
+		$("#repModules").empty();
 		var items = [];
 		setXML();
 		xmlDoc = $.parseXML(xml);
@@ -543,7 +649,7 @@ function setXML(){
 	}
 	if(ExcludedElements.length > 0){
 		$("#repElementsTag").text("Elements Excluded:");
-		
+		$("#repElements").empty();
 		var items = [];
 		setXML();
 		xmlDoc = $.parseXML(xml);
@@ -572,11 +678,11 @@ function setXML(){
 	}
 	if (ExcludedAttributes.length > 0){
 		$("#repAttributesTag").text("Attributes Excluded:");
+		$("#repAttributes").empty();
 		var items = [];
 		setXML();
 		xmlDoc = $.parseXML(xml);
 		$xml = $(xmlDoc);
-		//alert(xml);
 		$xml.find("elementSpec").each(function(i, layer){
 			//alert("Got here");
 			var module = layer.getAttribute('module');
@@ -626,11 +732,6 @@ function editinfo () {
 	method = $("#methodSelect").val();
 }
 
-//--------------------------------------------------------------------------------------------------------------
-//------------------------------------------------BUTTON CLICKS HERE--------------------------------------------
-//--------------------------------------------------------------------------------------------------------------
-
-
 $(document).on("click","span.newProject", function(){
     cleanSystem();
     AddedModules = [];
@@ -644,15 +745,12 @@ $(document).on("click","span.newProject", function(){
 
 $(document).on("click","span.saveStartInfo", function(){
     editinfo();
-//    $('#OnlineSelector').hide();
-//    $('#ExistingSelector').hide();
-//    $('#UploadCustom').hide();
     $("#tabs").tabs("select", 2); 
 });
 
 
 
-$(document).on("click","span.TEI_Custom", function(){
+$(document).on("click","button.TEI_Custom", function(){
 	$('#UploadCustom').show();
 	$("#ExistingSelector").hide();
 	$("#OnlineSelector").hide();
@@ -736,7 +834,6 @@ $(document).on("click","span.loadProject", function(){
 //Used to save a project to the browser.
 $(document).on("click","span.save", function(){
 	var name = $("#saveAs").val(); 
-	//alert(name);
 	if(name == ''){
 	}
 	else{
@@ -752,7 +849,7 @@ $(document).on("click","span.save", function(){
 $(document).on("click","span.load", function(){
     var name = $(this).parent().parent().children('td.fname').text();
     var data = localStorage.getItem('proj%*$&#'+name);
-    loadFile(data);
+    loadFile(data.replace(/&/g,"&amp;"));
     if(teiName != "undefined" && teiName != null){
 		var L = localStorage.getItem("tei%*$&#" + teiName);
 		if (L != null) {
@@ -821,34 +918,35 @@ $(document).on("click","span.output", function(){
 $(document).on("click","span.addRemove", function(){
 	name = $(this).attr('id');
 	action = $(this).html();
-	if(action == "Exclude"){
+	if(action == "Included"){
 		ExcludedElements.push(name);
-		$(this).html("Include");
+		$(this).html("Excluded");
 	}
-	if(action == "Include"){
-		ExcludedElements.splice($.inArray(name.substring(0, name.length - 1), ExcludedElements),1);
-		$(this).html("Exclude");
+	if(action == "Excluded"){
+		ExcludedElements.splice($.inArray(name, ExcludedElements),1);
+		$(this).html("Included");
 	}
-	
+	showelements(name.split(',')[0]);
 })
 
 
 //CLICK BUTTON EVENT FOR ADDING/REMOVING ATTRIBUTE
 $(document).on("click","span.addRemoveAttribute", function(){
 	name = $(this).attr('id');
-	//alert(name);
 	action = $(this).html();
-	if(action == "Exclude"){
+	if(action == "Included"){
 		ExcludedAttributes.push(name);
-		$(this).html("Include");
+		$(this).html("Excluded");
 	}
-	if(action == "Include"){
-		ExcludedAttributes.splice($.inArray(name.substring(0, name.length - 1), ExcludedAttributes),1);
-		$(this).html("Exclude");
+	if(action == "Excluded"){
+		ExcludedAttributes.splice($.inArray(name, ExcludedAttributes),1);
+		$(this).html("Included");
 	}
+	showattributes(name.split(',')[1]);
 })
 
 //CLICK BUTTON EVENT FOR VIEWING ELEMENTS
+
 $(document).on("click","span.modulelink",function() {
 	Back = "Modules";
 	Current = "Elements";
@@ -896,11 +994,13 @@ $(document).on("click","span.removeModule",function(){
 })
 
 
+
 $(document).on("click","span.continueToLoad", function(){
 	var xmldata = $("#inputarea").val();
-	xml = xmldata
-	givenXML = xmldata
-	loadFile(xmldata);
+
+    xml = xmldata.replace(/&/g,"&amp;")
+    givenXML = xml;
+    loadFile(xml);
 	if(teiName != "undefined" && teiName != null){
 		var L = localStorage.getItem("tei%*$&#" + teiName);
 		if (L != null) {
@@ -933,9 +1033,9 @@ $(document).on("click","span.outputXML", function(){
 
 $(document).on("click", "span.saveAttributeInfo", function(){
 	if($("#listOfValues").val() != ""){
-		index = -1;
+		var index = -1;
 		var values = $("#attributeIdent").text().replace(/;/g,",");
-		values = values + "," + $("#listOfValues").val();
+		values = values + "," + $("#listOfValues").val();		
 		$.each(ListofValues, function(i, listValue) {
 			if(values.split(',')[1] == listValue.split(',')[1] && values.split(',')[2] == listValue.split(',')[2] && values.split(',')[3] == listValue.split(',')[3]){
 				index = i;
@@ -947,9 +1047,37 @@ $(document).on("click", "span.saveAttributeInfo", function(){
 		else{
 			ListofValues.push(values);
 		}
+		
+		var closeOpen = ""
+		if($(".closedOrOpen").html() == "Closed List"){
+			closeOpen = "closed,";
+		}
+		else{
+			closeOpen = "open,";
+		}
+		closeOpen = closeOpen + $("#attributeIdent").text().replace(/;/g,",");
+		index = -1;
+		$.each(closedAndOpen, function(i, value){
+			if(value.split(',')[2] == closeOpen.split(',')[2] && value.split(',')[3] == closeOpen.split(',')[3] && value.split(',')[4] == closeOpen.split(',')[4]){
+				index = i;
+			}
+		})
+		if(index != -1){
+			closedAndOpen[index] = closeOpen;
+		}
+		else{
+			closedAndOpen.push(closeOpen);
+		}
 	}
 })
-
+$(document).on("click", "span.closedOrOpen", function(){
+	if($(".closedOrOpen").html() == "Open List"){
+		$(".closedOrOpen").html("Closed List");
+	}
+	else{
+		$(".closedOrOpen").html("Open List");
+	}
+})
 $(document).on("click","span.removeJSON", function(){
 	var name = $("JSONtoremove").val();
 	if(name == ''){

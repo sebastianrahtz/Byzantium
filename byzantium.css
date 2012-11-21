@@ -28,12 +28,13 @@ td#attributes{
 td{
     vertical-align:top;
 }
+
 table#moduleList td {
     padding: 2pt;
 }
 tr.choice >td {
     padding: 12pt;
-    border-bottom: solid red 2pt;
+    border-bottom: solid blue 2pt;
 }
 tr.filetable >td {
     font-family: monospace;
@@ -42,6 +43,7 @@ tr.filetable >td {
 h2{
     color:#900;
 }
+
 
 /* buttons */
 .modulelink,
@@ -64,16 +66,25 @@ span.button {
     background-color:#E0E0E0;
 }
 
-td.unselected {
-    color: red;
-}
 
 
 .ui-widget { font-family: Verdana,Arial,sans-serif/*{ffDefault}*/; font-size: 0.9em/*{fsDefault}*/; }
 .ui-widget .ui-widget { font-size: 0.9em; }
 .ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget { font-family: Verdana,Arial,sans-serif/*{ffDefault}*/; font-size: 0.9em; }
 
-/* tabs */
+.modulelink,
+.elementlink,
+.attributelink{
+    border:none;
+    color:blue;
+    cursor:pointer;
+}
+
+td.unselected {
+    color: red;
+}
+
+
 #tabs {
 	background: transparent;
 	border: none;

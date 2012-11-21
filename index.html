@@ -146,6 +146,7 @@
 								</select>
 							</td>
 						</tr>
+
 						<tr>
 							<td>Module element list method</td>
 							<td>
@@ -216,8 +217,8 @@
 				<div id="sparkline" style="float:right" border="1">
 					<span class="moduleSparkline"></span>
 					<ul>
-						<li>Red: Used elements</li>
-						<li>Blue: Unused elements</li>
+						<li>Red: Unused modules</li>
+						<li>Blue: Used modules</li>
 					</ul>
 				</div>
 				<div id="moduleSummary">
@@ -235,7 +236,6 @@
 			<div id="elements">
 				<p>NO MODULE SELECTED YET</p>
 			</div>
-
 			<div id="attributes">
 				<p>NO ELEMENT SELECTED YET</p>
 			</div>
@@ -245,6 +245,7 @@
 				<p id="attAlterName"></p>
 
 				<p id="attributeIdent" style="display:none"></p>
+				<span class="button closedOrOpen">Open List</span>
 				<form> List of Values:<input type="text" id="listOfValues" /><br />
 				</form>
 				<span class="button saveAttributeInfo">Save</span>
