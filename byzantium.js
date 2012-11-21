@@ -744,7 +744,7 @@ $(document).on("click","span.save", function(){
 $(document).on("click","span.load", function(){
     var name = $(this).parent().parent().children('td.fname').text();
     var data = localStorage.getItem('proj%*$&#'+name);
-    loadFile(data);
+    loadFile(data.replace(/&/g,"&amp;"));
     if(teiName != "undefined" && teiName != null){
 		var L = localStorage.getItem("tei%*$&#" + teiName);
 		if (L != null) {
@@ -890,9 +890,10 @@ $(document).on("click","span.removeModule",function(){
 
 $(document).on("click","span.continueToLoad", function(){
 	var xmldata = $("#inputarea").val();
-	xml = xmldata
-	givenXML = xmldata
-	loadFile(xmldata);
+
+    xml = xmldata.replace(/&/g,"&amp;")
+    givenXML = xml;
+    loadFile(xml);
 	if(teiName != "undefined" && teiName != null){
 		var L = localStorage.getItem("tei%*$&#" + teiName);
 		if (L != null) {
