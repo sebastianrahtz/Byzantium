@@ -40,6 +40,9 @@ tr.filetable >td {
     font-family: monospace;
     padding: 4pt;
 }
+tr.list >td {
+    padding: 4pt;
+}
 h2{
     color:#900;
 }
