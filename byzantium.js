@@ -90,7 +90,7 @@ function showmodules() {
 	});
     });
     $("#moduleSummary").html('<p>' + TEI.modules.length + " modules available, of which " + AddedModules.length + " are in use, containing " + liveElements + " elements, of which " +  ExcludedElements.length + " are excluded</p>");
-    $(".moduleSparkline").sparkline([(moduleCounter-AddedModules.length),AddedModules.length], {
+	$(".moduleSparkline").sparkline([(totElements-liveElements),(liveElements-ExcludedElements.length),ExcludedElements.length], {
 	type: 'pie',
 	width: '200',
 	height: '200',
@@ -125,7 +125,7 @@ function showelements(name  )
         if (element.module == name) {
 			totalElements += 1;
 			currentModule = name;
-            items.push('<tr><td><span class="button addRemove" id="' + name + "," + element.ident + '">');
+            items.push('<tr class="filetable"><td><span class="button addRemove" id="' + name + "," + element.ident + '">');
 			if($.inArray((name + "," + element.ident), ExcludedElements) == -1){
 				items.push("Included");
 				usedElements+=1;
@@ -137,6 +137,7 @@ function showelements(name  )
           }
         });
 	
+    $('#elements').append('<div id="sparkline" style="float:right" border="1"><span class="elementSparkline"></span><ul><li>Red: Unsed elements</li><li>Blue: Used elements</li></ul></div>');
     $('#elements').append($('<table/>', {'class': 'elements',html:  items.join('') }));
 	$(".elementSparkline").sparkline([(totalElements-usedElements),usedElements], {
 	type: 'pie',
@@ -446,9 +447,7 @@ function setXML(){
 			}
 		})
 		out = new XMLSerializer().serializeToString(xmlDoc);
-		xml = out;
-		alert(xml);
-			
+		xml = out;			
 	})	
 	var includedValue = [];
 	
@@ -506,7 +505,6 @@ function setXML(){
 				data = data + '</valList></attDef></attList></elementSpec>'
 				beenHereBefore = 1;
 			}
-			alert(data)
 			var at = $.parseXML(data).documentElement;
 			if(hasAtt == "true"){
 				$xml.find("elementSpec[ident=" + element + "][module=" + module + "]").find("attList").append($(at));
@@ -738,13 +736,6 @@ $(document).on("click","span.newProject", function(){
 
 $(document).on("click","span.saveStartInfo", function(){
     editinfo();
-});
-
-$(document).on("click","button.saveStartInfo", function(){
-    editinfo();
-//    $('#OnlineSelector').hide();
-//    $('#ExistingSelector').hide();
-//    $('#UploadCustom').hide();
     $("#tabs").tabs("select", 2); 
 });
 
@@ -834,7 +825,6 @@ $(document).on("click","span.loadProject", function(){
 //Used to save a project to the browser.
 $(document).on("click","span.save", function(){
 	var name = $("#saveAs").val(); 
-	//alert(name);
 	if(name == ''){
 	}
 	else{
@@ -1071,7 +1061,7 @@ $(document).on("click", "span.saveAttributeInfo", function(){
 		}
 	}
 })
-$(document).on("click", "button.closedOrOpen", function(){
+$(document).on("click", "span.closedOrOpen", function(){
 	if($(".closedOrOpen").html() == "Open List"){
 		$(".closedOrOpen").html("Closed List");
 	}
