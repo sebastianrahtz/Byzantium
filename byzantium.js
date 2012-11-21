@@ -67,7 +67,7 @@ function showmodules() {
     totElements = TEI.elements.length;
     var items = [];
     $.each(TEI.modules, function(i, module) {
-	var mString ='<tr id="div' + module.ident + '">';
+	var mString ='<tr class="list" id="div' + module.ident + '">';
 	if($.inArray(module.ident, AddedModules) != -1)
 	{
 	    mString += '<td><span class="button removeModule" id="'+module.ident+'R">Remove</span></td>';
@@ -123,17 +123,20 @@ function showelements(name  )
     $('#elements').html($('<h2/>', {html: "Elements in module " + name }));
     $.each(TEI.elements, function(i, element) {
         if (element.module == name) {
-			totalElements += 1;
-			currentModule = name;
-            items.push('<tr class="filetable"><td><span class="button addRemove" id="' + name + "," + element.ident + '">');
-			if($.inArray((name + "," + element.ident), ExcludedElements) == -1){
-				items.push("Included");
-				usedElements+=1;
-			}
-			else{
-				items.push("Excluded");
-			}
-			items.push('</span></td><td><span class="button elementlink">' + element.ident + '</span></td><td>' + element.desc + '</td></tr>');
+	    totalElements += 1;
+	    currentModule = name;
+            items.push('<tr class="list"><td>');
+	    items.push('<span class="button addRemove" id="' + name + "," + element.ident + '">');
+	    if($.inArray((name + "," + element.ident), ExcludedElements) == -1){
+		items.push("Exclude");
+		items.push('</span></td><td><span class="button elementlink">' + element.ident + '</span></td><td>' + element.desc + '</td></tr>');
+		usedElements+=1;
+	    }
+	    else{
+		items.push("Include");
+		items.push('</span></td><td>' + element.ident + '</td><td>' + element.desc + '</td></tr>');
+
+	    }
           }
         });
 	
@@ -170,23 +173,24 @@ function loadFile(xml){
 		key = item.getAttribute('key');
 		AddedModules.push(key);
 		excepts = item.getAttribute('except');
-	    if (excepts != null) {
-		var individualExcepts = excepts.split(" ");
-		$.each(individualExcepts, function(i, except){
-			if(except != ""){
-				ExcludedElements.push(key+","+except);
-			}
-		})
-		    }
 		includes = item.getAttribute('include');
-	    if (includes != null) {
-		var individualIncludes = includes.split(" ");
-		$.each(TEI.elements, function(i, element){
-		    if(element.module == currentModule && $.inArray(element.ident, individualIncludes) == -1) {
-			ExcludedElements.push(key+","+element.ident);
+	    if (excepts != null) {
+		$.each(excepts.split(" "), function(i, except){
+		    if(except != ""){
+			ExcludedElements.push(key+","+except);
 		    }
 		})
 		    }
+	    else {
+		if (includes != null) {
+		    var individualIncludes = includes.split(" ");
+		    $.each(TEI.elements, function(i, element){
+			if(element.module == key && $.inArray(element.ident, individualIncludes) == -1) {
+			    ExcludedElements.push(key+","+element.ident);
+			}
+		    })
+			}
+	    }
 	})
 	$xml.find("elementSpec").each(function(i, item){
 		var module = item.getAttribute('module');
@@ -235,19 +239,19 @@ function showattributes(name ) {
 							$.each(attclass.attributes, function(i, attribute){
 								totalAttributes+=1;
 								if($.inArray(classAttributeModule, AddedModules) != -1){
-									addableitems.push('<tr><td><span class="button addRemoveAttribute" id="' + currentModule + "," + name + "," + attribute.ident + '">');
+									addableitems.push('<tr class="list"><td><span class="button addRemoveAttribute" id="' + currentModule + "," + name + "," + attribute.ident + '">');
 									if($.inArray((currentModule + "," + name + "," + attribute.ident), ExcludedAttributes) == -1){
-										addableitems.push("Included");
+										addableitems.push("Exclude");
 										usedAttributes += 1;
 									}
 									else{
-										addableitems.push("Excluded");
+										addableitems.push("Include");
 										excludedAttributes += 1;
 									}
 									addableitems.push('</span></td><td>' + '<span class="button attributelink" id="att,' + currentModule + "," + name + "," + attribute.ident + '" >'+ attribute.ident + "</span></td><td>"  + attribute.desc + '</td></tr>');
 								}
 								else{
-									unaddableitems.push('<tr><td><button disabled="disabled">Requires: ' + classAttributeModule + "</span></td><td>"+ attribute.ident + '</td><td> ' + attribute.desc + '</td></tr>');
+									unaddableitems.push('<tr class="list"><td><button disabled="disabled">Requires: ' + classAttributeModule + "</span></td><td>"+ attribute.ident + '</td><td> ' + attribute.desc + '</td></tr>');
 									unavailableAttributes +=1;
 								}
 								
@@ -658,6 +662,7 @@ function setXML(){
 		$xml.find("moduleRef").each(function(i, element){
 			var module = element.getAttribute('key');
 			var elementList = element.getAttribute("except");
+		    if (elementList != null) {
 			var elementArray = elementList.split(" ");
 			if(elementArray.length > 1){
 				items.push('<dl><dt>Elements excluded in ' + module + ":</dt>");
@@ -668,7 +673,7 @@ function setXML(){
 				})
 				items.push('</dl>');
 			}
-		
+		    }
 		})
 		$('#repElements').append($('<ul/>', {
 			'class': 'repElements',
@@ -918,13 +923,13 @@ $(document).on("click","span.output", function(){
 $(document).on("click","span.addRemove", function(){
 	name = $(this).attr('id');
 	action = $(this).html();
-	if(action == "Included"){
+	if(action == "Exclude"){
 		ExcludedElements.push(name);
-		$(this).html("Excluded");
+		$(this).html("Include");
 	}
-	if(action == "Excluded"){
+	if(action == "Include"){
 		ExcludedElements.splice($.inArray(name, ExcludedElements),1);
-		$(this).html("Included");
+		$(this).html("Exclude");
 	}
 	showelements(name.split(',')[0]);
 })
@@ -934,13 +939,13 @@ $(document).on("click","span.addRemove", function(){
 $(document).on("click","span.addRemoveAttribute", function(){
 	name = $(this).attr('id');
 	action = $(this).html();
-	if(action == "Included"){
+	if(action == "Exclude"){
 		ExcludedAttributes.push(name);
-		$(this).html("Excluded");
+		$(this).html("Include");
 	}
-	if(action == "Excluded"){
+	if(action == "Include"){
 		ExcludedAttributes.splice($.inArray(name, ExcludedAttributes),1);
-		$(this).html("Included");
+		$(this).html("Exclude");
 	}
 	showattributes(name.split(',')[1]);
 })
@@ -997,7 +1002,6 @@ $(document).on("click","span.removeModule",function(){
 
 $(document).on("click","span.continueToLoad", function(){
 	var xmldata = $("#inputarea").val();
-
     xml = xmldata.replace(/&/g,"&amp;")
     givenXML = xml;
     loadFile(xml);
