@@ -315,7 +315,6 @@ function setXML(){
 			    excludeString += " " + element.split(',')[1];
 			}
 		})
-		    alert("module " + currentModule + " = " + method);
 		    if (excludeString == '') 
 			{
 			    $xml.find("schemaSpec").append($(mr).attr({key: currentModule}));
@@ -404,9 +403,7 @@ function setXML(){
 		var change = "change";
 		var module = value.split(",")[1];
 		var element = value.split(",")[2];
-		alert($xml.find("elementSpec[ident=" + element + "][module=" + module + "]"));
 		var exclusions = $xml.find("elementSpec[ident=" + element + "][module=" + module + "]");
-		//alert(value);
 	})
 	
 	out = new XMLSerializer().serializeToString(xmlDoc);
@@ -478,7 +475,6 @@ function setXML(){
 	 // files is a FileList of File objects. List some properties.
 	 var output = [];
 	 for (var i = 0, f; f = files[i]; i++) {
-	     alert("found " + f.name);
 	     output.push('<li><strong>', escape(f.name), '</strong> (', f.type || 'n/a', ') - ',
 			 f.size, ' bytes, last modified: ',
 			 f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a',
@@ -568,7 +564,6 @@ function setXML(){
 		setXML();
 		xmlDoc = $.parseXML(xml);
 		$xml = $(xmlDoc);
-		//alert(xml);
 		$xml.find("elementSpec").each(function(i, layer){
 			//alert("Got here");
 			var module = layer.getAttribute('module');
