@@ -134,7 +134,7 @@ function showelements(name  )
 	    }
 	    else{
 		items.push("Include");
-		items.push('</span></td><td>' + element.ident + '</td><td>' + element.desc + '</td></tr>');
+		items.push('</span></td><td class="unselected">' + element.ident + '</td><td>' + element.desc + '</td></tr>');
 
 	    }
           }
