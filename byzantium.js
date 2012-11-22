@@ -140,7 +140,7 @@ function showelements(name  )
           }
         });
 	
-    $('#elements').append('<div id="sparkline" style="float:right" border="1"><span class="elementSparkline"></span><ul><li>Red: Unsed elements</li><li>Blue: Used elements</li></ul></div>');
+    $('#elements').append('<div id="sparkline" style="float:right" border="1"><span class="elementSparkline"></span><ul><li>Red: Unused elements</li><li>Blue: Used elements</li></ul></div>');
     $('#elements').append($('<table/>', {'class': 'elements',html:  items.join('') }));
 	$(".elementSparkline").sparkline([(totalElements-usedElements),usedElements], {
 	type: 'pie',
