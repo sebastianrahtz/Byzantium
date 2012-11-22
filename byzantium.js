@@ -173,14 +173,24 @@ function loadFile(xml){
 		key = item.getAttribute('key');
 		AddedModules.push(key);
 		excepts = item.getAttribute('except');
+		includes = item.getAttribute('include');
 	    if (excepts != null) {
-		var individualExcepts = excepts.split(" ");
-		$.each(individualExcepts, function(i, except){
-			if(except != ""){
-				ExcludedElements.push(key+","+except);
-			}
+		$.each(excepts.split(" "), function(i, except){
+		    if(except != ""){
+			ExcludedElements.push(key+","+except);
+		    }
 		})
 		    }
+	    else {
+		if (includes != null) {
+		    var individualIncludes = includes.split(" ");
+		    $.each(TEI.elements, function(i, element){
+			if(element.module == key && $.inArray(element.ident, individualIncludes) == -1) {
+			    ExcludedElements.push(key+","+element.ident);
+			}
+		    })
+			}
+	    }
 	})
 	$xml.find("elementSpec").each(function(i, item){
 		var module = item.getAttribute('module');
@@ -652,6 +662,7 @@ function setXML(){
 		$xml.find("moduleRef").each(function(i, element){
 			var module = element.getAttribute('key');
 			var elementList = element.getAttribute("except");
+		    if (elementList != null) {
 			var elementArray = elementList.split(" ");
 			if(elementArray.length > 1){
 				items.push('<dl><dt>Elements excluded in ' + module + ":</dt>");
@@ -662,7 +673,7 @@ function setXML(){
 				})
 				items.push('</dl>');
 			}
-		
+		    }
 		})
 		$('#repElements').append($('<ul/>', {
 			'class': 'repElements',
@@ -991,7 +1002,6 @@ $(document).on("click","span.removeModule",function(){
 
 $(document).on("click","span.continueToLoad", function(){
 	var xmldata = $("#inputarea").val();
-
     xml = xmldata.replace(/&/g,"&amp;")
     givenXML = xml;
     loadFile(xml);
