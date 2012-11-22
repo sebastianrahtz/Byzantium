@@ -317,7 +317,8 @@ $(document).ready(function(){
 		});
 	}
         cleanSystem();
-    doShowAll();
+    doShowProjects();
+    doShowDatabases();
     $('#defaultDatabase').html(defaultDatabase);
     $('#colophon').html("Byzantium " + VERSION + ". Written by Nick Burlingame. Date: " + today);
 })
@@ -533,7 +534,7 @@ function setXML(){
 }
 
 //This function is used to show the name of all the projects that are saved to the browser.
- function doShowAll(){
+ function doShowProjects(){
    var key = "";
    var pairs = "";
    var i=0;
@@ -542,7 +543,7 @@ function setXML(){
 	 if(key.split("%*$&#")[0] != "proj"){
 	 }
 	 else{
-		pairs += "<tr><td class='fname'>"+key.split("%*$&#")[1]+"</td><td><button class='load'>Load</button><td><button class='delete'>Delete</button></tr>\n";
+	pairs += "<tr><td class='fname'>"+key.split("%*$&#")[1]+"</td><td><span class='button load'>Load</span><td><span class='button delete'>Delete</span></tr>\n";
 	 }
        }
      if (pairs != "") {
@@ -550,22 +551,21 @@ function setXML(){
      }
  }
  
-  function doShowTEI(){
+  function doShowDatabases(){
    var key = "";
-   var pairs = "<tr><th>Name</th></tr>\n";
+   var pairs = "";
    var i=0;
    for (i=0; i<=localStorage.length-1; i++) {
 	 key = localStorage.key(i);
 	 if(key.split("%*$&#")[0] != "tei"){
 	 }
 	 else{
-		pairs += "<tr><td>"+key.split("%*$&#")[1]+"</td></tr>\n";
+		pairs += "<tr><td class='fname'>"+key.split("%*$&#")[1]+"</td><td><span class='button loadDatabase'>Load</span><td><span class='button deleteDatabase'>Delete</span></tr>\n";
 	 }
-   }
-   if (pairs == "<tr><th>Name</th><th>Value</th></tr>\n") {
-	 pairs += "<tr><td><i>empty</i></td>\n<td><i>empty</i></td></tr>\n";
-   }
-   document.getElementById('teipairs').innerHTML = pairs;
+       }
+     if (pairs != "") {
+	 $('#teiitems_table').html('<table><tr><th>Name</th><th>Action</th></tr>' + pairs + '</table>');
+     }
  }
  
  function loadDefaultTEI(){
@@ -608,7 +608,7 @@ function setXML(){
 		     document.getElementById('inputarea').innerHTML=this.result;
 		 };
 	     })(f);
-	     // Read in the image file as a data URL.
+	     // Read in the file data
 	     reader.readAsText(f);
 	 }
 	 document.getElementById(listContainer).innerHTML = '<ul>' + output.join('') + '</ul>';
@@ -755,12 +755,6 @@ $(document).on("click","span.saveStartInfo", function(){
 
 
 
-$(document).on("click","button.TEI_Custom", function(){
-	$('#UploadCustom').show();
-	$("#ExistingSelector").hide();
-	$("#OnlineSelector").hide();
-        $("#tabs").tabs("select", 2); 
-})
 
 $(document).on("click","span.TEI_Default", function(){
 	loadDefaultTEI()
@@ -794,16 +788,17 @@ $(document).on("click","span.setOnline", function(){
 		});
 	}
 	$('#message').html('<p>' + teiName + ' database loaded</p>')
+    doShowDatabases();
 })
 
 $(document).on("click","span.TEI_Existing", function(){
 //	$("#ExistingSelector").show();
 //	$("#OnlineSelector").hide();
 //	$("#UploadCustom").hide();
-	doShowTEI();
+	doShowDatabases();
 })
 
-$(document).on("click","span.setExisting", function(){
+$(document).on("click","span.loadDatabase", function(){
 	var name = $('#loadTEI').val();
 	teiName = name;
 	if(localStorage.getItem("tei%*$&#" + name) == null){
@@ -832,7 +827,7 @@ $(document).on("click","span.SubmitTEI", function(){
 $(document).on("click","span.loadProject", function(){
     url = defaultDatabase,
 	loadTEI();
-	doShowAll();
+	doShowProjects();
         $("#tabs").tabs("select", 2); 
 });
 
@@ -847,7 +842,7 @@ $(document).on("click","span.save", function(){
 		localStorage.setItem("proj%*$&#"+name, data);
 		
 	}
-	doShowAll();
+	doShowProjects();
 })
 
 //Used to load a project from the browser.
@@ -868,8 +863,6 @@ $(document).on("click","span.load", function(){
 		loadDefaultTEI();
 	}
 	showNewModules();
-	$('#modules').show();
-	$('#actions').show();
     $("#tabs").tabs("select", 2); 
     
 })
@@ -877,7 +870,7 @@ $(document).on("click","span.load", function(){
 $(document).on("click","span.delete", function(){
     var name = $(this).parent().parent().children('td.fname').text();
     localStorage.removeItem("proj%*$&#" + name);
-    doShowAll();
+    doShowProjects();
 })
 
 $(document).on("click","span.output", function(){
@@ -1082,15 +1075,6 @@ $(document).on("click", "span.closedOrOpen", function(){
 		$(".closedOrOpen").html("Open List");
 	}
 })
-$(document).on("click","span.removeJSON", function(){
-	var name = $("JSONtoremove").val();
-	if(name == ''){
-	}
-	else{
-		localStorage.removeItem("tei%*$&#" + name);
-	}
-	doShowTEI();
-})
 $(document).on("click", "span.restart", function(){
 	$('#projectSelection').show();
 	$('#actions').hide();
@@ -1102,3 +1086,21 @@ $(document).on("click", "span.restart", function(){
     cleanSystem();
 })
 
+$(document).on("click","span.loadDatabase", function(){
+    var teiname = $(this).parent().parent().children('td.fname').text();
+    var data = localStorage.getItem('tei%*$&#'+teiname);
+    var L = localStorage.getItem("tei%*$&#" + teiName);
+    if (L != null) {
+	TEI = JSON.parse(L);
+    }
+    else{
+	loadDefaultTEI();
+    }
+    $("#tabs").tabs("select", 3);     
+})
+
+$(document).on("click","span.deleteDatabase", function(){
+    var name = $(this).parent().parent().children('td.fname').text();
+    localStorage.removeItem("tei%*$&#" + name);
+    doShowDatabases();
+})

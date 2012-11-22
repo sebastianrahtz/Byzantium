@@ -13,6 +13,7 @@
             var tabNumber = ui.index;
             var tabName = $(ui.tab).text();            
             if      (tabNumber == 1 ) {	editinfo(); }
+            else if (tabNumber == 2 ) {	doShowDatabases(); }
             else if (tabNumber == 3 ) {	showmodules(); }
             else if (tabNumber == 7 ) { makeReport(); }
         }});
@@ -184,17 +185,7 @@
 				<td>From local storage
 				</td>
 				<td>
-				<div id="ExistingSelector">
-				  <b>Load Which TEI:</b>
-				  <input type="text" id="loadTEI" />
-				<div id="tei_table">
-				  <h2>Saved Databases</h2>
-				  <table id="teipairs"></table>
-				</div>
-				<span class="button setExisting">Load</span>
-				<span class="button removeJSON">Remove</span>
-				<input type="text" id="JSONtoremove" />
-				</div>
+				<div id="teiitems_table"></div>
 				</td>
 			      </tr>
 			      <tr class="choice">
