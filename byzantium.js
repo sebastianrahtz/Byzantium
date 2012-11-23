@@ -1,10 +1,23 @@
-/**
+/*
 Roma Revised Version
-Created: 11/1/2012
+Started: 11/1/2012
 Programmed By: Sebastian Rahtz and Nicholas Burlingame
+
+Copyright TEI Consortium.
+
+These material is dual-licensed:
+
+1. Distributed under a Creative Commons Attribution-ShareAlike 3.0
+Unported License http://creativecommons.org/licenses/by-sa/3.0/ 
+
+2. http://www.opensource.org/licenses/BSD-2-Clause
+                
+All rights reserved.
+
+
 */
 
-var VERSION = "0.2";
+var VERSION = "0.3";
 var defaultDatabase='http://bits.nsms.ox.ac.uk:8080/jenkins/job/TEIP5/lastSuccessfulBuild/artifact/release/xml/tei/odd/p5subset.js';
 var today=new Date();
 
