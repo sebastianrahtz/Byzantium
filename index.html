@@ -1,7 +1,20 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Byzantium: an ODD editor</title>
+<meta charset="utf-8" />
+<!--
+Copyright TEI Consortium.
+
+These material is dual-licensed:
+
+1. Distributed under a Creative Commons Attribution-ShareAlike 3.0
+Unported License http://creativecommons.org/licenses/by-sa/3.0/ 
+
+2. http://www.opensource.org/licenses/BSD-2-Clause
+                
+All rights reserved.
+-->
 		<script src="jquery.js"></script>
 		<script src="jquery-ui.js"></script>
 		<script src="byzantium.js"></script>
@@ -13,6 +26,7 @@
             var tabNumber = ui.index;
             var tabName = $(ui.tab).text();            
             if      (tabNumber == 1 ) {	editinfo(); }
+            else if (tabNumber == 2 ) {	doShowDatabases(); }
             else if (tabNumber == 3 ) {	showmodules(); }
             else if (tabNumber == 7 ) { makeReport(); }
         }});
@@ -186,17 +200,7 @@
 				<td>From local storage
 				</td>
 				<td>
-				<div id="ExistingSelector">
-				  <b>Load Which TEI:</b>
-				  <input type="text" id="loadTEI" />
-				<div id="tei_table">
-				  <h2>Saved Databases</h2>
-				  <table id="teipairs"></table>
-				</div>
-				<span class="button setExisting">Load</span>
-				<span class="button removeJSON">Remove</span>
-				<input type="text" id="JSONtoremove" />
-				</div>
+				<div id="teiitems_table"></div>
 				</td>
 			      </tr>
 			      <tr class="choice">
@@ -219,8 +223,8 @@
 				<div id="sparkline" style="float:right" border="1">
 					<span class="moduleSparkline"></span>
 					<ul>
-						<li>Red: Unused modules</li>
-						<li>Blue: Used modules</li>
+						<li>Red: Unused elements</li>
+						<li>Blue: Used elements</li>
 					</ul>
 				</div>
 				<div id="moduleSummary">
