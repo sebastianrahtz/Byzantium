@@ -886,8 +886,12 @@ $(document).on("click","span.output", function(){
     {	
     case "TEI ODD":  	
   target="TEI%3Atext%3Axml/xml%3Aapplication%3Axml"; break;	
+    case "RELAX NG Compact Schema":  	
+  target = "ODD%3Atext%3Axml/ODDC%3Atext%3Axml/rnc%3Aapplication%3Arelaxng-compact"; break;	
     case "RELAX NG Schema":  	
   target = "ODD%3Atext%3Axml/ODDC%3Atext%3Axml/relaxng%3Aapplication%3Axml-relaxng"; break;	
+    case "XSD Schema":  	
+  target = "ODD%3Atext%3Axml/ODDC%3Atext%3Axml/relaxng%3Aapplication%3Axml-xsd"; break;	
     case "ISO Schematron":  	
   target = "ODD%3Atext%3Axml/ODDC%3Atext%3Axml/isosch%3Atext%3Axml"; break;	
     case "Schematron":  	
