@@ -897,7 +897,7 @@ $(document).on("click","span.output", function(){
     case "RELAX NG Schema":  	
   target = "ODD%3Atext%3Axml/ODDC%3Atext%3Axml/relaxng%3Aapplication%3Axml-relaxng"; break;	
     case "XSD Schema":  	
-  target = "ODD%3Atext%3Axml/ODDC%3Atext%3Axml/relaxng%3Aapplication%3Axml-xsd"; break;	
+  target = "ODD%3Atext%3Axml/ODDC%3Atext%3Axml/xsd%3Aapplication%3Axml-xsd"; break;	
     case "ISO Schematron":  	
   target = "ODD%3Atext%3Axml/ODDC%3Atext%3Axml/isosch%3Atext%3Axml"; break;	
     case "Schematron":  	
