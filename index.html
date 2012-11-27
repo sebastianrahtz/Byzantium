@@ -1,7 +1,20 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Byzantium: an ODD editor</title>
+<meta charset="utf-8" />
+<!--
+Copyright TEI Consortium.
+
+These material is dual-licensed:
+
+1. Distributed under a Creative Commons Attribution-ShareAlike 3.0
+Unported License http://creativecommons.org/licenses/by-sa/3.0/ 
+
+2. http://www.opensource.org/licenses/BSD-2-Clause
+                
+All rights reserved.
+-->
 		<script src="jquery.js"></script>
 		<script src="jquery-ui.js"></script>
 		<script src="byzantium.js"></script>
@@ -13,6 +26,7 @@
             var tabNumber = ui.index;
             var tabName = $(ui.tab).text();            
             if      (tabNumber == 1 ) {	editinfo(); }
+            else if (tabNumber == 2 ) {	doShowDatabases(); }
             else if (tabNumber == 3 ) {	showmodules(); }
             else if (tabNumber == 7 ) { makeReport(); }
         }});
@@ -34,17 +48,19 @@
 			</table>
 		</div>
 		<div id="actions"> Project name:<input type="text" id="saveAs" />
-			<button class="save">Save to local storage</button>
+			<span class="button save">Save to local storage</span>
 			<select id="outputSelection">
 				<option>TEI ODD</option>
+				<option>RELAX NG Compact Schema</option>
 				<option>RELAX NG Schema</option>
+				<option>XSD Schema</option>
 				<option>ISO Schematron</option>
 				<option>Schematron</option>
 				<option>DTD</option>
 				<option>JSON</option>
 				<option>HTML documentation</option>
 			</select>
-			<button class="output">Generate</button>
+			<span class="button output">Generate</span>
 		</div>
 
 		<div id="tabs">
@@ -77,13 +93,13 @@
 
 			<div id="projectSelection">
 			  <table>
-			    <tr class="choice"><td>New project</td><td><button class="newProject">Create</button></td></tr>
+			    <tr class="choice"><td>New project</td><td><span class="button newProject">Create</span></td></tr>
 			    <tr class="choice"><td>Upload ODD</td><td>
 				<div id="upload">
 				  <script type="text/javascript">checkFileSupport();</script>
 				        <input type="file" id="files" name="files[]" multiple="multiple" />
 					<output id="list"></output>
-					<button  class="continueToLoad">Load file</button>
+					<span class="button continueToLoad">Load file</span>
 				  <script>
 				  function handleFileSelect(evt) {
 				  var files = evt.target.files;
@@ -92,18 +108,16 @@
 				  document.getElementById('files').addEventListener('change',  handleFileSelect, false);
 				  </script>
 				</div>
-				</td></tr>
-				<tr>
-				  <td>Projects in local storage</td>
-				    <td>
-				    <div id="loadProjectTools">
-					<div id="items_table">
-					</div>
-				</div>
 				</td>
-				</tr>
-				</table>
-
+			      </tr>
+			      <tr class="choice">
+				<td>Projects in local storage</td>
+				<td>
+				<div id="loadProjectTools"/>
+				<div id="items_table"></div>
+				</td>
+			      </tr>
+			    </table>
 			</div>
 
 			<div id="startInfo">
@@ -148,9 +162,19 @@
 								</select>
 							</td>
 						</tr>
+
+						<tr>
+							<td>Module element list method</td>
+							<td>
+								<select id="methodSelect">
+									<option	value="except">Exception</option>
+									<option value="include">Inclusion</option>
+ 							        </select>
+							      </td>
+							    </tr>
 					</table>
 				</form>
-				<button class="saveStartInfo">Save</button>
+				<span class="button saveStartInfo">Save</span>
 
 			</div>
 
@@ -160,7 +184,7 @@
 			  <table>
 			    <tr>
 			      <td>Default</td>
-			      <td><button class="TEI_Default">Load</button></td>
+			      <td><span class="button TEI_Default">Load</span></td>
 			    </tr>
 			    <tr class="choice"> <td colspan="2"><span id="defaultDatabase"/></td></tr>
 			    <tr class="choice">
@@ -168,7 +192,7 @@
 			      <td>
 			      <div id="OnlineSelector"> Enter URL:<input type="text" id="TEI_OnlineSelector"
 				/><br /> Name TEI:<input type="text" id="TEI_OnlineName" /><br />
-				<button class="setOnline">Load</button>
+				<span class="button setOnline">Load</span>
 				</div>
 				</td>
 			      </tr>
@@ -176,17 +200,7 @@
 				<td>From local storage
 				</td>
 				<td>
-				<div id="ExistingSelector">
-				  <b>Load Which TEI:</b>
-				  <input type="text" id="loadTEI" />
-				<div id="tei_table">
-				  <h2>Saved Databases</h2>
-				  <table id="teipairs"></table>
-				</div>
-				<button class="setExisting">Load</button>
-				<button class="removeJSON">Remove</button>
-				<input type="text" id="JSONtoremove" />
-				</div>
+				<div id="teiitems_table"></div>
 				</td>
 			      </tr>
 			      <tr class="choice">
@@ -196,7 +210,7 @@
 				  <script type="text/javascript">checkFileSupport();</script>
 				  <input type="file" id="JSONfiles" name="files[]" multiple="multiple" />
 				  <output id="JSONlist"></output>
-				  <button class="loadCustomJSON">Load</button>
+				  <span class="button loadCustomJSON">Load</span>
 				  <script>document.getElementById('JSONfiles').addEventListener('change', handleFileSelect, false);</script>
 				</div>
 				</td>
@@ -209,8 +223,8 @@
 				<div id="sparkline" style="float:right" border="1">
 					<span class="moduleSparkline"></span>
 					<ul>
-						<li>Red: Unused modules</li>
-						<li>Blue: Used modules</li>
+						<li>Red: Unused elements</li>
+						<li>Blue: Used elements</li>
 					</ul>
 				</div>
 				<div id="moduleSummary">
@@ -237,10 +251,10 @@
 				<p id="attAlterName"></p>
 
 				<p id="attributeIdent" style="display:none"></p>
-				<button class="closedOrOpen">Open List</button>
+				<span class="button closedOrOpen">Open List</span>
 				<form> List of Values:<input type="text" id="listOfValues" /><br />
 				</form>
-				<button class="saveAttributeInfo">Save</button>
+				<span class="button saveAttributeInfo">Save</span>
 			</div>
 
 			<div id="output"></div>
@@ -252,6 +266,7 @@
 				<p id="repAuthor"></p>
 				<p id="repDescription"></p>
 				<p id="repLanguage"></p>
+				<p id="repMethod"></p>
 				<p id="repModulesTag"></p>
 				<div id="repModules"></div>
 				<p id="repElementsTag"></p>
@@ -268,6 +283,9 @@
 		
 		<div class="trailer">
 			<p id="colophon"></p>
+		  <p><a
+			href="https://github.com/sebastianrahtz/Byzantium">Source
+			on Github (Sebastian Rahtz fork)</a></p>
 		</div>
 	</body>
 </html>

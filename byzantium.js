@@ -1,10 +1,23 @@
-/**
+/*
 Roma Revised Version
-Created: 11/1/2012
+Started: 11/1/2012
 Programmed By: Sebastian Rahtz and Nicholas Burlingame
+
+Copyright TEI Consortium.
+
+These material is dual-licensed:
+
+1. Distributed under a Creative Commons Attribution-ShareAlike 3.0
+Unported License http://creativecommons.org/licenses/by-sa/3.0/ 
+
+2. http://www.opensource.org/licenses/BSD-2-Clause
+                
+All rights reserved.
+
+
 */
 
-var VERSION = "0.2";
+var VERSION = "0.3";
 var defaultDatabase='http://bits.nsms.ox.ac.uk:8080/jenkins/job/TEIP5/lastSuccessfulBuild/artifact/release/xml/tei/odd/p5subset.js';
 var today=new Date();
 
@@ -23,6 +36,7 @@ var description = "";
 var filename = "";
 var givenXML = "";
 var language = "";
+var method = "except";
 var liveElements = 0;
 var moduleCounter = 0;
 var teiName = "";
@@ -66,15 +80,15 @@ function showmodules() {
     totElements = TEI.elements.length;
     var items = [];
     $.each(TEI.modules, function(i, module) {
-	var mString ='<tr id="div' + module.ident + '">';
+	var mString ='<tr class="list" id="div' + module.ident + '">';
 	if($.inArray(module.ident, AddedModules) != -1)
 	{
-	    mString += '<td><button class="removeModule" id="'+module.ident+'R">Remove</button></td>';
-	    mString += '<td><button class="modulelink" style="border:none; color:blue; cursor: pointer;">' + module.ident + '</button></td>' ;
+	    mString += '<td><span class="button removeModule" id="'+module.ident+'R">Remove</span></td>';
+	    mString += '<td><span class="button modulelink" >' + module.ident + '</span></td>' ;
 	}
 	else
 	{
-            mString += '<td><button class="addModule" id="' + module.ident + 'A">Add</button></td>';
+            mString += '<td><span class="button addModule" id="' + module.ident + 'A">Add</span></td>';
 	    mString += '<td class="unselected">' + module.ident + '</td>';
 	}
 	mString += '<td>' + module.desc + '</td></tr>';
@@ -89,7 +103,7 @@ function showmodules() {
 	});
     });
     $("#moduleSummary").html('<p>' + TEI.modules.length + " modules available, of which " + AddedModules.length + " are in use, containing " + liveElements + " elements, of which " +  ExcludedElements.length + " are excluded</p>");
-    $(".moduleSparkline").sparkline([(moduleCounter-AddedModules.length),AddedModules.length], {
+	$(".moduleSparkline").sparkline([(totElements-liveElements),(liveElements-ExcludedElements.length),ExcludedElements.length], {
 	type: 'pie',
 	width: '200',
 	height: '200',
@@ -106,11 +120,6 @@ function showNewModules(){
 	$.each(AddedModules, function(i, module){
 		items.push('<li>' + AddedModules[i] + '</li>');
 	});
-/*	$('#selected').html($('<p/>', { html: "Modules Selected:" }));
-	$('#selected').append($('<ul/>', {
-		'class': 'selected',
-		html: items.join('')
-	}));*/
 }
 
 //DISPLAYS ELEMENTS
@@ -122,20 +131,24 @@ function showelements(name  )
     $('#elements').html($('<h2/>', {html: "Elements in module " + name }));
     $.each(TEI.elements, function(i, element) {
         if (element.module == name) {
-			totalElements += 1;
-			currentModule = name;
-            items.push('<tr><td><button class="addRemove" id="' + name + "," + element.ident + '">');
-			if($.inArray((name + "," + element.ident), ExcludedElements) == -1){
-				items.push("Included");
-				usedElements+=1;
-			}
-			else{
-				items.push("Excluded");
-			}
-			items.push('</button></td><td><button class="elementlink" style="border:none; color:blue; cursor: pointer;">' + element.ident + '</button></td><td>' + element.desc + '</td></tr>');
+	    totalElements += 1;
+	    currentModule = name;
+            items.push('<tr class="list"><td>');
+	    items.push('<span class="button addRemove" id="' + name + "," + element.ident + '">');
+	    if($.inArray((name + "," + element.ident), ExcludedElements) == -1){
+		items.push("Exclude");
+		items.push('</span></td><td><span class="button elementlink">' + element.ident + '</span></td><td>' + element.desc + '</td></tr>');
+		usedElements+=1;
+	    }
+	    else{
+		items.push("Include");
+		items.push('</span></td><td class="unselected">' + element.ident + '</td><td>' + element.desc + '</td></tr>');
+
+	    }
           }
         });
-	$('#elements').append('<div id="sparkline" style="float:right" border="1"><span class="elementSparkline"></span><ul><li>Red: Unsed elements</li><li>Blue: Used elements</li></ul></div>');
+	
+    $('#elements').append('<div id="sparkline" style="float:right" border="1"><span class="elementSparkline"></span><ul><li>Red: Unused elements</li><li>Blue: Used elements</li></ul></div>');
     $('#elements').append($('<table/>', {'class': 'elements',html:  items.join('') }));
 	$(".elementSparkline").sparkline([(totalElements-usedElements),usedElements], {
 	type: 'pie',
@@ -145,6 +158,7 @@ function showelements(name  )
 	borderColor: '#7f7f7f'});
 }
 
+//Loads an xml file from either local host or from HTML storage
 function loadFile(xml){
 	AddedModules = [];
 	xmlDoc = $.parseXML(xml);
@@ -159,23 +173,36 @@ function loadFile(xml){
         $('#description').val(description);
         $('#author').val(author);
         $('#languageSelect').val(language);
+        $('#methodSelect').val(method);
         $('#filename').val(filename);
 	if(teiName == "undefined" || teiName == null){
 		teiName = "";
 	}
+	//Populates the module segment.
 	$xml.find("moduleRef").each(function(i, item) {
 		key = item.getAttribute('key');
-		excepts = item.getAttribute('except');
 		AddedModules.push(key);
+		excepts = item.getAttribute('except');
+		includes = item.getAttribute('include');
 	    if (excepts != null) {
-		var individualExcepts = excepts.split(" ");
-		$.each(individualExcepts, function(i, except){
-			if(except != ""){
-				ExcludedElements.push(key+","+except);
-			}
+		$.each(excepts.split(" "), function(i, except){
+		    if(except != ""){
+			ExcludedElements.push(key+","+except);
+		    }
 		})
 		    }
+	    else {
+		if (includes != null) {
+		    var individualIncludes = includes.split(" ");
+		    $.each(TEI.elements, function(i, element){
+			if(element.module == key && $.inArray(element.ident, individualIncludes) == -1) {
+			    ExcludedElements.push(key+","+element.ident);
+			}
+		    })
+			}
+	    }
 	})
+	//This part populates the elements and the attributes.
 	$xml.find("elementSpec").each(function(i, item){
 		var module = item.getAttribute('module');
 		var element = item.getAttribute('ident');
@@ -197,13 +224,11 @@ function loadFile(xml){
 			ListofValues.push(data);
 		})
 	})	
-}
+	    }
 
 
 //DISPLAYS ATTRIBUTES
 function showattributes(name ) {
-	//alert(name);
-	//alert(name);
 	Back = "Elements";
 	Current = "Attributes";
 	var addableitems = [];
@@ -225,19 +250,19 @@ function showattributes(name ) {
 							$.each(attclass.attributes, function(i, attribute){
 								totalAttributes+=1;
 								if($.inArray(classAttributeModule, AddedModules) != -1){
-									addableitems.push('<tr><td><button class="addRemoveAttribute" id="' + currentModule + "," + name + "," + attribute.ident + '">');
+									addableitems.push('<tr class="list"><td><span class="button addRemoveAttribute" id="' + currentModule + "," + name + "," + attribute.ident + '">');
 									if($.inArray((currentModule + "," + name + "," + attribute.ident), ExcludedAttributes) == -1){
-										addableitems.push("Included");
+										addableitems.push("Exclude");
 										usedAttributes += 1;
 									}
 									else{
-										addableitems.push("Excluded");
+										addableitems.push("Include");
 										excludedAttributes += 1;
 									}
-									addableitems.push('</button></td><td>' + '<button class="attributelink" id="att,' + currentModule + "," + name + "," + attribute.ident + '" style="border:none; color:blue; cursor: pointer;">'+ attribute.ident + "</button></td><td>"  + attribute.desc + '</td></tr>');
+									addableitems.push('</span></td><td>' + '<span class="button attributelink" id="att,' + currentModule + "," + name + "," + attribute.ident + '" >'+ attribute.ident + "</span></td><td>"  + attribute.desc + '</td></tr>');
 								}
 								else{
-									unaddableitems.push('<tr><td><button disabled="disabled">Requires: ' + classAttributeModule + "</button></td><td>"+ attribute.ident + '</td><td> ' + attribute.desc + '</td></tr>');
+									unaddableitems.push('<tr class="list"><td><button disabled="disabled">Requires: ' + classAttributeModule + "</span></td><td>"+ attribute.ident + '</td><td> ' + attribute.desc + '</td></tr>');
 									unavailableAttributes +=1;
 								}
 								
@@ -259,6 +284,7 @@ function showattributes(name ) {
 	sliceColors: ['#dc3912','#3366cc','#7f7f7f','#109618','#66aa00','#dd4477','#0099c6','#990099 '],
 	borderColor: '#7f7f7f'});
 }
+//Alters the attributes' lists, as well as making them open or closed.
 function alterattributes(id){
 	$("#attributeIdent").text(id);
 	$("#attAlterName").text("Attribute Name: " + id.split(',')[3]);
@@ -303,7 +329,8 @@ $(document).ready(function(){
 		});
 	}
         cleanSystem();
-    doShowAll();
+    doShowProjects();
+    doShowDatabases();
     $('#defaultDatabase').html(defaultDatabase);
     $('#colophon').html("Byzantium " + VERSION + ". Written by Nick Burlingame. Date: " + today);
 })
@@ -365,14 +392,33 @@ function setXML(){
 	$.each(AddedModules, function(i, name) {
 	    var mr = document.createElementNS("http://www.tei-c.org/ns/1.0", 'moduleRef');
 		var excludeString = "";
+		var includeString = "";
 		var currentModule = name;
+	        $.each(TEI.elements, function(i, element) {
+		    if (element.module == currentModule && $.inArray((currentModule + "," + element.ident), ExcludedElements) == -1) {
+			includeString += " " + element.ident;
+		    }
+		})
 		$.each(ExcludedElements, function(j, element){
 			if(element.split(',')[0] == currentModule){
-				excludeString = excludeString + " " + element.split(',')[1];
+			    excludeString += " " + element.split(',')[1];
 			}
 		})
-		$xml.find("schemaSpec").append($(mr).attr({key: currentModule, except: excludeString}));
-	})
+		    if (excludeString == '') 
+			{
+			    $xml.find("schemaSpec").append($(mr).attr({key: currentModule}));
+			}
+			else 
+			{
+			    if (method == 'include') {
+				$xml.find("schemaSpec").append($(mr).attr({key: currentModule, include: includeString}));
+			    }
+			    else
+			    {
+				$xml.find("schemaSpec").append($(mr).attr({key: currentModule, except: excludeString}));
+			    }
+			}
+		    })
 	
 	var excludes = [];
 	$.each(ExcludedAttributes, function(i, attribute){
@@ -427,9 +473,7 @@ function setXML(){
 			}
 		})
 		out = new XMLSerializer().serializeToString(xmlDoc);
-		xml = out;
-		alert(xml);
-			
+		xml = out;			
 	})	
 	var includedValue = [];
 	
@@ -443,6 +487,8 @@ function setXML(){
 		}
 	})
 	var beenHereBefore = 0;
+	var currentModEle = "";
+	var previousModEle = "";
 	$.each(ListofValues, function(i, value){
 		var es = $.parseXML("<elementSpec/>").documentElement;
 		var al = $.parseXML("<attList/>").documentElement;
@@ -450,6 +496,11 @@ function setXML(){
 		var change = "change";
 		var module = value.split(",")[1];
 		var element = value.split(",")[2];
+		currentModEle = module + "," + element;
+		if(currentModEle != previousModEle){
+			beenHereBefore = 0;
+		}
+		var exclusions = $xml.find("elementSpec[ident=" + element + "][module=" + module + "]");
 		if($.inArray(value, includedValue) != -1){
 			
 			var hasAtt = "false";
@@ -484,27 +535,25 @@ function setXML(){
 			}
 			else{
 				data = data + '</valList></attDef></attList></elementSpec>'
-				beenHereBefore = 1;
 			}
-			alert(data)
 			var at = $.parseXML(data).documentElement;
-			if(hasAtt == "true"){
+			if(hasAtt == "true" || beenHereBefore > 0){
 				$xml.find("elementSpec[ident=" + element + "][module=" + module + "]").find("attList").append($(at));
 			}
 			else{
 				$xml.find("schemaSpec").append($(at));
+				beenHereBefore = 1;
 			}
 		}
-		//alert(exclusions);
+		previousModEle = currentModEle;
 	})
 	
 	out = new XMLSerializer().serializeToString(xmlDoc);
 	xml = out;
-	//alert(xml);
 }
 
 //This function is used to show the name of all the projects that are saved to the browser.
- function doShowAll(){
+ function doShowProjects(){
    var key = "";
    var pairs = "";
    var i=0;
@@ -513,7 +562,7 @@ function setXML(){
 	 if(key.split("%*$&#")[0] != "proj"){
 	 }
 	 else{
-		pairs += "<tr><td class='fname'>"+key.split("%*$&#")[1]+"</td><td><button class='load'>Load</button><td><button class='delete'>Delete</button></tr>\n";
+	pairs += "<tr><td class='fname'>"+key.split("%*$&#")[1]+"</td><td><span class='button load'>Load</span><td><span class='button delete'>Delete</span></tr>\n";
 	 }
        }
      if (pairs != "") {
@@ -521,24 +570,23 @@ function setXML(){
      }
  }
  
-  function doShowTEI(){
+  function doShowDatabases(){
    var key = "";
-   var pairs = "<tr><th>Name</th></tr>\n";
+   var pairs = "";
    var i=0;
    for (i=0; i<=localStorage.length-1; i++) {
 	 key = localStorage.key(i);
 	 if(key.split("%*$&#")[0] != "tei"){
 	 }
 	 else{
-		pairs += "<tr><td>"+key.split("%*$&#")[1]+"</td></tr>\n";
+		pairs += "<tr><td class='fname'>"+key.split("%*$&#")[1]+"</td><td><span class='button loadDatabase'>Load</span><td><span class='button deleteDatabase'>Delete</span></tr>\n";
 	 }
-   }
-   if (pairs == "<tr><th>Name</th><th>Value</th></tr>\n") {
-	 pairs += "<tr><td><i>empty</i></td>\n<td><i>empty</i></td></tr>\n";
-   }
-   document.getElementById('teipairs').innerHTML = pairs;
+       }
+     if (pairs != "") {
+	 $('#teiitems_table').html('<table><tr><th>Name</th><th>Action</th></tr>' + pairs + '</table>');
+     }
  }
- 
+ //Loads the default TEI that Sebastian created.
  function loadDefaultTEI(){
  	if(localStorage.getItem("tei%*$&#Default") === null){
 		$.ajax({
@@ -568,7 +616,6 @@ function setXML(){
 	 // files is a FileList of File objects. List some properties.
 	 var output = [];
 	 for (var i = 0, f; f = files[i]; i++) {
-	     alert("found " + f.name);
 	     output.push('<li><strong>', escape(f.name), '</strong> (', f.type || 'n/a', ') - ',
 			 f.size, ' bytes, last modified: ',
 			 f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a',
@@ -580,13 +627,14 @@ function setXML(){
 		     document.getElementById('inputarea').innerHTML=this.result;
 		 };
 	     })(f);
-	     // Read in the image file as a data URL.
+	     // Read in the file data
 	     reader.readAsText(f);
 	 }
 	 document.getElementById(listContainer).innerHTML = '<ul>' + output.join('') + '</ul>';
      }
  
-    function makeReport () {
+ //Creates the report page
+function makeReport () {
 	if(filename != ""){
 		$("#repFilename").text("Filename: " + filename);
 	}
@@ -602,6 +650,7 @@ function setXML(){
 	if(language != ""){
 		$("#repLanguage").text("Language: " + language);
 	}
+	$("#repMethod").text("Method " + method);
 	if(AddedModules.length > 0){
 		$("#repModulesTag").text("Modules Added:");
 		$("#repModules").empty();
@@ -633,6 +682,7 @@ function setXML(){
 		$xml.find("moduleRef").each(function(i, element){
 			var module = element.getAttribute('key');
 			var elementList = element.getAttribute("except");
+		    if (elementList != null) {
 			var elementArray = elementList.split(" ");
 			if(elementArray.length > 1){
 				items.push('<dl><dt>Elements excluded in ' + module + ":</dt>");
@@ -643,7 +693,7 @@ function setXML(){
 				})
 				items.push('</dl>');
 			}
-		
+		    }
 		})
 		$('#repElements').append($('<ul/>', {
 			'class': 'repElements',
@@ -658,7 +708,6 @@ function setXML(){
 		setXML();
 		xmlDoc = $.parseXML(xml);
 		$xml = $(xmlDoc);
-		//alert(xml);
 		$xml.find("elementSpec").each(function(i, layer){
 			//alert("Got here");
 			var module = layer.getAttribute('module');
@@ -705,14 +754,10 @@ function editinfo () {
 		description = "My TEI Customization starts with modules tei, core, textstructure and header";
 	}
 	language = $("#languageSelect").val();
+	method = $("#methodSelect").val();
 }
 
-//--------------------------------------------------------------------------------------------------------------
-//------------------------------------------------BUTTON CLICKS HERE--------------------------------------------
-//--------------------------------------------------------------------------------------------------------------
-
-
-$(document).on("click","button.newProject", function(){
+$(document).on("click","span.newProject", function(){
     cleanSystem();
     AddedModules = [];
     AddedModules.push("core");
@@ -723,24 +768,15 @@ $(document).on("click","button.newProject", function(){
     $("#tabs").tabs("select", 1); 
 });
 
-$(document).on("click","button.saveStartInfo", function(){
+$(document).on("click","span.saveStartInfo", function(){
     editinfo();
-//    $('#OnlineSelector').hide();
-//    $('#ExistingSelector').hide();
-//    $('#UploadCustom').hide();
     $("#tabs").tabs("select", 2); 
 });
 
 
 
-$(document).on("click","button.TEI_Custom", function(){
-	$('#UploadCustom').show();
-	$("#ExistingSelector").hide();
-	$("#OnlineSelector").hide();
-        $("#tabs").tabs("select", 2); 
-})
 
-$(document).on("click","button.TEI_Default", function(){
+$(document).on("click","span.TEI_Default", function(){
 	loadDefaultTEI()
 	$('#message').html('<p>Default database loaded</p>')
         $("#tabs").tabs("select", 3); 
@@ -748,13 +784,13 @@ $(document).on("click","button.TEI_Default", function(){
 
 
 
-$(document).on("click","button.TEI_Online", function(){
+$(document).on("click","span.TEI_Online", function(){
 //	$("#UploadCustom").hide();
 //	$("#OnlineSelector").show();
 //	$("#ExistingSelector").hide();
 })
 
-$(document).on("click","button.setOnline", function(){
+$(document).on("click","span.setOnline", function(){
 	var TEIurl= $('#TEI_OnlineSelector').val();
 	var name = $('#TEI_OnlineName').val();
 	teiName = name;
@@ -772,16 +808,17 @@ $(document).on("click","button.setOnline", function(){
 		});
 	}
 	$('#message').html('<p>' + teiName + ' database loaded</p>')
+    doShowDatabases();
 })
 
-$(document).on("click","button.TEI_Existing", function(){
+$(document).on("click","span.TEI_Existing", function(){
 //	$("#ExistingSelector").show();
 //	$("#OnlineSelector").hide();
 //	$("#UploadCustom").hide();
-	doShowTEI();
+	doShowDatabases();
 })
 
-$(document).on("click","button.setExisting", function(){
+$(document).on("click","span.loadDatabase", function(){
 	var name = $('#loadTEI').val();
 	teiName = name;
 	if(localStorage.getItem("tei%*$&#" + name) == null){
@@ -797,7 +834,7 @@ $(document).on("click","button.setExisting", function(){
 
 
 
-$(document).on("click","button.SubmitTEI", function(){
+$(document).on("click","span.SubmitTEI", function(){
 	showNewModules();
 	if(TEI == []){
 	}
@@ -807,17 +844,16 @@ $(document).on("click","button.SubmitTEI", function(){
 	}
 });
 
-$(document).on("click","button.loadProject", function(){
+$(document).on("click","span.loadProject", function(){
     url = defaultDatabase,
 	loadTEI();
-	doShowAll();
+	doShowProjects();
         $("#tabs").tabs("select", 2); 
 });
 
 //Used to save a project to the browser.
-$(document).on("click","button.save", function(){
+$(document).on("click","span.save", function(){
 	var name = $("#saveAs").val(); 
-	//alert(name);
 	if(name == ''){
 	}
 	else{
@@ -826,14 +862,14 @@ $(document).on("click","button.save", function(){
 		localStorage.setItem("proj%*$&#"+name, data);
 		
 	}
-	doShowAll();
+	doShowProjects();
 })
 
 //Used to load a project from the browser.
-$(document).on("click","button.load", function(){
+$(document).on("click","span.load", function(){
     var name = $(this).parent().parent().children('td.fname').text();
     var data = localStorage.getItem('proj%*$&#'+name);
-    loadFile(data);
+    loadFile(data.replace(/&/g,"&amp;"));
     if(teiName != "undefined" && teiName != null){
 		var L = localStorage.getItem("tei%*$&#" + teiName);
 		if (L != null) {
@@ -847,26 +883,28 @@ $(document).on("click","button.load", function(){
 		loadDefaultTEI();
 	}
 	showNewModules();
-	$('#modules').show();
-	$('#actions').show();
     $("#tabs").tabs("select", 2); 
     
 })
 
-$(document).on("click","button.delete", function(){
+$(document).on("click","span.delete", function(){
     var name = $(this).parent().parent().children('td.fname').text();
     localStorage.removeItem("proj%*$&#" + name);
-    doShowAll();
+    doShowProjects();
 })
 
-$(document).on("click","button.output", function(){
+$(document).on("click","span.output", function(){
 	var value = $("#outputSelection").val();	
     switch (value)	
     {	
     case "TEI ODD":  	
   target="TEI%3Atext%3Axml/xml%3Aapplication%3Axml"; break;	
+    case "RELAX NG Compact Schema":  	
+  target = "ODD%3Atext%3Axml/ODDC%3Atext%3Axml/rnc%3Aapplication%3Arelaxng-compact"; break;	
     case "RELAX NG Schema":  	
   target = "ODD%3Atext%3Axml/ODDC%3Atext%3Axml/relaxng%3Aapplication%3Axml-relaxng"; break;	
+    case "XSD Schema":  	
+  target = "ODD%3Atext%3Axml/ODDC%3Atext%3Axml/xsd%3Aapplication%3Axml-xsd"; break;	
     case "ISO Schematron":  	
   target = "ODD%3Atext%3Axml/ODDC%3Atext%3Axml/isosch%3Atext%3Axml"; break;	
     case "Schematron":  	
@@ -899,38 +937,39 @@ $(document).on("click","button.output", function(){
 
 
 //CLICK BUTTON EVENT FOR ADDING/REMOVING ELEMENT
-$(document).on("click","button.addRemove", function(){
+$(document).on("click","span.addRemove", function(){
 	name = $(this).attr('id');
 	action = $(this).html();
-	if(action == "Included"){
+	if(action == "Exclude"){
 		ExcludedElements.push(name);
-		$(this).html("Excluded");
+		$(this).html("Include");
 	}
-	if(action == "Excluded"){
+	if(action == "Include"){
 		ExcludedElements.splice($.inArray(name, ExcludedElements),1);
-		$(this).html("Included");
+		$(this).html("Exclude");
 	}
 	showelements(name.split(',')[0]);
 })
 
 
 //CLICK BUTTON EVENT FOR ADDING/REMOVING ATTRIBUTE
-$(document).on("click","button.addRemoveAttribute", function(){
+$(document).on("click","span.addRemoveAttribute", function(){
 	name = $(this).attr('id');
 	action = $(this).html();
-	if(action == "Included"){
+	if(action == "Exclude"){
 		ExcludedAttributes.push(name);
-		$(this).html("Excluded");
+		$(this).html("Include");
 	}
-	if(action == "Excluded"){
+	if(action == "Include"){
 		ExcludedAttributes.splice($.inArray(name, ExcludedAttributes),1);
-		$(this).html("Included");
+		$(this).html("Exclude");
 	}
 	showattributes(name.split(',')[1]);
 })
 
 //CLICK BUTTON EVENT FOR VIEWING ELEMENTS
-$(document).on("click","button.modulelink",function() {
+
+$(document).on("click","span.modulelink",function() {
 	Back = "Modules";
 	Current = "Elements";
     showelements($(this).text() );
@@ -940,13 +979,13 @@ $(document).on("click","button.modulelink",function() {
 
 
 //CLICK BUTTON EVENT FOR VIEWING ATTRIBUTES
-$(document).on("click","button.elementlink",function(){
+$(document).on("click","span.elementlink",function(){
     showattributes($(this).text() );
     $("#tabs").tabs("select", 5); 
     return false;
 })
 
-$(document).on("click","button.attributelink", function(){
+$(document).on("click","span.attributelink", function(){
 	alterattributes($(this).attr("id"));
     $("#tabs").tabs("select", 6); 
 
@@ -954,7 +993,7 @@ $(document).on("click","button.attributelink", function(){
 })
 
 //CLICK BUTTON EVENT FOR ADDING MODULE
-$(document).on("click","button.addModule",function() {
+$(document).on("click","span.addModule",function() {
 	name = $(this).attr('id');
 	var exists = false;
 	var index = $.inArray(name.substring(0, name.length - 1), AddedModules);
@@ -966,7 +1005,7 @@ $(document).on("click","button.addModule",function() {
 })
 
 //CLICK BUTTON EVENT FOR REMOVING MODULE
-$(document).on("click","button.removeModule",function(){
+$(document).on("click","span.removeModule",function(){
 	name = $(this).attr('id');
 	var exists = false;
 	if($.inArray(name.substring(0, name.length - 1), AddedModules) != -1){
@@ -977,11 +1016,12 @@ $(document).on("click","button.removeModule",function(){
 })
 
 
-$(document).on("click","button.continueToLoad", function(){
+
+$(document).on("click","span.continueToLoad", function(){
 	var xmldata = $("#inputarea").val();
-	xml = xmldata
-	givenXML = xmldata
-	loadFile(xmldata);
+    xml = xmldata.replace(/&/g,"&amp;")
+    givenXML = xml;
+    loadFile(xml);
 	if(teiName != "undefined" && teiName != null){
 		var L = localStorage.getItem("tei%*$&#" + teiName);
 		if (L != null) {
@@ -999,7 +1039,7 @@ $(document).on("click","button.continueToLoad", function(){
         $("#tabs").tabs("select", 3); 
 })
 
-$(document).on("click","button.loadCustomJSON", function(){
+$(document).on("click","span.loadCustomJSON", function(){
 	eval($('#inputarea').val());
 	teiName = $("#JSONfile").val();
 	showNewModules();
@@ -1008,11 +1048,11 @@ $(document).on("click","button.loadCustomJSON", function(){
         $("#tabs").tabs("select", 3); 
 })
 
-$(document).on("click","button.outputXML", function(){
+$(document).on("click","span.outputXML", function(){
 
 })
 
-$(document).on("click", "button.saveAttributeInfo", function(){
+$(document).on("click", "span.saveAttributeInfo", function(){
 	if($("#listOfValues").val() != ""){
 		var index = -1;
 		var values = $("#attributeIdent").text().replace(/;/g,",");
@@ -1051,7 +1091,7 @@ $(document).on("click", "button.saveAttributeInfo", function(){
 		}
 	}
 })
-$(document).on("click", "button.closedOrOpen", function(){
+$(document).on("click", "span.closedOrOpen", function(){
 	if($(".closedOrOpen").html() == "Open List"){
 		$(".closedOrOpen").html("Closed List");
 	}
@@ -1059,16 +1099,7 @@ $(document).on("click", "button.closedOrOpen", function(){
 		$(".closedOrOpen").html("Open List");
 	}
 })
-$(document).on("click","button.removeJSON", function(){
-	var name = $("JSONtoremove").val();
-	if(name == ''){
-	}
-	else{
-		localStorage.removeItem("tei%*$&#" + name);
-	}
-	doShowTEI();
-})
-$(document).on("click", "button.restart", function(){
+$(document).on("click", "span.restart", function(){
 	$('#projectSelection').show();
 	$('#actions').hide();
 	$('#UploadCustom').hide();
@@ -1079,3 +1110,21 @@ $(document).on("click", "button.restart", function(){
     cleanSystem();
 })
 
+$(document).on("click","span.loadDatabase", function(){
+    var teiname = $(this).parent().parent().children('td.fname').text();
+    var data = localStorage.getItem('tei%*$&#'+teiname);
+    var L = localStorage.getItem("tei%*$&#" + teiName);
+    if (L != null) {
+	TEI = JSON.parse(L);
+    }
+    else{
+	loadDefaultTEI();
+    }
+    $("#tabs").tabs("select", 3);     
+})
+
+$(document).on("click","span.deleteDatabase", function(){
+    var name = $(this).parent().parent().children('td.fname').text();
+    localStorage.removeItem("tei%*$&#" + name);
+    doShowDatabases();
+})

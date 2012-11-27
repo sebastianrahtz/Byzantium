@@ -1,3 +1,19 @@
+/* Byzantium CSS */
+/*
+Copyright TEI Consortium.
+
+These material is dual-licensed:
+
+1. Distributed under a Creative Commons Attribution-ShareAlike 3.0
+Unported License http://creativecommons.org/licenses/by-sa/3.0/ 
+
+2. http://www.opensource.org/licenses/BSD-2-Clause
+                
+All rights reserved.
+
+
+*/
+
 body {
     font-family: Verdana,Arial,sans-serif;
 }
@@ -28,14 +44,49 @@ td#attributes{
 td{
     vertical-align:top;
 }
+
+table#moduleList td {
+    padding: 2pt;
+}
 tr.choice >td {
     padding: 12pt;
     border-bottom: solid blue 2pt;
 }
+tr.filetable >td {
+    font-family: monospace;
+    padding: 4pt;
+}
+tr.list >td {
+    padding: 4pt;
+}
 h2{
     color:#900;
 }
-/* Byzantium */
+
+
+/* buttons */
+.modulelink,
+.elementlink,
+.attributelink{
+    color:blue;
+}
+
+span.button {
+    font-family: Verdana, Arial, Helvetica, sans-serif; 
+    font-size: smaller; 
+    margin: 3px;
+    color: #003366
+    border: #00ffff;
+    border-style: solid;
+    border-width: 1px;
+    cursor:pointer;
+    padding: 2pt;
+    border-radius: 5px;
+    background-color:#E0E0E0;
+}
+
+
+
 .ui-widget { font-family: Verdana,Arial,sans-serif/*{ffDefault}*/; font-size: 0.9em/*{fsDefault}*/; }
 .ui-widget .ui-widget { font-size: 0.9em; }
 .ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget { font-family: Verdana,Arial,sans-serif/*{ffDefault}*/; font-size: 0.9em; }
@@ -47,9 +98,11 @@ h2{
     color:blue;
     cursor:pointer;
 }
+
 td.unselected {
     color: red;
 }
+
 
 #tabs {
 	background: transparent;
