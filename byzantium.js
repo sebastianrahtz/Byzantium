@@ -120,11 +120,6 @@ function showNewModules(){
 	$.each(AddedModules, function(i, module){
 		items.push('<li>' + AddedModules[i] + '</li>');
 	});
-/*	$('#selected').html($('<p/>', { html: "Modules Selected:" }));
-	$('#selected').append($('<ul/>', {
-		'class': 'selected',
-		html: items.join('')
-	}));*/
 }
 
 //DISPLAYS ELEMENTS
@@ -163,6 +158,7 @@ function showelements(name  )
 	borderColor: '#7f7f7f'});
 }
 
+//Loads an xml file from either local host or from HTML storage
 function loadFile(xml){
 	AddedModules = [];
 	xmlDoc = $.parseXML(xml);
@@ -182,6 +178,7 @@ function loadFile(xml){
 	if(teiName == "undefined" || teiName == null){
 		teiName = "";
 	}
+	//Populates the module segment.
 	$xml.find("moduleRef").each(function(i, item) {
 		key = item.getAttribute('key');
 		AddedModules.push(key);
@@ -205,6 +202,7 @@ function loadFile(xml){
 			}
 	    }
 	})
+	//This part populates the elements and the attributes.
 	$xml.find("elementSpec").each(function(i, item){
 		var module = item.getAttribute('module');
 		var element = item.getAttribute('ident');
@@ -286,6 +284,7 @@ function showattributes(name ) {
 	sliceColors: ['#dc3912','#3366cc','#7f7f7f','#109618','#66aa00','#dd4477','#0099c6','#990099 '],
 	borderColor: '#7f7f7f'});
 }
+//Alters the attributes' lists, as well as making them open or closed.
 function alterattributes(id){
 	$("#attributeIdent").text(id);
 	$("#attAlterName").text("Attribute Name: " + id.split(',')[3]);
@@ -488,6 +487,8 @@ function setXML(){
 		}
 	})
 	var beenHereBefore = 0;
+	var currentModEle = "";
+	var previousModEle = "";
 	$.each(ListofValues, function(i, value){
 		var es = $.parseXML("<elementSpec/>").documentElement;
 		var al = $.parseXML("<attList/>").documentElement;
@@ -495,6 +496,10 @@ function setXML(){
 		var change = "change";
 		var module = value.split(",")[1];
 		var element = value.split(",")[2];
+		currentModEle = module + "," + element;
+		if(currentModEle != previousModEle){
+			beenHereBefore = 0;
+		}
 		var exclusions = $xml.find("elementSpec[ident=" + element + "][module=" + module + "]");
 		if($.inArray(value, includedValue) != -1){
 			
@@ -530,16 +535,17 @@ function setXML(){
 			}
 			else{
 				data = data + '</valList></attDef></attList></elementSpec>'
-				beenHereBefore = 1;
 			}
 			var at = $.parseXML(data).documentElement;
-			if(hasAtt == "true"){
+			if(hasAtt == "true" || beenHereBefore > 0){
 				$xml.find("elementSpec[ident=" + element + "][module=" + module + "]").find("attList").append($(at));
 			}
 			else{
 				$xml.find("schemaSpec").append($(at));
+				beenHereBefore = 1;
 			}
 		}
+		previousModEle = currentModEle;
 	})
 	
 	out = new XMLSerializer().serializeToString(xmlDoc);
@@ -580,7 +586,7 @@ function setXML(){
 	 $('#teiitems_table').html('<table><tr><th>Name</th><th>Action</th></tr>' + pairs + '</table>');
      }
  }
- 
+ //Loads the default TEI that Sebastian created.
  function loadDefaultTEI(){
  	if(localStorage.getItem("tei%*$&#Default") === null){
 		$.ajax({
@@ -627,7 +633,8 @@ function setXML(){
 	 document.getElementById(listContainer).innerHTML = '<ul>' + output.join('') + '</ul>';
      }
  
-    function makeReport () {
+ //Creates the report page
+function makeReport () {
 	if(filename != ""){
 		$("#repFilename").text("Filename: " + filename);
 	}
