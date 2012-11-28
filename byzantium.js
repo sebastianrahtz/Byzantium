@@ -56,6 +56,7 @@ function cleanSystem() {
     Current = "";
     ExcludedAttributes=[];
     ExcludedElements=[];
+	ListofValues = [];
     author = "";
     currentModule = "";
     description = "TEI customization made on " + today;
@@ -103,7 +104,7 @@ function showmodules() {
 	});
     });
     $("#moduleSummary").html('<p>' + TEI.modules.length + " modules available, of which " + AddedModules.length + " are in use, containing " + liveElements + " elements, of which " +  ExcludedElements.length + " are excluded</p>");
-	$(".moduleSparkline").sparkline([(totElements-liveElements),(liveElements-ExcludedElements.length),ExcludedElements.length], {
+	$(".moduleSparkline").sparkline([(TEI.modules.length - AddedModules.length),(AddedModules.length)], {
 	type: 'pie',
 	width: '200',
 	height: '200',
@@ -160,6 +161,7 @@ function showelements(name  )
 
 //Loads an xml file from either local host or from HTML storage
 function loadFile(xml){
+	
 	AddedModules = [];
 	xmlDoc = $.parseXML(xml);
 	$xml = $(xmlDoc);
@@ -253,13 +255,14 @@ function showattributes(name ) {
 									addableitems.push('<tr class="list"><td><span class="button addRemoveAttribute" id="' + currentModule + "," + name + "," + attribute.ident + '">');
 									if($.inArray((currentModule + "," + name + "," + attribute.ident), ExcludedAttributes) == -1){
 										addableitems.push("Exclude");
+										addableitems.push('</span></td><td>' + '<span class="button attributelink" id="att,' + currentModule + "," + name + "," + attribute.ident + '" >'+ attribute.ident + "</span></td><td>"  + attribute.desc + '</td></tr>');
 										usedAttributes += 1;
 									}
 									else{
 										addableitems.push("Include");
+										addableitems.push('</span></td><td class="unselected">' + '<span id="att,' + currentModule + "," + name + "," + attribute.ident + '" >'+ attribute.ident + "</span></td><td>"  + attribute.desc + '</td></tr>');
 										excludedAttributes += 1;
 									}
-									addableitems.push('</span></td><td>' + '<span class="button attributelink" id="att,' + currentModule + "," + name + "," + attribute.ident + '" >'+ attribute.ident + "</span></td><td>"  + attribute.desc + '</td></tr>');
 								}
 								else{
 									unaddableitems.push('<tr class="list"><td><button disabled="disabled">Requires: ' + classAttributeModule + "</span></td><td>"+ attribute.ident + '</td><td> ' + attribute.desc + '</td></tr>');
@@ -818,11 +821,11 @@ $(document).on("click","span.TEI_Existing", function(){
 	doShowDatabases();
 })
 
-$(document).on("click","span.loadDatabase", function(){
+/*$(document).on("click","span.loadDatabase", function(){
 	var name = $('#loadTEI').val();
 	teiName = name;
 	if(localStorage.getItem("tei%*$&#" + name) == null){
-		loadDefault();
+		loadDefaultTEI();
 	}
 	else{
 		var getTEI = localStorage.getItem("tei%*$&#" + name);
@@ -830,7 +833,7 @@ $(document).on("click","span.loadDatabase", function(){
 	}
 	$("#actions").show();
 	$('#message').html('<p>' + teiName + ' database loaded</p>')
-})
+})*/
 
 
 
@@ -1041,7 +1044,7 @@ $(document).on("click","span.continueToLoad", function(){
 
 $(document).on("click","span.loadCustomJSON", function(){
 	eval($('#inputarea').val());
-	teiName = $("#JSONfile").val();
+	teiName = $("#TEI_LocalName").val();
 	showNewModules();
 	$('#actions').show();
 	$('#message').html('<p>' + teiName + ' database loaded</p>')
