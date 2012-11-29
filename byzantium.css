@@ -29,7 +29,7 @@ float:right;
   font-style:italic;
 }
 
-td#elements{
+td#members{
     font-size:90%;
     margin:5%;
     background-color:#EEE;
@@ -64,13 +64,6 @@ h2{
 }
 
 
-/* buttons */
-.modulelink,
-.elementlink,
-.attributelink{
-    color:blue;
-}
-
 span.button {
     font-family: Verdana, Arial, Helvetica, sans-serif; 
     font-size: smaller; 
@@ -92,7 +85,7 @@ span.button {
 .ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget { font-family: Verdana,Arial,sans-serif/*{ffDefault}*/; font-size: 0.9em; }
 
 .modulelink,
-.elementlink,
+.classlink,
 .attributelink{
     border:none;
     color:blue;
