@@ -410,6 +410,7 @@ function setXML(){
 		$xml.find("schemaSpec").attr({docLang: language});
 	}
 	
+    // first create the moduleRef elements
 	$.each(AddedModules, function(i, name) {
 	    var mr = document.createElementNS("http://www.tei-c.org/ns/1.0", 'moduleRef');
 		var excludeString = "";
@@ -442,61 +443,42 @@ function setXML(){
 		    })
 	
 	var excludes = [];
-	$.each(ExcludedAttributes, function(i, attribute){
-		if($.inArray(attribute.split(',')[0], AddedModules) != -1){
-			if($.inArray((attribute.split(',')[0] + "," + attribute.split(',')[1]), ExcludedMembers) == -1){
-				excludes.push(attribute);
-			}
-		}
-	})
-	usedModules = [];
-	usedMembers = [];
+	var usedModules = [];
+	var changedElements = [];
 	var finalAttributes = [];
 	var attributeString = "";
-	$.each(excludes, function(i, AttribElement){
-		var currentModule = AttribElement.split(",")[0];
-		$.each(excludes, function(j, AttribElement2){
-			var currentElement = AttribElement2.split(',')[1];
-			attributeString = currentModule + "," + currentElement;
-			$.each(excludes, function(k, AttribElement3){
-				if(currentModule == AttribElement3.split(',')[0]){
-					if(currentElement == AttribElement3.split(',')[1]){
-						attributeString = attributeString + "," + AttribElement3.split(',')[2];
-					}
-				}
-			})
-			if($.inArray(attributeString, usedMembers) == -1){
-				if(attributeString.split(',').length > 2 ){
-					usedMembers.push(attributeString);
-				}
-			}
-			attributeString = "";
-		})
-	})
-	
-	$.each(usedMembers, function(i, item){
-		currentModule = item.split(",")[0];
-		currentMember = item.split(",")[1];
-		attributeArray = item.split(",");
-		var es = document.createElementNS("http://www.tei-c.org/ns/1.0", types[currentMember]["type"]);
-		var al = document.createElementNS("http://www.tei-c.org/ns/1.0", 'attList');
-		var change = "change";
-		$.each(attributeArray, function(j, item2){
-			if(j < 2){
-			}
-			else{
-			    currentAttribute = item2;
-			    var ad = document.createElementNS("http://www.tei-c.org/ns/1.0", 'attDef');
-			    $(al).append($(ad).attr({ident: currentAttribute, mode: "delete"}));
-			}
-		})
-	        $(es).append($(al));
-		$xml.find("schemaSpec").append($(es).attr({ident: currentMember, module: currentModule, mode: change}));
+    var change = "change";
+
+    // go over excluded attributes and check modules are still available, then  generate a list of elements which 
+    // are affected, with list of attributes to delete
+	$.each(ExcludedAttributes, function(i, attrib){
+	    var currentModule = attrib.split(',')[0];
+	    var currentMember = attrib.split(',')[1];
+	    var currentAttribute = attrib.split(',')[2];
+	    var currentType = types[currentMember]["type"]
+	    if($.inArray(currentModule, AddedModules) != -1 && $.inArray(currentModule + "," + currentMember, ExcludedMembers) == -1) 
+	    {
+		var ad = document.createElementNS("http://www.tei-c.org/ns/1.0", 'attDef');
+		if ($xml.find('*[ident="' + currentMember + '"]').length > 0) {
+		    $xml.find('*[ident="' + currentMember + '"]').find('attList').append($(ad).attr({ident: currentAttribute, mode: "delete"}));
+		}
+		else
+		{
+		    var es = document.createElementNS("http://www.tei-c.org/ns/1.0", types[currentMember]["type"]);
+		    var al = document.createElementNS("http://www.tei-c.org/ns/1.0", 'attList');
+			$(al).append($(ad).attr({ident: currentAttribute, mode: "delete"}));
+			$(es).append($(al));
+			$xml.find("schemaSpec").append($(es).attr({ident: currentMember, module: currentModule, mode: change}));
+		}
 		out = new XMLSerializer().serializeToString(xmlDoc);
-		xml = out;			
-	})	
-	var includedValue = [];
+		xmlDoc = $.parseXML(out);
+		$xml = $(xmlDoc);
+	    }
+	});
+
+    var includedValue = [];
 	
+    // ok, now we can deal with the changed attributes, for which we have created <valList>s
 	$.each(ListofValues, function(i, value){
 		if($.inArray(value.split(',')[1], AddedModules) != -1){
 			if($.inArray((value.split(',')[1] + "," + value.split(',')[2]), ExcludedMembers) == -1){
@@ -510,10 +492,8 @@ function setXML(){
 	$.each(ListofValues, function(i, value){
 		var es = document.createElementNS("http://www.tei-c.org/ns/1.0", types[currentMember]["type"]);
 		var al = document.createElementNS("http://www.tei-c.org/ns/1.0", 'attList');
-		var es = $.parseXML("<elementSpec/>").documentElement;
-		var al = $.parseXML("<attList/>").documentElement;
+		var vl = document.createElementNS("http://www.tei-c.org/ns/1.0", 'valList');
 		var vl = $.parseXML("<valList type='closed' mode='replace'/>").documentElement;
-		var change = "change";
 		var module = value.split(",")[1];
 		var element = value.split(",")[2];
 		var exclusions = $xml.find("elementSpec[ident=" + element + "][module=" + module + "]");
