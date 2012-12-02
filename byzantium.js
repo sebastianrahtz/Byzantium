@@ -58,6 +58,7 @@ function cleanSystem() {
     Current = "";
     ExcludedAttributes=[];
     ExcludedMembers=[];
+    ListofValues = [];
     author = "";
     currentModule = "";
     description = "TEI customization made on " + TODAY;
@@ -122,11 +123,6 @@ function showNewModules(){
 	$.each(AddedModules, function(i, module){
 		items.push('<li>' + AddedModules[i] + '</li>');
 	});
-/*	$('#selected').html($('<p/>', { html: "Modules Selected:" }));
-	$('#selected').append($('<ul/>', {
-		'class': 'selected',
-		html: items.join('')
-	}));*/
 }
 
 //DISPLAYS MEMBERS
@@ -165,7 +161,9 @@ function showmembers(name  )
 	borderColor: '#7f7f7f'});
 }
 
+//Loads an xml file from either local host or from HTML storage
 function loadFile(xml){
+	
 	AddedModules = [];
 	xmlDoc = $.parseXML(xml);
 	$xml = $(xmlDoc);
@@ -184,6 +182,7 @@ function loadFile(xml){
 	if(teiName == "undefined" || teiName == null){
 		teiName = "";
 	}
+	//Populates the module segment.
 	$xml.find("moduleRef").each(function(i, item) {
 		key = item.getAttribute('key');
 		AddedModules.push(key);
@@ -207,6 +206,7 @@ function loadFile(xml){
 			}
 	    }
 	})
+	//This part populates the elements and the attributes.
 	$xml.find("elementSpec").each(function(i, item){
 		var module = item.getAttribute('module');
 		var element = item.getAttribute('ident');
@@ -296,8 +296,7 @@ $('#attributes').append('<div id="sparkline" style="float:right" border="1"><spa
 	sliceColors: ['#dc3912','#3366cc','#7f7f7f','#109618','#66aa00','#dd4477','#0099c6','#990099 '],
 	borderColor: '#7f7f7f'});
 }
-
-			
+//Alters the attributes' lists, as well as making them open or closed.
 function alterattributes(id){
 	$("#attributeIdent").text(id);
 	$("#attAlterName").text("Attribute Name: " + id.split(',')[3]);
@@ -489,6 +488,8 @@ function setXML(){
 		}
 	})
 	var beenHereBefore = 0;
+	var currentModEle = "";
+	var previousModEle = "";
 	$.each(ListofValues, function(i, value){
 		var es = document.createElementNS("http://www.tei-c.org/ns/1.0", types[currentMember]["type"]);
 		var al = document.createElementNS("http://www.tei-c.org/ns/1.0", 'attList');
@@ -496,6 +497,10 @@ function setXML(){
 		var vl = $.parseXML("<valList type='closed' mode='replace'/>").documentElement;
 		var module = value.split(",")[1];
 		var element = value.split(",")[2];
+		currentModEle = module + "," + element;
+		if(currentModEle != previousModEle){
+			beenHereBefore = 0;
+		}
 		var exclusions = $xml.find("elementSpec[ident=" + element + "][module=" + module + "]");
 		if($.inArray(value, includedValue) != -1){
 			
@@ -531,16 +536,17 @@ function setXML(){
 			}
 			else{
 				data = data + '</valList></attDef></attList></elementSpec>'
-				beenHereBefore = 1;
 			}
 			var at = $.parseXML(data).documentElement;
-			if(hasAtt == "true"){
+			if(hasAtt == "true" || beenHereBefore > 0){
 				$xml.find("elementSpec[ident=" + element + "][module=" + module + "]").find("attList").append($(at));
 			}
 			else{
 				$xml.find("schemaSpec").append($(at));
+				beenHereBefore = 1;
 			}
 		}
+		previousModEle = currentModEle;
 	})
 	
 	out = new XMLSerializer().serializeToString(xmlDoc);
@@ -581,7 +587,7 @@ function setXML(){
 	 $('#teiitems_table').html('<table>' + pairs + '</table>');
      }
  }
- 
+ //Loads the default TEI that Sebastian created.
  function loadDefaultTEI(){
  	if(localStorage.getItem("tei%*$&#Default") === null){
 		$.ajax({
@@ -628,7 +634,8 @@ function setXML(){
 	 document.getElementById(listContainer).innerHTML = '<ul>' + output.join('') + '</ul>';
      }
  
-    function makeReport () {
+ //Creates the report page
+function makeReport () {
 	if(filename != ""){
 		$("#repFilename").text("Filename: " + filename);
 	}
@@ -856,7 +863,7 @@ $(document).on("click","span.output", function(){
     case "RELAX NG Schema":  	
   target = "ODD%3Atext%3Axml/ODDC%3Atext%3Axml/relaxng%3Aapplication%3Axml-relaxng"; break;	
     case "XSD Schema":  	
-  target = "ODD%3Atext%3Axml/ODDC%3Atext%3Axml/relaxng%3Aapplication%3Axml-xsd"; break;	
+  target = "ODD%3Atext%3Axml/ODDC%3Atext%3Axml/xsd%3Aapplication%3Axml-xsd"; break;	
     case "ISO Schematron":  	
   target = "ODD%3Atext%3Axml/ODDC%3Atext%3Axml/isosch%3Atext%3Axml"; break;	
     case "Schematron":  	
@@ -995,7 +1002,7 @@ $(document).on("click","span.continueToLoad", function(){
 
 $(document).on("click","span.loadCustomJSON", function(){
 	eval($('#inputarea').val());
-	teiName = $("#JSONfile").val();
+	teiName = $("#TEI_LocalName").val();
 	showNewModules();
 	$('#actions').show();
     status(teiName + ' database loaded')
