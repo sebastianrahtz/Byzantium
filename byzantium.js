@@ -513,7 +513,7 @@ function setXML(){
 		    var al = document.createElementNS("http://www.tei-c.org/ns/1.0", 'attList');
 		    $(al).append($(ad).attr({ident: currentAttribute, mode: "change"}));
 		    $(es).append($(al));
-		    $xml.find("schemaSpec").append($(es).attr({ident: currentMember, module: currentModule, mode: change}));
+		    $xml.find("schemaSpec").append($(es).attr({ident: currentMember, module: currentModule, mode: "change"}));
 		}
 	    }
 
