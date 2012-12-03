@@ -432,11 +432,11 @@ function setXML(){
 			else 
 			{
 			    if (method == 'include') {
-				$xml.find("schemaSpec").append($(mr).attr({key: currentModule, include: includeString}));
+				$xml.find("schemaSpec").append($(mr).attr({key: currentModule, include: includeString.replace(/^\s+/, '')}));
 			    }
 			    else
 			    {
-				$xml.find("schemaSpec").append($(mr).attr({key: currentModule, except: excludeString}));
+				$xml.find("schemaSpec").append($(mr).attr({key: currentModule, except: excludeString.replace(/^\s+/, '')}));
 			    }
 			}
 		    })
@@ -446,7 +446,6 @@ function setXML(){
 	var changedElements = [];
 	var finalAttributes = [];
 	var attributeString = "";
-    var change = "change";
 
     // go over excluded attributes and check modules are still available, then  generate a list of elements which 
     // are affected, with list of attributes to delete
@@ -465,88 +464,59 @@ function setXML(){
 		{
 		    var es = document.createElementNS("http://www.tei-c.org/ns/1.0", types[currentMember]["type"]);
 		    var al = document.createElementNS("http://www.tei-c.org/ns/1.0", 'attList');
-			$(al).append($(ad).attr({ident: currentAttribute, mode: "delete"}));
-			$(es).append($(al));
-			$xml.find("schemaSpec").append($(es).attr({ident: currentMember, module: currentModule, mode: change}));
+		    $(al).append($(ad).attr({ident: currentAttribute, mode: "delete"}));
+		    $(es).append($(al));
+		    $xml.find("schemaSpec").append($(es).attr({ident: currentMember, module: currentModule, mode: "change"}));
 		}
+	    }
+
 		out = new XMLSerializer().serializeToString(xmlDoc);
 		xmlDoc = $.parseXML(out);
 		$xml = $(xmlDoc);
-	    }
+
+
 	});
 
-    var includedValue = [];
 	
-    // ok, now we can deal with the changed attributes, for which we have created <valList>s
+    // ok, now we can deal with the changed attributes, for which we have create <valList>s
 	$.each(ListofValues, function(i, value){
-		if($.inArray(value.split(',')[1], AddedModules) != -1){
-			if($.inArray((value.split(',')[1] + "," + value.split(',')[2]), ExcludedMembers) == -1){
-				if($.inArray((value.split(',')[1] + "," + value.split(',')[2] + ',' + value.split(',')[3]), ExcludedAttributes) == -1){
-					includedValue.push(value);
-				}
-			}
+	    var currentModule = value.split(',')[1];
+	    var currentMember = value.split(',')[2];
+	    var currentAttribute = value.split(',')[3];
+	    var currentType = types[currentMember]["type"]
+	    if($.inArray(currentModule, AddedModules) != -1 && $.inArray(currentModule + "," + currentMember, ExcludedMembers) == -1) 
+	    {
+		$.each(closedAndOpen, function(i, posCloseOpen){
+		    if(value.split(',')[1] + value.split(',')[2] + value.split(',')[3] == posCloseOpen.split(',')[2] + posCloseOpen.split(',')[3] + posCloseOpen.split(',')[4]){
+			closeOpen = posCloseOpen.split(',')[0];
+		    }
+		})
+		var ad = document.createElementNS("http://www.tei-c.org/ns/1.0", 'attDef');
+		var vl = document.createElementNS("http://www.tei-c.org/ns/1.0", 'valList')
+		var vi;
+		$(vl).attr({mode: 'replace',type: closeOpen});
+		var splitList = value.split(",");
+		$.each(splitList, function(i, val){
+		    if(i > 3){
+			vi = document.createElementNS("http://www.tei-c.org/ns/1.0", 'valItem');
+			$(vi).attr({ident: val});
+			$(vl).append($(vi));
+		    }
+		})
+		$(ad).append($(vl));
+		if ($xml.find('*[ident="' + currentMember + '"]').length > 0) {
+		    $xml.find('*[ident="' + currentMember + '"]').find('attList').append($(ad).attr({ident: currentAttribute, mode: "change"}));
 		}
-	})
-	var beenHereBefore = 0;
-	var currentModEle = "";
-	var previousModEle = "";
-	$.each(ListofValues, function(i, value){
-		var es = document.createElementNS("http://www.tei-c.org/ns/1.0", types[currentMember]["type"]);
-		var al = document.createElementNS("http://www.tei-c.org/ns/1.0", 'attList');
-		var vl = document.createElementNS("http://www.tei-c.org/ns/1.0", 'valList');
-		var vl = $.parseXML("<valList type='closed' mode='replace'/>").documentElement;
-		var module = value.split(",")[1];
-		var element = value.split(",")[2];
-		currentModEle = module + "," + element;
-		if(currentModEle != previousModEle){
-			beenHereBefore = 0;
+		else
+		{
+		    var es = document.createElementNS("http://www.tei-c.org/ns/1.0", types[currentMember]["type"]);
+		    var al = document.createElementNS("http://www.tei-c.org/ns/1.0", 'attList');
+		    $(al).append($(ad).attr({ident: currentAttribute, mode: "change"}));
+		    $(es).append($(al));
+		    $xml.find("schemaSpec").append($(es).attr({ident: currentMember, module: currentModule, mode: change}));
 		}
-		var exclusions = $xml.find("elementSpec[ident=" + element + "][module=" + module + "]");
-		if($.inArray(value, includedValue) != -1){
-			
-			var hasAtt = "false";
-			var data = '';
-			var closeOpen = '';
-			$.each(ExcludedAttributes, function(i, attribute){
-				if(value.split(',')[1] + "," + value.split(',')[2] == attribute.split(',')[0] + "," + attribute.split(',')[1]){
-					hasAtt = "true";
-				}
-			})
-			$.each(closedAndOpen, function(i, posCloseOpen){
-				if(value.split(',')[1] + value.split(',')[2] + value.split(',')[3] == posCloseOpen.split(',')[2] + posCloseOpen.split(',')[3] + posCloseOpen.split(',')[4]){
-					closeOpen = posCloseOpen.split(',')[0];
-				}
-			})
-			if(hasAtt == "true" || beenHereBefore > 0){
-				data = '<attDef ident="' + value.split(",")[3] + '" mode="change" xmlns="http://www.tei-c.org/ns/1.0"><valList type="' + closeOpen + '" mode="replace">';
-			}
-			else{
-				data = '<elementSpec xmlns="http://www.tei-c.org/ns/1.0" ident="'+element+'" module="' + module + '" mode="change"><attList><attDef ident="' + value.split(",")[3] + '" mode="change" xmlns="http://www.tei-c.org/ns/1.0"><valList type="' + closeOpen + '" mode="replace">';
-			}
-			var splitList = value.split(",");
-			$.each(splitList, function(i){
-				if(i > (splitList.length-5)){
-				}
-				else{
-					data = data + '<valItem ident="' + value.split(",")[i+4] + '"/>'
-				}
-			})
-			if(hasAtt == "true" || beenHereBefore > 0){
-				data = data + '</valList></attDef>'
-			}
-			else{
-				data = data + '</valList></attDef></attList></elementSpec>'
-			}
-			var at = $.parseXML(data).documentElement;
-			if(hasAtt == "true" || beenHereBefore > 0){
-				$xml.find("elementSpec[ident=" + element + "][module=" + module + "]").find("attList").append($(at));
-			}
-			else{
-				$xml.find("schemaSpec").append($(at));
-				beenHereBefore = 1;
-			}
-		}
-		previousModEle = currentModEle;
+	    }
+
 	})
 	
 	out = new XMLSerializer().serializeToString(xmlDoc);
@@ -852,6 +822,11 @@ $(document).on("click","span.delete", function(){
     doShowProjects();
 })
 
+$(document).on("click","span.preview", function(){
+    setXML();
+    alert(xml);
+})
+
 $(document).on("click","span.output", function(){
 	var value = $("#outputSelection").val();	
     switch (value)	
@@ -893,8 +868,7 @@ $(document).on("click","span.output", function(){
 	}
     document.getElementsByTagName("body")[0].appendChild(f);
     document.getElementsByName("input")[0].value=xml;
-    alert(xml)
-    //f.submit();
+    f.submit();
     $('#outputFormMulti').remove();
 })
 
