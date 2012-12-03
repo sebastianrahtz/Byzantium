@@ -29,6 +29,7 @@ All rights reserved.
             else if (tabNumber == 2 ) {	doShowDatabases(); }
             else if (tabNumber == 3 ) {	showmodules(); }
             else if (tabNumber == 7 ) { makeReport(); }
+            else if (tabNumber == 8 ) { makePreview(); }
         }});
     });
 </script>
@@ -62,7 +63,6 @@ All rights reserved.
 				<option>ePub documentation</option>
 			</select>
 			<span class="button output">Generate</span>
-			<span class="button preview">View customization</span>
 		</div>
 
 		<div id="tabs">
@@ -90,6 +90,9 @@ All rights reserved.
 				</li>
 				<li>
 					<a href="#reportPage">Report</a>
+				</li>
+				<li>
+					<a href="#Preview">View customization</a>
 				</li>
 			</ul>
 
@@ -278,6 +281,8 @@ All rights reserved.
 				<div id="repAttributes"></div>
 			</div>
 
+			<div id="Preview">
+			</div>
 		</div>
 
 		<div id="message"></div>

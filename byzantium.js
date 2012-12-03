@@ -727,6 +727,11 @@ function editinfo () {
 	method = $("#methodSelect").val();
 }
 
+function makePreview() {
+    setXML();
+    $('#Preview').html("<pre>" + xml.replace(/</g,'\n&lt;') + "</pre>");
+}
+
 $(document).on("click","span.newProject", function(){
     cleanSystem();
     AddedModules = [];
@@ -820,11 +825,6 @@ $(document).on("click","span.delete", function(){
     var name = $(this).parent().parent().children('td.fname').text();
     localStorage.removeItem("proj%*$&#" + name);
     doShowProjects();
-})
-
-$(document).on("click","span.preview", function(){
-    setXML();
-    alert(xml);
 })
 
 $(document).on("click","span.output", function(){
