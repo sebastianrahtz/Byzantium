@@ -10,10 +10,10 @@ Copyright TEI Consortium.
 These material is dual-licensed:
 
 1. Distributed under a Creative Commons Attribution-ShareAlike 3.0
-Unported License http://creativecommons.org/licenses/by-sa/3.0/ 
+Unported License http://creativecommons.org/licenses/by-sa/3.0/
 
 2. http://www.opensource.org/licenses/BSD-2-Clause
-                
+
 All rights reserved.
 
 
@@ -103,7 +103,7 @@ function showmodules() {
         liveMembers=0;
         $.each(AddedModules, function(i, module){
             $.each(TEI.members, function(i, member){
-                if (member.module == module) { 
+                if (member.module == module) {
                     liveMembers++;
                 }
             });
@@ -151,7 +151,7 @@ function showmembers(name) {
             }
         }
     });
-    
+
     $('#members').append('<div id="sparkline" style="float:right" border="1"><span class="membersparkline"></span><ul><li>Red: Unused members</li><li>Blue: Used members</li></ul></div>');
     $('#members').append($('<table/>', {'class': 'members',html:  items.join('') }));
     $(".membersparkline").sparkline([(totalMembers-usedMembers),usedMembers], {
@@ -262,7 +262,7 @@ function showattributes(name ) {
         });
         $.each(member.classattributes, function(i, classattribute){
             var classAttributeModule = classattribute.module,
-                classAttributeClass  = classattribute.className;
+                classAttributeClass = classattribute.className;
             $.each(TEI.members, function(i, attclass) {
                 if (attclass.ident != classAttributeClass) {
                     return;
@@ -284,7 +284,7 @@ function showattributes(name ) {
                     else {
                         unaddableitems.push('<tr class="list"><td>' + classAttributeClass + '</td><td><button disabled="disabled">Requires: ' + classAttributeModule + "</span></td><td>"+ attribute.ident + '</td><td> ' + attribute.desc + '</td></tr>');
                         unavailableAttributes +=1;
-                    }                
+                    }
                 });
             });
         });
@@ -332,7 +332,7 @@ function alterattributes(id){
     });
 }
 
-// READY FUNCTION. 
+// READY FUNCTION.
 $(function(){
     if (localStorage.getItem("tei%*$&#Default") === null) {
         $.ajax({
@@ -405,7 +405,7 @@ function setXML(){
         out = new XMLSerializer().serializeToString(xmlDoc);
         xml = out;
     }
-    
+
     xmlDoc = $.parseXML(xml);
     $xml = $(xmlDoc);
     $xml.find("title").append(title);
@@ -417,7 +417,7 @@ function setXML(){
     if (language!=""){
         $xml.find("schemaSpec").attr({docLang: language});
     }
-    
+
     // first create the moduleRef elements
     $.each(AddedModules, function(i, name) {
         var mr = document.createElementNS('http://www.tei-c.org/ns/1.0', 'moduleRef'),
@@ -447,7 +447,7 @@ function setXML(){
         }
     });
 
-    // go over excluded attributes and check modules are still available, then  generate a list of elements which 
+    // go over excluded attributes and check modules are still available, then generate a list of elements which
     // are affected, with list of attributes to delete
     $.each(ExcludedAttributes, function(i, attrib){
         var ad, es, al,
@@ -473,7 +473,7 @@ function setXML(){
         xmlDoc = $.parseXML(out);
         $xml = $(xmlDoc);
     });
-    
+
     // ok, now we can deal with the changed attributes, for which we have create <valList>s
     $.each(ListofValues, function(i, value) {
         var vi, ad, vl, es, al, splitList, currentModule = value.split(',')[1],
@@ -510,7 +510,7 @@ function setXML(){
             }
         }
     });
-    
+
     out = new XMLSerializer().serializeToString(xmlDoc);
     xml = out;
 }
@@ -532,7 +532,7 @@ function setXML(){
         $('#items_table').html('<table>' + pairs + '</table>');
     }
  }
- 
+
   function doShowDatabases(){
    var key = '',
     pairs = '',
@@ -565,8 +565,8 @@ function loadDefaultTEI(){
         TEI = JSON.parse(localStorage.getItem("tei%*$&#Default"));
     }
 }
- 
- 
+
+
 function checkFileSupport() {
     if (window.File && window.FileReader && window.FileList && window.Blob) {
         //  alert("Great success! All the File APIs are supported.");
@@ -598,7 +598,7 @@ function showFiles(files, listContainer) {
      }
      $('#' + listContainer).html('<ul>' + output.join('') + '</ul>');
  }
- 
+
 // Creates the report page
 function makeReport () {
     var items;
@@ -625,12 +625,12 @@ function makeReport () {
         setXML();
         xmlDoc = $.parseXML(xml);
         $xml = $(xmlDoc);
-        
+
         $xml.find("moduleRef").each(function(i, element) {
             var module = element.getAttribute('key');
             items.push('<li>' + module + '</li>');
         });
-        
+
         $('#repModules').append($('<ul/>', {
             'class': 'repModules',
             html: items.join('')
@@ -643,7 +643,7 @@ function makeReport () {
         setXML();
         xmlDoc = $.parseXML(xml);
         $xml = $(xmlDoc);
-        
+
         $xml.find("moduleRef").each(function(i, element) {
             var elementArray,
                 module = element.getAttribute('key'),
@@ -687,7 +687,7 @@ function makeReport () {
             'class': 'repAttributes',
             html: items.join('')
         }));
-    }    
+    }
 }
 
 function editinfo () {
@@ -732,19 +732,19 @@ $("span.newProject").click(function() {
     AddedModules.push("header");
     AddedModules.push("textstructure");
     showNewModules();
-    $("#tabs").tabs("select", 1); 
+    $("#tabs").tabs("select", 1);
 });
 
 $("span.saveStartInfo").click(function(){
     editinfo();
-    $("#tabs").tabs("select", 2); 
+    $("#tabs").tabs("select", 2);
 });
 
 
 $("span.TEI_Default").click(function(){
     loadDefaultTEI();
     status("Default database loaded");
-    $("#tabs").tabs("select", 3); 
+    $("#tabs").tabs("select", 3);
 });
 
 $("span.setOnline").click(function() {
@@ -760,11 +760,11 @@ $("span.setOnline").click(function() {
                localStorage.setItem("tei%*$&#"+name, JSON.stringify(data, null, 2));
             }
         })).done(function() {
-            $("#tabs").tabs("select", 3); 
+            $("#tabs").tabs("select", 3);
         });
     }
     status(TEIurl + " database loaded");
-    $("#tabs").tabs("select", 3); 
+    $("#tabs").tabs("select", 3);
     doShowDatabases();
 });
 
@@ -772,18 +772,18 @@ $('span.loadProject').click(function(){
     url = defaultDatabase;
     loadTEI();
     doShowProjects();
-        $("#tabs").tabs("select", 2); 
+        $("#tabs").tabs("select", 2);
 });
 
 //Used to save a project to the browser.
 $("span.save").click(function() {
-    var data, name = $("#saveAs").val(); 
+    var data, name = $("#saveAs").val();
     if (name == ''){
     }
     else{
         setXML();
         data = xml;
-        localStorage.setItem("proj%*$&#"+name, data);    
+        localStorage.setItem("proj%*$&#"+name, data);
     }
     doShowProjects();
 });
@@ -807,7 +807,7 @@ $("span.load").click(function () {
         loadDefaultTEI();
     }
     showNewModules();
-    $("#tabs").tabs("select", 2);    
+    $("#tabs").tabs("select", 2);
 });
 
 $("span.delete").click(function(){
@@ -817,7 +817,7 @@ $("span.delete").click(function(){
 });
 
 $('span.output').click(function() {
-    var f, target, oxgproperties, value = $("#outputSelection").val();    
+    var f, target, oxgproperties, value = $("#outputSelection").val();
     switch (value) {
         case 'TEI ODD':
             target='TEI:text:xml/xml:application:xml'; break;
@@ -842,7 +842,7 @@ $('span.output').click(function() {
     }
     target = encodeURIComponent(target);
     oxgproperties ="?properties=<conversions><conversion%20index='0'><property%20id='pl.psnc.dl.ege.tei.profileNames'>tei</property></conversion><conversion%20index='1'><property%20id='pl.psnc.dl.ege.tei.profileNames'>tei</property><property%20id='oxgarage.textOnly'>true</property><property%20id='oxgarage.lang'>" + language +  "</property></conversion></conversions>";
-    setXML();    
+    setXML();
     f = document.createElement('form');
     f.id="outputFormMulti";
     status("Send request to " + OXGARAGE + "Conversions/" + target + "/" + oxgproperties);
@@ -907,13 +907,13 @@ $('span.modulelink').click(function() {
 // CLICK BUTTON EVENT FOR VIEWING ATTRIBUTES
 $('span.memberlink').click(function(){
     showattributes($(this).text());
-    $("#tabs").tabs("select", 5); 
+    $("#tabs").tabs("select", 5);
     return false;
 });
 
 $('span.attributelink').click(function() {
     alterattributes($(this).attr("id"));
-    $("#tabs").tabs("select", 6); 
+    $("#tabs").tabs("select", 6);
     return false;
 });
 
@@ -961,7 +961,7 @@ $('span.continueToLoad').click(function() {
     }
     $('#actions').show();
     showNewModules();
-    $("#tabs").tabs("select", 3); 
+    $("#tabs").tabs("select", 3);
 });
 
 $('span.loadCustomJSON').click(function() {
@@ -970,7 +970,7 @@ $('span.loadCustomJSON').click(function() {
     showNewModules();
     $('#actions').show();
     status(teiName + ' database loaded');
-    $("#tabs").tabs("select", 3); 
+    $("#tabs").tabs("select", 3);
 });
 
 $('span.outputXML').click(function() {
@@ -982,7 +982,7 @@ $('span.saveAttributeInfo').click(function() {
         return;
     }
     values = $("#attributeIdent").text().replace(/;/g,",");
-    values += ',' + $("#listOfValues").val();        
+    values += ',' + $("#listOfValues").val();
     $.each(ListofValues, function(i, listValue) {
         if (values.split(',')[1] == listValue.split(',')[1] && values.split(',')[2] == listValue.split(',')[2] && values.split(',')[3] == listValue.split(',')[3]){
             index = i;
@@ -994,7 +994,7 @@ $('span.saveAttributeInfo').click(function() {
     else {
         ListofValues.push(values);
     }
-    
+
     closeOpen = '';
     if ($(".closedOrOpen").html() == "Closed List") {
         closeOpen = "closed,";
@@ -1046,7 +1046,7 @@ $('span.loadDatabase').click(function() {
     }
     status(thisname + ' database loaded');
     doShowDatabases();
-    $("#tabs").tabs("select", 3);     
+    $("#tabs").tabs("select", 3);
 });
 
 $('span.deleteDatabase').click(function() {
