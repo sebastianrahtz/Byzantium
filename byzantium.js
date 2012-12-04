@@ -701,9 +701,30 @@ function editInfo () {
     method = $("#methodSelect").val();
 }
 
+var editor;
 function makePreview() {
     setXML();
-    $('#Preview').html("<pre>" + xml.replace(/</g,'\n&lt;') + "</pre>");
+    // var content = "<pre>" + xml.replace(/</g,'\n&lt;') + "</pre>";
+    // $('#Preview').html(content);
+    setTimeout(function () {
+        if (!editor) {
+            $('#code').html(xml);
+            editor = CodeMirror.fromTextArea($("#code")[0], {
+                mode: "application/xml",
+                lineNumbers: true,
+                lineWrapping: true
+            });
+        }
+        else {
+            editor.setValue(xml);
+        }
+        editor.setSelection({line:0, ch:0}, {line:xml.length, ch:xml.length});
+        var range = {from: editor.getCursor('start'), to: editor.getCursor('end')};
+        editor.autoFormatRange(range.from, range.to);
+        editor.setCursor(0, 0);
+    }, 0);
+
+    // CodeMirror.runMode(xml, "application/xml", $("#code")[0]);
 }
 
 // READY FUNCTION.
