@@ -574,7 +574,7 @@ function checkFileSupport() {
     }
 }
 
-function showFiles(files,listContainer) {
+function showFiles(files, listContainer) {
      // files is a FileList of File objects. List some properties.
      var i, f, reader, output = [];
      for (i = 0; f = files[i]; i++) {
