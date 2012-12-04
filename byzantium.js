@@ -34,11 +34,11 @@ var VERSION = '0.4',
     AddedModules = [],
     Back = '',
     Current = '',
-    ExcludedAttributes=[],
-    ExcludedMembers=[],
-    ListofValues=[],
+    ExcludedAttributes = [],
+    ExcludedMembers = [],
+    ListofValues = [],
     closedAndOpen = [],
-    TEI=[],
+    TEI = [],
     author = '',
     currentModule = '',
     description = '',
@@ -63,18 +63,18 @@ function cleanSystem() {
     AddedModules = [];
     Back = "";
     Current = "";
-    ExcludedAttributes=[];
-    ExcludedMembers=[];
+    ExcludedAttributes = [];
+    ExcludedMembers = [];
     ListofValues = [];
-    author = "";
-    currentModule = "";
+    author = '';
+    currentModule = '';
     description = "TEI customization made on " + TODAY;
     filename = "myTEI";
-    givenXML = "";
-    teiName = "";
+    givenXML = '';
+    teiName = '';
     title = "My view of the TEI";
-    url='';
-    xml = "";
+    url = '';
+    xml = '';
 }
 // DISPLAYS INITIAL MODULES
 function showModules() {
@@ -85,11 +85,11 @@ function showModules() {
         alert("NO DATABASE LOADED");
     }
     else {
-        moduleCounter=TEI.modules.length;
+        moduleCounter = TEI.modules.length;
         totMembers = TEI.members.length;
         var items = [];
         $.each(TEI.modules, function(i, module) {
-            var mString ='<tr class="list" id="div' + module.ident + '">';
+            var mString = '<tr class="list" id="div' + module.ident + '">';
             if ($.inArray(module.ident, AddedModules) != -1) {
                 mString += '<td><span class="button removeModule" id="' + module.ident + 'R">Remove</span></td>';
                 mString += '<td><span class="button modulelink" >' + module.ident + '</span></td>' ;
@@ -103,7 +103,7 @@ function showModules() {
          });
 
         $('#moduleList').html(items.join(''));
-        liveMembers=0;
+        liveMembers = 0;
         $.each(AddedModules, function(i, module){
             $.each(TEI.members, function(i, member){
                 if (member.module == module) {
@@ -146,7 +146,7 @@ function showmembers(name) {
             if ($.inArray((name + "," + member.ident), ExcludedMembers) == -1) {
                 items.push("Exclude");
                 items.push('</span></td><td><span class="button memberlink">' + member.ident + '</span></td><td>' + member.desc + '</td></tr>');
-                usedMembers+=1;
+                usedMembers++;
             }
             else {
                 items.push("Include");
@@ -286,7 +286,7 @@ function showattributes(name ) {
                     }
                     else {
                         unaddableitems.push('<tr class="list"><td>' + classAttributeClass + '</td><td><button disabled="disabled">Requires: ' + classAttributeModule + "</span></td><td>"+ attribute.ident + '</td><td> ' + attribute.desc + '</td></tr>');
-                        unavailableAttributes +=1;
+                        unavailableAttributes++;
                     }
                 });
             });
@@ -356,14 +356,14 @@ function loadTEI(){
 
 // Sets the XML to be outputted.
 function setXML(){
-    var out, types=[],
+    var out, types = [],
         excludes = [],
         usedModules = [],
         changedElements = [],
         finalAttributes = [],
         attributeString = '';
     $.each(TEI.members, function(i, name) {
-        types[name.ident]=[];
+        types[name.ident] = [];
         types[name.ident].type = name.type;
     });
 
@@ -396,10 +396,10 @@ function setXML(){
     $xml.find("title").append(title);
     $xml.find("author").append(author);
     $xml.find("schemaSpec").attr({ident: filename});
-    if (teiName!=""){
+    if (teiName != '') {
         $xml.find("schemaSpec").attr({source: teiName});
     }
-    if (language!=""){
+    if (language != '') {
         $xml.find("schemaSpec").attr({docLang: language});
     }
 
@@ -502,10 +502,9 @@ function setXML(){
 
 //This function is used to show the name of all the projects that are saved to the browser.
  function doShowProjects() {
-   var key = '',
-        pairs = '',
-        i=0;
-    for (i=0; i <= localStorage.length-1; i++) {
+   var i, key = '',
+        pairs = '';
+    for (i = 0; i <= localStorage.length-1; i++) {
         key = localStorage.key(i);
         if (key.split("%*$&#")[0] != "proj") {
         }
@@ -519,10 +518,9 @@ function setXML(){
  }
 
   function doShowDatabases(){
-   var key = '',
-    pairs = '',
-    i=0;
-   for (i=0; i <= localStorage.length-1; i++) {
+   var i, key = '',
+    pairs = '';
+   for (i = 0; i <= localStorage.length-1; i++) {
         key = localStorage.key(i);
         if (key.split('%*$&#')[0] != 'tei'){
         }
@@ -822,7 +820,7 @@ $(document).on('click', 'span.output', function() {
     var f, target, oxgproperties, value = $("#outputSelection").val();
     switch (value) {
         case 'TEI ODD':
-            target='TEI:text:xml/xml:application:xml'; break;
+            target = 'TEI:text:xml/xml:application:xml'; break;
         case 'RELAX NG Compact Schema':
             target = 'ODD:text:xml/ODDC:text:xml/rnc:application:relaxng-compact'; break;
         case 'RELAX NG Schema':
@@ -843,10 +841,10 @@ $(document).on('click', 'span.output', function() {
             target = 'ODD:text:xml/ODDC:text:xml/oddjson:application:json'; break;
     }
     target = encodeURIComponent(target);
-    oxgproperties ="?properties=<conversions><conversion%20index='0'><property%20id='pl.psnc.dl.ege.tei.profileNames'>tei</property></conversion><conversion%20index='1'><property%20id='pl.psnc.dl.ege.tei.profileNames'>tei</property><property%20id='oxgarage.textOnly'>true</property><property%20id='oxgarage.lang'>" + language +  "</property></conversion></conversions>";
+    oxgproperties = "?properties=<conversions><conversion%20index='0'><property%20id='pl.psnc.dl.ege.tei.profileNames'>tei</property></conversion><conversion%20index='1'><property%20id='pl.psnc.dl.ege.tei.profileNames'>tei</property><property%20id='oxgarage.textOnly'>true</property><property%20id='oxgarage.lang'>" + language +  "</property></conversion></conversions>";
     setXML();
     f = document.createElement('form');
-    f.id="outputFormMulti";
+    f.id = "outputFormMulti";
     status("Send request to " + OXGARAGE + "Conversions/" + target + "/" + oxgproperties);
     f.action = OXGARAGE + "Conversions/" + target + "/" + oxgproperties;
     f.method = "post";
@@ -858,7 +856,7 @@ $(document).on('click', 'span.output', function() {
         f.innerHTML += "<input name='filename' value='" + "myTEI" + "' style='display:none;'/>";
     }
     document.getElementsByTagName("body")[0].appendChild(f);
-    document.getElementsByName("input")[0].value=xml;
+    document.getElementsByName("input")[0].value = xml;
     f.submit();
     $('#outputFormMulti').remove();
 });
