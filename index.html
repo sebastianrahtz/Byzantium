@@ -24,12 +24,19 @@ All rights reserved.
         $( "#tabs" ).tabs({
        select: function(event, ui){
             var tabNumber = ui.index;
-            var tabName = $(ui.tab).text();            
-            if      (tabNumber == 1 ) {	editinfo(); }
-            else if (tabNumber == 2 ) {	doShowDatabases(); }
-            else if (tabNumber == 3 ) {	showmodules(); }
-            else if (tabNumber == 7 ) { makeReport(); }
-            else if (tabNumber == 8 ) { makePreview(); }
+            var tabName = $(ui.tab).text();
+            switch (tabNumber) {
+                case 1:
+                    editInfo(); break;
+                case 2:
+                    doShowDatabases(); break;
+                case 3:
+                    showModules(); break;
+                case 7:
+                    makeReport(); break;
+                case 8:
+                    makePreview(); break;
+            }
         }});
     });
 </script>
