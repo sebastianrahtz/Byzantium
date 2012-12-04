@@ -34,11 +34,11 @@ var VERSION = '0.4',
     AddedModules = [],
     Back = '',
     Current = '',
-    ExcludedAttributes=[],
-    ExcludedMembers=[],
-    ListofValues=[],
+    ExcludedAttributes = [],
+    ExcludedMembers = [],
+    ListofValues = [],
     closedAndOpen = [],
-    TEI=[],
+    TEI = [],
     author = '',
     currentModule = '',
     description = '',
@@ -63,18 +63,18 @@ function cleanSystem() {
     AddedModules = [];
     Back = "";
     Current = "";
-    ExcludedAttributes=[];
-    ExcludedMembers=[];
+    ExcludedAttributes = [];
+    ExcludedMembers = [];
     ListofValues = [];
-    author = "";
-    currentModule = "";
+    author = '';
+    currentModule = '';
     description = "TEI customization made on " + TODAY;
     filename = "myTEI";
-    givenXML = "";
-    teiName = "";
+    givenXML = '';
+    teiName = '';
     title = "My view of the TEI";
-    url='';
-    xml = "";
+    url = '';
+    xml = '';
 }
 // DISPLAYS INITIAL MODULES
 function showModules() {
@@ -85,11 +85,11 @@ function showModules() {
         alert("NO DATABASE LOADED");
     }
     else {
-        moduleCounter=TEI.modules.length;
+        moduleCounter = TEI.modules.length;
         totMembers = TEI.members.length;
         var items = [];
         $.each(TEI.modules, function(i, module) {
-            var mString ='<tr class="list" id="div' + module.ident + '">';
+            var mString = '<tr class="list" id="div' + module.ident + '">';
             if ($.inArray(module.ident, AddedModules) != -1) {
                 mString += '<td><span class="button removeModule" id="' + module.ident + 'R">Remove</span></td>';
                 mString += '<td><span class="button modulelink" >' + module.ident + '</span></td>' ;
@@ -103,7 +103,7 @@ function showModules() {
          });
 
         $('#moduleList').html(items.join(''));
-        liveMembers=0;
+        liveMembers = 0;
         $.each(AddedModules, function(i, module){
             $.each(TEI.members, function(i, member){
                 if (member.module == module) {
@@ -146,7 +146,7 @@ function showmembers(name) {
             if ($.inArray((name + "," + member.ident), ExcludedMembers) == -1) {
                 items.push("Exclude");
                 items.push('</span></td><td><span class="button memberlink">' + member.ident + '</span></td><td>' + member.desc + '</td></tr>');
-                usedMembers+=1;
+                usedMembers++;
             }
             else {
                 items.push("Include");
@@ -286,7 +286,7 @@ function showattributes(name ) {
                     }
                     else {
                         unaddableitems.push('<tr class="list"><td>' + classAttributeClass + '</td><td><button disabled="disabled">Requires: ' + classAttributeModule + "</span></td><td>"+ attribute.ident + '</td><td> ' + attribute.desc + '</td></tr>');
-                        unavailableAttributes +=1;
+                        unavailableAttributes++;
                     }
                 });
             });
@@ -356,14 +356,14 @@ function loadTEI(){
 
 // Sets the XML to be outputted.
 function setXML(){
-    var out, types=[],
+    var out, types = [],
         excludes = [],
         usedModules = [],
         changedElements = [],
         finalAttributes = [],
         attributeString = '';
     $.each(TEI.members, function(i, name) {
-        types[name.ident]=[];
+        types[name.ident] = [];
         types[name.ident].type = name.type;
     });
 
@@ -396,10 +396,10 @@ function setXML(){
     $xml.find("title").append(title);
     $xml.find("author").append(author);
     $xml.find("schemaSpec").attr({ident: filename});
-    if (teiName!=""){
+    if (teiName != '') {
         $xml.find("schemaSpec").attr({source: teiName});
     }
-    if (language!=""){
+    if (language != '') {
         $xml.find("schemaSpec").attr({docLang: language});
     }
 
@@ -502,10 +502,9 @@ function setXML(){
 
 //This function is used to show the name of all the projects that are saved to the browser.
  function doShowProjects() {
-   var key = '',
-        pairs = '',
-        i=0;
-    for (i=0; i <= localStorage.length-1; i++) {
+   var i, key = '',
+        pairs = '';
+    for (i = 0; i <= localStorage.length-1; i++) {
         key = localStorage.key(i);
         if (key.split("%*$&#")[0] != "proj") {
         }
@@ -519,10 +518,9 @@ function setXML(){
  }
 
   function doShowDatabases(){
-   var key = '',
-    pairs = '',
-    i=0;
-   for (i=0; i <= localStorage.length-1; i++) {
+   var i, key = '',
+    pairs = '';
+   for (i = 0; i <= localStorage.length-1; i++) {
         key = localStorage.key(i);
         if (key.split('%*$&#')[0] != 'tei'){
         }
@@ -725,334 +723,333 @@ $(function(){
     doShowDatabases();
     $('#defaultDatabase').html(defaultDatabase);
     $('#colophon').html("Byzantium " + VERSION + ". Written by Nick Burlingame. Contact: " + EMAIL + ". Date: " + TODAY);
+});
 
-    $("span.newProject").click(function() {
-        cleanSystem();
-        AddedModules = [];
-        AddedModules.push("core");
-        AddedModules.push("tei");
-        AddedModules.push("header");
-        AddedModules.push("textstructure");
-        showNewModules();
-        $("#tabs").tabs("select", 1);
-    });
+$(document).on('click', 'span.newProject', function() {
+    cleanSystem();
+    AddedModules = [];
+    AddedModules.push("core");
+    AddedModules.push("tei");
+    AddedModules.push("header");
+    AddedModules.push("textstructure");
+    showNewModules();
+    $("#tabs").tabs("select", 1);
+});
 
-    $("span.saveStartInfo").click(function(){
-        editInfo();
-        $("#tabs").tabs("select", 2);
-    });
+$(document).on('click', 'span.saveStartInfo', function(){
+    editInfo();
+    $("#tabs").tabs("select", 2);
+});
 
+$(document).on('click', 'span.TEI_Default', function(){
+    loadDefaultTEI();
+    status("Default database loaded");
+    $("#tabs").tabs("select", 3);
+});
 
-    $("span.TEI_Default").click(function(){
-        loadDefaultTEI();
-        status("Default database loaded");
-        $("#tabs").tabs("select", 3);
-    });
-
-    $("span.setOnline").click(function() {
-        var TEIurl= $('#TEI_OnlineSelector').val(),
-            name = $('#TEI_OnlineName').val();
-        teiName = name;
-        if ((TEIurl != "") && (name != "")) {
-            $.when($.ajax({
-                url: TEIurl,
-                dataType: 'jsonp',
-                jsonpCallback: 'teijs',
-                success: function(data) {
-                   localStorage.setItem("tei%*$&#"+name, JSON.stringify(data, null, 2));
-                }
-            })).done(function() {
-                $("#tabs").tabs("select", 3);
-            });
-        }
-        status(TEIurl + " database loaded");
-        $("#tabs").tabs("select", 3);
-        doShowDatabases();
-    });
-
-    $('span.loadProject').click(function(){
-        url = defaultDatabase;
-        loadTEI();
-        doShowProjects();
-            $("#tabs").tabs("select", 2);
-    });
-
-    //Used to save a project to the browser.
-    $("span.save").click(function() {
-        var data, name = $("#saveAs").val();
-        if (name == ''){
-        }
-        else{
-            setXML();
-            data = xml;
-            localStorage.setItem("proj%*$&#"+name, data);
-        }
-        doShowProjects();
-    });
-
-    //Used to load a project from the browser.
-    $("span.load").click(function () {
-        var l,
-            name = $(this).parent().parent().children('td.fname').text(),
-            data = localStorage.getItem('proj%*$&#'+name);
-        loadFile(data.replace(/&/g,"&amp;"));
-        if (teiName != "undefined" && teiName != null) {
-            l = localStorage.getItem("tei%*$&#" + teiName);
-            if (l != null) {
-                TEI = JSON.parse(l);
+$(document).on('click', 'span.setOnline', function() {
+    var TEIurl= $('#TEI_OnlineSelector').val(),
+        name = $('#TEI_OnlineName').val();
+    teiName = name;
+    if ((TEIurl != "") && (name != "")) {
+        $.when($.ajax({
+            url: TEIurl,
+            dataType: 'jsonp',
+            jsonpCallback: 'teijs',
+            success: function(data) {
+               localStorage.setItem("tei%*$&#"+name, JSON.stringify(data, null, 2));
             }
-            else{
-                loadDefaultTEI();
-            }
-        }
-        else {
-            loadDefaultTEI();
-        }
-        showNewModules();
+        })).done(function() {
+            $("#tabs").tabs("select", 3);
+        });
+    }
+    status(TEIurl + " database loaded");
+    $("#tabs").tabs("select", 3);
+    doShowDatabases();
+});
+
+$(document).on('click', 'span.loadProject', function(){
+    url = defaultDatabase;
+    loadTEI();
+    doShowProjects();
         $("#tabs").tabs("select", 2);
-    });
+});
 
-    $("span.delete").click(function(){
-        var name = $(this).parent().parent().children('td.fname').text();
-        localStorage.removeItem("proj%*$&#" + name);
-        doShowProjects();
-    });
-
-    $('span.output').click(function() {
-        var f, target, oxgproperties, value = $("#outputSelection").val();
-        switch (value) {
-            case 'TEI ODD':
-                target='TEI:text:xml/xml:application:xml'; break;
-            case 'RELAX NG Compact Schema':
-                target = 'ODD:text:xml/ODDC:text:xml/rnc:application:relaxng-compact'; break;
-            case 'RELAX NG Schema':
-                target = 'ODD:text:xml/ODDC:text:xml/relaxng:application:xml-relaxng'; break;
-            case 'XSD Schema':
-                target = 'ODD:text:xml/ODDC:text:xml/xsd:application:xml-xsd'; break;
-            case 'ISO Schematron':
-                target = 'ODD:text:xml/ODDC:text:xml/isosch:text:xml'; break;
-            case 'Schematron':
-                target = 'ODD:text:xml/ODDC:text:xml/sch:text:xml'; break;
-            case 'DTD':
-                target = 'ODD:text:xml/ODDC:text:xml/dtd:application:xml-dtd'; break;
-            case 'HTML documentation':
-                target = 'ODD:text:xml/ODDC:text:xml/oddhtml:application:xhtml+xml'; break;
-            case 'ePub documentation':
-                target = 'ODD:text:xml/ODDC:text:xml/TEI:text:xml/epub:application:epub+zip/'; break;
-            case 'JSON':
-                target = 'ODD:text:xml/ODDC:text:xml/oddjson:application:json'; break;
-        }
-        target = encodeURIComponent(target);
-        oxgproperties ="?properties=<conversions><conversion%20index='0'><property%20id='pl.psnc.dl.ege.tei.profileNames'>tei</property></conversion><conversion%20index='1'><property%20id='pl.psnc.dl.ege.tei.profileNames'>tei</property><property%20id='oxgarage.textOnly'>true</property><property%20id='oxgarage.lang'>" + language +  "</property></conversion></conversions>";
+//Used to save a project to the browser.
+$(document).on('click', 'span.save', function() {
+    var data, name = $("#saveAs").val();
+    if (name == '') {
+    }
+    else {
         setXML();
-        f = document.createElement('form');
-        f.id="outputFormMulti";
-        status("Send request to " + OXGARAGE + "Conversions/" + target + "/" + oxgproperties);
-        f.action = OXGARAGE + "Conversions/" + target + "/" + oxgproperties;
-        f.method = "post";
-        f.innerHTML += "<textarea name='input' style='display:none;'>default</textarea>";
-        if (filename != "") {
-            f.innerHTML += "<input name='filename' value='" + filename + "' style='display:none;'/>";
-        }
-        else {
-            f.innerHTML += "<input name='filename' value='" + "myTEI" + "' style='display:none;'/>";
-        }
-        document.getElementsByTagName("body")[0].appendChild(f);
-        document.getElementsByName("input")[0].value=xml;
-        f.submit();
-        $('#outputFormMulti').remove();
-    });
+        data = xml;
+        localStorage.setItem("proj%*$&#"+name, data);
+    }
+    doShowProjects();
+});
 
-
-    // CLICK BUTTON EVENT FOR ADDING/REMOVING ELEMENT
-    $('span.addRemove').click(function() {
-        var action;
-        name = $(this).attr('id');
-        action = $(this).html();
-        if (action == "Exclude"){
-            ExcludedMembers.push(name);
-            $(this).html("Include");
-        }
-        if (action == "Include"){
-            ExcludedMembers.splice($.inArray(name, ExcludedMembers),1);
-            $(this).html("Exclude");
-        }
-        showmembers(name.split(',')[0]);
-    });
-
-
-    //CLICK BUTTON EVENT FOR ADDING/REMOVING ATTRIBUTE
-    $('span.addRemoveAttribute').click(function() {
-        var action;
-        name = $(this).attr('id');
-        action = $(this).html();
-        if (action == "Exclude"){
-            ExcludedAttributes.push(name);
-            $(this).html("Include");
-        }
-        if (action == "Include"){
-            ExcludedAttributes.splice($.inArray(name, ExcludedAttributes),1);
-            $(this).html("Exclude");
-        }
-        showattributes(name.split(',')[1]);
-    });
-
-    //CLICK BUTTON EVENT FOR VIEWING ELEMENTS
-
-    $('span.modulelink').click(function() {
-        showmembers($(this).text());
-        $("#tabs").tabs("select", 4);
-        return false;
-    });
-
-
-    // CLICK BUTTON EVENT FOR VIEWING ATTRIBUTES
-    $('span.memberlink').click(function(){
-        showattributes($(this).text());
-        $("#tabs").tabs("select", 5);
-        return false;
-    });
-
-    $('span.attributelink').click(function() {
-        alterattributes($(this).attr("id"));
-        $("#tabs").tabs("select", 6);
-        return false;
-    });
-
-    // CLICK BUTTON EVENT FOR ADDING MODULE
-    $('span.addModule').click(function() {
-        var index, exists = false;
-        name = $(this).attr('id');
-        index = $.inArray(name.substring(0, name.length - 1), AddedModules);
-        if(index == -1) {
-            AddedModules.push(name.substring(0, name.length - 1));
-        }
-        showModules();
-        showNewModules();
-    });
-
-    // CLICK BUTTON EVENT FOR REMOVING MODULE
-    $('span.removeModule').click(function() {
-        var exists = false;
-        name = $(this).attr('id');
-        if ($.inArray(name.substring(0, name.length - 1), AddedModules) != -1) {
-            AddedModules.splice($.inArray(name.substring(0, name.length - 1), AddedModules),1);
-        }
-        showModules();
-        showNewModules();
-    });
-
-    $('span.continueToLoad').click(function() {
-        var l, xmldata = $("#inputarea").val();
-        xml = xmldata.replace(/&/g, '&amp;');
-        givenXML = xml;
-        loadFile(xml);
-        if (teiName != "undefined" && teiName != null) {
-            l = localStorage.getItem("tei%*$&#" + teiName);
-            if (l != null) {
-                TEI = JSON.parse(l);
-            }
-            else {
-                loadDefaultTEI();
-            }
-        }
-        else {
-            loadDefaultTEI();
-        }
-        $('#actions').show();
-        showNewModules();
-        $("#tabs").tabs("select", 3);
-    });
-
-    $('span.loadCustomJSON').click(function() {
-        eval($('#inputarea').val());
-        teiName = $("#TEI_LocalName").val();
-        showNewModules();
-        $('#actions').show();
-        status(teiName + ' database loaded');
-        $("#tabs").tabs("select", 3);
-    });
-
-    $('span.outputXML').click(function() {
-    });
-
-    $('span.saveAttributeInfo').click(function() {
-        var closeOpen = '', values, index = -1;
-        if ($("#listOfValues").val() == "") {
-            return;
-        }
-        values = $("#attributeIdent").text().replace(/;/g,",");
-        values += ',' + $("#listOfValues").val();
-        $.each(ListofValues, function(i, listValue) {
-            if (values.split(',')[1] == listValue.split(',')[1] && values.split(',')[2] == listValue.split(',')[2] && values.split(',')[3] == listValue.split(',')[3]){
-                index = i;
-            }
-        });
-        if (index != -1) {
-            ListofValues[index] = values;
-        }
-        else {
-            ListofValues.push(values);
-        }
-
-        if ($(".closedOrOpen").html() == "Closed List") {
-            closeOpen = "closed,";
-        }
-        else {
-            closeOpen = "open,";
-        }
-        closeOpen +=  $("#attributeIdent").text().replace(/;/g,",");
-        index = -1;
-        $.each(closedAndOpen, function(i, value) {
-            if (value.split(',')[2] == closeOpen.split(',')[2] && value.split(',')[3] == closeOpen.split(',')[3] && value.split(',')[4] == closeOpen.split(',')[4]){
-                index = i;
-            }
-        });
-        if (index != -1) {
-            closedAndOpen[index] = closeOpen;
-        }
-        else {
-            closedAndOpen.push(closeOpen);
-        }
-    });
-    $('span.closedOrOpen').click(function() {
-        if ($(".closedOrOpen").html() == "Open List"){
-            $(".closedOrOpen").html("Closed List");
+//Used to load a project from the browser.
+$(document).on('click', 'span.load', function () {
+    var l,
+        name = $(this).parent().parent().children('td.fname').text(),
+        data = localStorage.getItem('proj%*$&#'+name);
+    loadFile(data.replace(/&/g,"&amp;"));
+    if (teiName != "undefined" && teiName != null) {
+        l = localStorage.getItem("tei%*$&#" + teiName);
+        if (l != null) {
+            TEI = JSON.parse(l);
         }
         else{
-            $(".closedOrOpen").html("Open List");
+            loadDefaultTEI();
         }
-    });
-    $('span.restart').click(function() {
-        $('#projectSelection').show();
-        $('#actions').hide();
-        $('#UploadCustom').hide();
-        $('#OnlineSelector').hide();
-        $('#ExistingSelector').hide();
-        $('#selected').empty();
-        $('#selected').show();
-        cleanSystem();
-    });
+    }
+    else {
+        loadDefaultTEI();
+    }
+    showNewModules();
+    $("#tabs").tabs("select", 2);
+});
 
-    $('span.loadDatabase').click(function() {
-        var thisname = $(this).parent().parent().children('td.fname').text(),
-            l = localStorage.getItem("tei%*$&#" + thisname);
+$(document).on('click', 'span.delete', function() {
+    var name = $(this).parent().parent().children('td.fname').text();
+    localStorage.removeItem("proj%*$&#" + name);
+    doShowProjects();
+});
+
+$(document).on('click', 'span.output', function() {
+    var f, target, oxgproperties, value = $("#outputSelection").val();
+    switch (value) {
+        case 'TEI ODD':
+            target = 'TEI:text:xml/xml:application:xml'; break;
+        case 'RELAX NG Compact Schema':
+            target = 'ODD:text:xml/ODDC:text:xml/rnc:application:relaxng-compact'; break;
+        case 'RELAX NG Schema':
+            target = 'ODD:text:xml/ODDC:text:xml/relaxng:application:xml-relaxng'; break;
+        case 'XSD Schema':
+            target = 'ODD:text:xml/ODDC:text:xml/xsd:application:xml-xsd'; break;
+        case 'ISO Schematron':
+            target = 'ODD:text:xml/ODDC:text:xml/isosch:text:xml'; break;
+        case 'Schematron':
+            target = 'ODD:text:xml/ODDC:text:xml/sch:text:xml'; break;
+        case 'DTD':
+            target = 'ODD:text:xml/ODDC:text:xml/dtd:application:xml-dtd'; break;
+        case 'HTML documentation':
+            target = 'ODD:text:xml/ODDC:text:xml/oddhtml:application:xhtml+xml'; break;
+        case 'ePub documentation':
+            target = 'ODD:text:xml/ODDC:text:xml/TEI:text:xml/epub:application:epub+zip/'; break;
+        case 'JSON':
+            target = 'ODD:text:xml/ODDC:text:xml/oddjson:application:json'; break;
+    }
+    target = encodeURIComponent(target);
+    oxgproperties = "?properties=<conversions><conversion%20index='0'><property%20id='pl.psnc.dl.ege.tei.profileNames'>tei</property></conversion><conversion%20index='1'><property%20id='pl.psnc.dl.ege.tei.profileNames'>tei</property><property%20id='oxgarage.textOnly'>true</property><property%20id='oxgarage.lang'>" + language +  "</property></conversion></conversions>";
+    setXML();
+    f = document.createElement('form');
+    f.id = "outputFormMulti";
+    status("Send request to " + OXGARAGE + "Conversions/" + target + "/" + oxgproperties);
+    f.action = OXGARAGE + "Conversions/" + target + "/" + oxgproperties;
+    f.method = "post";
+    f.innerHTML += "<textarea name='input' style='display:none;'>default</textarea>";
+    if (filename != "") {
+        f.innerHTML += "<input name='filename' value='" + filename + "' style='display:none;'/>";
+    }
+    else {
+        f.innerHTML += "<input name='filename' value='" + "myTEI" + "' style='display:none;'/>";
+    }
+    document.getElementsByTagName("body")[0].appendChild(f);
+    document.getElementsByName("input")[0].value = xml;
+    f.submit();
+    $('#outputFormMulti').remove();
+});
+
+
+// CLICK BUTTON EVENT FOR ADDING/REMOVING ELEMENT
+$(document).on('click', 'span.addRemove', function() {
+    var action;
+    name = $(this).attr('id');
+    action = $(this).html();
+    if (action == "Exclude"){
+        ExcludedMembers.push(name);
+        $(this).html("Include");
+    }
+    if (action == "Include"){
+        ExcludedMembers.splice($.inArray(name, ExcludedMembers),1);
+        $(this).html("Exclude");
+    }
+    showmembers(name.split(',')[0]);
+});
+
+
+// CLICK BUTTON EVENT FOR ADDING/REMOVING ATTRIBUTE
+$(document).on('click', 'span.addRemoveAttribute', function() {
+    var action;
+    name = $(this).attr('id');
+    action = $(this).html();
+    if (action == "Exclude"){
+        ExcludedAttributes.push(name);
+        $(this).html("Include");
+    }
+    if (action == "Include"){
+        ExcludedAttributes.splice($.inArray(name, ExcludedAttributes),1);
+        $(this).html("Exclude");
+    }
+    showattributes(name.split(',')[1]);
+});
+
+//CLICK BUTTON EVENT FOR VIEWING ELEMENTS
+
+$(document).on('click', 'span.modulelink', function() {
+    showmembers($(this).text());
+    $("#tabs").tabs("select", 4);
+    return false;
+});
+
+
+// CLICK BUTTON EVENT FOR VIEWING ATTRIBUTES
+$(document).on('click', 'span.memberlink', function() {
+    showattributes($(this).text());
+    $("#tabs").tabs("select", 5);
+    return false;
+});
+
+$(document).on('click', 'span.attributelink', function() {
+    alterattributes($(this).attr("id"));
+    $("#tabs").tabs("select", 6);
+    return false;
+});
+
+// CLICK BUTTON EVENT FOR ADDING MODULE
+$(document).on('click', 'span.addModule', function() {
+    var index, exists = false;
+    name = $(this).attr('id');
+    index = $.inArray(name.substring(0, name.length - 1), AddedModules);
+    if(index == -1) {
+        AddedModules.push(name.substring(0, name.length - 1));
+    }
+    showModules();
+    showNewModules();
+});
+
+// CLICK BUTTON EVENT FOR REMOVING MODULE
+$(document).on('click', 'span.removeModule', function() {
+    var exists = false;
+    name = $(this).attr('id');
+    if ($.inArray(name.substring(0, name.length - 1), AddedModules) != -1) {
+        AddedModules.splice($.inArray(name.substring(0, name.length - 1), AddedModules),1);
+    }
+    showModules();
+    showNewModules();
+});
+
+$(document).on('click', 'span.continueToLoad', function() {
+    var l, xmldata = $("#inputarea").val();
+    xml = xmldata.replace(/&/g, '&amp;');
+    givenXML = xml;
+    loadFile(xml);
+    if (teiName != "undefined" && teiName != null) {
+        l = localStorage.getItem("tei%*$&#" + teiName);
         if (l != null) {
             TEI = JSON.parse(l);
         }
         else {
             loadDefaultTEI();
         }
-        status(thisname + ' database loaded');
-        doShowDatabases();
-        $("#tabs").tabs("select", 3);
-    });
+    }
+    else {
+        loadDefaultTEI();
+    }
+    $('#actions').show();
+    showNewModules();
+    $("#tabs").tabs("select", 3);
+});
 
-    $('span.deleteDatabase').click(function() {
-        var name = $(this).parent().parent().children('td.fname').text();
-        localStorage.removeItem("tei%*$&#" + name);
-        doShowDatabases();
+$(document).on('click', 'span.loadCustomJSON', function() {
+    eval($('#inputarea').val());
+    teiName = $("#TEI_LocalName").val();
+    showNewModules();
+    $('#actions').show();
+    status(teiName + ' database loaded');
+    $("#tabs").tabs("select", 3);
+});
+
+$(document).on('click', 'span.outputXML', function() {
+});
+
+$(document).on('click', 'span.saveAttributeInfo', function() {
+    var closeOpen = '', values, index = -1;
+    if ($("#listOfValues").val() == "") {
+        return;
+    }
+    values = $("#attributeIdent").text().replace(/;/g,",");
+    values += ',' + $("#listOfValues").val();
+    $.each(ListofValues, function(i, listValue) {
+        if (values.split(',')[1] == listValue.split(',')[1] && values.split(',')[2] == listValue.split(',')[2] && values.split(',')[3] == listValue.split(',')[3]){
+            index = i;
+        }
     });
+    if (index != -1) {
+        ListofValues[index] = values;
+    }
+    else {
+        ListofValues.push(values);
+    }
+
+    if ($(".closedOrOpen").html() == "Closed List") {
+        closeOpen = "closed,";
+    }
+    else {
+        closeOpen = "open,";
+    }
+    closeOpen +=  $("#attributeIdent").text().replace(/;/g,",");
+    index = -1;
+    $.each(closedAndOpen, function(i, value) {
+        if (value.split(',')[2] == closeOpen.split(',')[2] && value.split(',')[3] == closeOpen.split(',')[3] && value.split(',')[4] == closeOpen.split(',')[4]){
+            index = i;
+        }
+    });
+    if (index != -1) {
+        closedAndOpen[index] = closeOpen;
+    }
+    else {
+        closedAndOpen.push(closeOpen);
+    }
+});
+$(document).on('click', 'span.closedOrOpen', function() {
+    if ($(".closedOrOpen").html() == "Open List"){
+        $(".closedOrOpen").html("Closed List");
+    }
+    else{
+        $(".closedOrOpen").html("Open List");
+    }
+});
+$(document).on('click', 'span.restart', function() {
+    $('#projectSelection').show();
+    $('#actions').hide();
+    $('#UploadCustom').hide();
+    $('#OnlineSelector').hide();
+    $('#ExistingSelector').hide();
+    $('#selected').empty();
+    $('#selected').show();
+    cleanSystem();
+});
+
+$(document).on('click', 'span.loadDatabase', function() {
+    var thisname = $(this).parent().parent().children('td.fname').text(),
+        l = localStorage.getItem("tei%*$&#" + thisname);
+    if (l != null) {
+        TEI = JSON.parse(l);
+    }
+    else {
+        loadDefaultTEI();
+    }
+    status(thisname + ' database loaded');
+    doShowDatabases();
+    $("#tabs").tabs("select", 3);
+});
+
+$(document).on('click', 'span.deleteDatabase', function() {
+    var name = $(this).parent().parent().children('td.fname').text();
+    localStorage.removeItem("tei%*$&#" + name);
+    doShowDatabases();
 });
 
 // EXPORTS
