@@ -778,9 +778,9 @@ $(document).on('click', 'span.loadProject', function(){
 //Used to save a project to the browser.
 $(document).on('click', 'span.save', function() {
     var data, name = $("#saveAs").val();
-    if (name == ''){
+    if (name == '') {
     }
-    else{
+    else {
         setXML();
         data = xml;
         localStorage.setItem("proj%*$&#"+name, data);
