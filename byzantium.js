@@ -18,6 +18,15 @@ All rights reserved.
 
 
 */
+function checkFileSupport() {
+    if (window.File && window.FileReader && window.FileList && window.Blob) {
+        //  alert("Great success! All the File APIs are supported.");
+    }
+    else {
+        alert('The File APIs are not fully supported in this browser.');
+    }
+}
+
 (function () {
 
 'use strict';
@@ -566,15 +575,6 @@ function loadDefaultTEI(){
     }
 }
 
-
-function checkFileSupport() {
-    if (window.File && window.FileReader && window.FileList && window.Blob) {
-        //  alert("Great success! All the File APIs are supported.");
-    }
-    else {
-        alert('The File APIs are not fully supported in this browser.');
-    }
-}
 
 function showFiles(files, listContainer) {
      // files is a FileList of File objects. List some properties.
