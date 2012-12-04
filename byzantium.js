@@ -588,13 +588,13 @@ function showFiles(files,listContainer) {
          // Closure to capture the file information.
          reader.onload = (function(theFile) {
             return function(e) {
-                document.getElementById('inputarea').innerHTML = this.result;
+                $('#inputarea').html(this.result);
             };
          }(f));
          // Read in the file data
          reader.readAsText(f);
      }
-     document.getElementById(listContainer).innerHTML = '<ul>' + output.join('') + '</ul>';
+     $('#' + listContainer).html('<ul>' + output.join('') + '</ul>');
  }
  
 // Creates the report page
@@ -840,17 +840,17 @@ $(document).on("click","span.output", function(){
     }
     oxgproperties ="?properties=<conversions><conversion%20index='0'><property%20id='pl.psnc.dl.ege.tei.profileNames'>tei</property></conversion><conversion%20index='1'><property%20id='pl.psnc.dl.ege.tei.profileNames'>tei</property><property%20id='oxgarage.textOnly'>true</property><property%20id='oxgarage.lang'>" + language +  "</property></conversion></conversions>";
     setXML();    
-    f = document.createElement('form');    
+    f = document.createElement('form');
     f.id="outputFormMulti";
     status("Send request to " + OXGARAGE + "Conversions/" + target + "/" + oxgproperties);
     f.action = OXGARAGE + "Conversions/" + target + "/" + oxgproperties;
     f.method = "post";
-    f.innerHTML = f.innerHTML + "<textarea name='input' style='display:none;'>default</textarea>";
-    if (filename != ""){
-        f.innerHTML = f.innerHTML + "<input name='filename' value='" + filename + "' style='display:none;'/>";
+    f.innerHTML += "<textarea name='input' style='display:none;'>default</textarea>";
+    if (filename != "") {
+        f.innerHTML += "<input name='filename' value='" + filename + "' style='display:none;'/>";
     }
     else {
-        f.innerHTML = f.innerHTML + "<input name='filename' value='" + "myTEI" + "' style='display:none;'/>";
+        f.innerHTML += "<input name='filename' value='" + "myTEI" + "' style='display:none;'/>";
     }
     document.getElementsByTagName("body")[0].appendChild(f);
     document.getElementsByName("input")[0].value=xml;
