@@ -18,6 +18,8 @@ All rights reserved.
 
 
 */
+(function () {
+
 'use strict';
 var VERSION = '0.4',
     EMAIL = 'tei@it.ox.ac.uk',
@@ -1052,3 +1054,5 @@ $('span.deleteDatabase').click(function() {
     localStorage.removeItem("tei%*$&#" + name);
     doShowDatabases();
 });
+
+}());
