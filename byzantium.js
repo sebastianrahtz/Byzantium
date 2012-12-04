@@ -814,30 +814,31 @@ $("span.delete").click(function(){
     doShowProjects();
 });
 
-$(document).on("click","span.output", function(){
+$('span.output').click(function() {
     var f, target, oxgproperties, value = $("#outputSelection").val();    
-    switch (value) {    
-        case "TEI ODD":
-            target="TEI%3Atext%3Axml/xml%3Aapplication%3Axml"; break;    
-        case "RELAX NG Compact Schema":      
-            target = "ODD%3Atext%3Axml/ODDC%3Atext%3Axml/rnc%3Aapplication%3Arelaxng-compact"; break;    
-        case "RELAX NG Schema":      
-            target = "ODD%3Atext%3Axml/ODDC%3Atext%3Axml/relaxng%3Aapplication%3Axml-relaxng"; break;    
-        case "XSD Schema":      
-            target = "ODD%3Atext%3Axml/ODDC%3Atext%3Axml/xsd%3Aapplication%3Axml-xsd"; break;    
-        case "ISO Schematron":      
-            target = "ODD%3Atext%3Axml/ODDC%3Atext%3Axml/isosch%3Atext%3Axml"; break;    
-        case "Schematron":      
-            target = "ODD%3Atext%3Axml/ODDC%3Atext%3Axml/sch%3Atext%3Axml"; break;    
-        case "DTD":      
-            target = 'ODD%3Atext%3Axml/ODDC%3Atext%3Axml/dtd%3Aapplication%3Axml-dtd'; break;
-        case "HTML documentation":      
-            target = "ODD%3Atext%3Axml/ODDC%3Atext%3Axml/oddhtml%3Aapplication%3Axhtml%2Bxml"; break;
-        case "ePub documentation":      
-            target = "ODD%3Atext%3Axml/ODDC%3Atext%3Axml/TEI%3Atext%3Axml/epub%3Aapplication%3Aepub%2Bzip/"; break;
-        case "JSON":      
-            target = "ODD%3Atext%3Axml/ODDC%3Atext%3Axml/oddjson%3Aapplication%3Ajson"; break;    
+    switch (value) {
+        case 'TEI ODD':
+            target='TEI:text:xml/xml:application:xml'; break;
+        case 'RELAX NG Compact Schema':
+            target = 'ODD:text:xml/ODDC:text:xml/rnc:application:relaxng-compact'; break;
+        case 'RELAX NG Schema':
+            target = 'ODD:text:xml/ODDC:text:xml/relaxng:application:xml-relaxng'; break;
+        case 'XSD Schema':
+            target = 'ODD:text:xml/ODDC:text:xml/xsd:application:xml-xsd'; break;
+        case 'ISO Schematron':
+            target = 'ODD:text:xml/ODDC:text:xml/isosch:text:xml'; break;
+        case 'Schematron':
+            target = 'ODD:text:xml/ODDC:text:xml/sch:text:xml'; break;
+        case 'DTD':
+            target = 'ODD:text:xml/ODDC:text:xml/dtd:application:xml-dtd'; break;
+        case 'HTML documentation':
+            target = 'ODD:text:xml/ODDC:text:xml/oddhtml:application:xhtml+xml'; break;
+        case 'ePub documentation':
+            target = 'ODD:text:xml/ODDC:text:xml/TEI:text:xml/epub:application:epub+zip/'; break;
+        case 'JSON':
+            target = 'ODD:text:xml/ODDC:text:xml/oddjson:application:json'; break;
     }
+    target = encodeURIComponent(target);
     oxgproperties ="?properties=<conversions><conversion%20index='0'><property%20id='pl.psnc.dl.ege.tei.profileNames'>tei</property></conversion><conversion%20index='1'><property%20id='pl.psnc.dl.ege.tei.profileNames'>tei</property><property%20id='oxgarage.textOnly'>true</property><property%20id='oxgarage.lang'>" + language +  "</property></conversion></conversions>";
     setXML();    
     f = document.createElement('form');
@@ -973,7 +974,7 @@ $('span.loadCustomJSON').click(function() {
 $('span.outputXML').click(function() {
 });
 
-$(document).on("click", "span.saveAttributeInfo", function(){
+$('span.saveAttributeInfo').click(function() {
     var closeOpen, values, index = -1;
     if ($("#listOfValues").val() == "") {
         return;
