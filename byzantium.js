@@ -28,6 +28,7 @@ var VERSION = '0.4',
     defaultDatabase = 'http://bits.nsms.ox.ac.uk:8080/jenkins/job/TEIP5/lastSuccessfulBuild/artifact/release/xml/tei/odd/p5subset.js',
     OXGARAGE = 'http://oxgarage.oucs.ox.ac.uk:8080/ege-webservice/',
     TODAY = new Date(),
+    TEIExport = {},
     xmlDoc,
     $xml,
     AddedModules = [],
@@ -1055,11 +1056,12 @@ $(function(){
 });
 
 // EXPORTS
-window.checkFileSupport = checkFileSupport;
-window.editInfo = editInfo;
-window.doShowDatabases = doShowDatabases;
-window.showModules = showModules;
-window.makeReport = makeReport;
-window.makePreview = makePreview;
+TEIExport.checkFileSupport = checkFileSupport;
+TEIExport.editInfo = editInfo;
+TEIExport.doShowDatabases = doShowDatabases;
+TEIExport.showModules = showModules;
+TEIExport.makeReport = makeReport;
+TEIExport.makePreview = makePreview;
+window.TEI = TEIExport;
 
 }());
