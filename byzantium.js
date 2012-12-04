@@ -971,9 +971,6 @@ $(document).on('click', 'span.loadCustomJSON', function() {
     $("#tabs").tabs("select", 3);
 });
 
-$(document).on('click', 'span.outputXML', function() {
-});
-
 $(document).on('click', 'span.saveAttributeInfo', function() {
     var closeOpen = '', values, index = -1;
     if ($("#listOfValues").val() == "") {
