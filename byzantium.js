@@ -265,7 +265,7 @@ function showattributes(name ) {
         });
         $.each(member.classattributes, function(i, classattribute){
             var classAttributeModule = classattribute.module,
-                classAttributeClass = classattribute.className;
+                classAttributeClass = classattribute.class;
             $.each(TEI.members, function(i, attclass) {
                 if (attclass.ident != classAttributeClass) {
                     return;
