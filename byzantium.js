@@ -82,7 +82,6 @@ function showModules() {
         localStorage.setItem(("tei%*$&#" + teiName), JSON.stringify(TEI, null, 2));
     }
     if (TEI.modules === undefined ) {
-        alert("NO DATABASE LOADED");
     }
     else {
         moduleCounter = TEI.modules.length;
@@ -305,12 +304,13 @@ function showattributes(name ) {
 }
 // Alters the attributes' lists, as well as making them open or closed.
 function alterattributes(id){
-    $("#attributeIdent").text(id);
-    $("#attAlterName").text("Attribute Name: " + id.split(',')[3]);
-    $(".closedOrOpen").html("Open List");
-    $.each(closedAndOpen, function(i, closeOpen) {
-        if (closeOpen.split(',')[2] + closeOpen.split(',')[3] + closeOpen.split(',')[4] == id.split(',')[1] + id.split(',')[2] + id.split(',')[3]) {
-            if (closeOpen.split(',')[0] == 'closed') {
+	$('#alterAttributes').html('<p>Attribute <b>' + id.split(',')[3] + '</b>  (from ' + id.split(',')[2] + ')<span class="button closedOrOpen">Open List</span>');
+			     $('#alterAttributes').append('<table id="valList"><thead><tr><th>Value</th><th>Description</th></tr></thead><tbody></tbody></table>');
+			     $('#valList').append('<tr><td><input name="val"></td><td><input name="desc"></td></tr>');
+	      $(".closedOrOpen").html("Open List");
+	      $.each(closedAndOpen, function(i, closeOpen) {
+		    if (closeOpen.split(',')[2] + closeOpen.split(',')[3] + closeOpen.split(',')[4] == id.split(',')[1] + id.split(',')[2] + id.split(',')[3]) {
+		if (closeOpen.split(',')[0] == 'closed') {
                 $(".closedOrOpen").html("Closed List");
             }
             if (closeOpen.split(',')[0] == 'open') {
