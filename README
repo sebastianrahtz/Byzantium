@@ -1,2 +1,6 @@
 A replacement for TEI Roma web interface, written in Javascript (jQuery) by
 Nick Burlingame.
+
+To run a local copy:
+$ git clone https://github.com/sebastianrahtz/Byzantium.git
+$ chromium-browser Byzantium/index.html
