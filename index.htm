@@ -1,0 +1,74 @@
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+	</head>
+	
+	<body>
+		<form>
+			<table>
+				<thead>
+					<tr>
+						<th scope="col">Track</th>
+						<th scope="col">Album</th>
+						<th scope="col">Artist</th>
+					</tr>
+				</thead>
+				
+				<tbody>
+					<tr>
+						<td><input name="track1" id="track1"></td>
+						<td><input name="album1" id="album1"></td>
+						<td>
+							<select name="artist1" id="artist1">
+								<option value="">Please select</option>
+								<option value="1">David Hasselhoff</option>
+								<option value="2">Michael Jackson</option>
+								<option value="3">Tina Turner</option>								
+							</select>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</form>
+
+		<button>Add Row</button>
+		
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+		<script>
+		$(document).ready(function($)
+		{
+			// trigger event when button is clicked
+			$("button").click(function()
+			{
+				// add new row to table using addTableRow function
+				addTableRow($("table"));
+				// prevent button redirecting to new page
+				return false;
+			});
+		
+			// function to add a new row to a table by cloning the last row and 
+			// incrementing the name and id values by 1 to make them unique
+			function addTableRow(table)
+			{
+				// clone the last row in the table
+				var $tr = $(table).find("tbody tr:last").clone();
+				// get the name attribute for the input and select fields
+				$tr.find("input,select").attr("name", function()
+				{
+					// break the field name and it's number into two parts
+					var parts = this.id.match(/(\D+)(\d+)$/);
+					// create a unique name for the new field by incrementing
+					// the number for the previous field by 1
+					return parts[1] + ++parts[2];
+				// repeat for id attributes
+				}).attr("id", function(){
+					var parts = this.id.match(/(\D+)(\d+)$/);
+					return parts[1] + ++parts[2];
+				});
+				// append the new row to the table
+				$(table).find("tbody tr:last").after($tr);
+			};
+		});
+		</script>		
+	</body>
+</html>

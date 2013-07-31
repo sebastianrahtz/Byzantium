@@ -23,7 +23,7 @@ All rights reserved.
 (function () {
 
 'use strict';
-var VERSION = '0.4',
+var VERSION = '0.5',
     EMAIL = 'tei@it.ox.ac.uk',
     defaultDatabase = 'http://bits.nsms.ox.ac.uk:8080/jenkins/job/TEIP5/lastSuccessfulBuild/artifact/release/xml/tei/odd/p5subset.js',
     OXGARAGE = 'http://oxgarage.oucs.ox.ac.uk:8080/ege-webservice/',
@@ -304,12 +304,15 @@ function showattributes(name ) {
 }
 // Alters the attributes' lists, as well as making them open or closed.
 function alterattributes(id){
-	$('#alterAttributes').html('<p>Attribute <b>' + id.split(',')[3] + '</b>  (from ' + id.split(',')[2] + ')<span class="button closedOrOpen">Open List</span>');
-			     $('#alterAttributes').append('<table id="valList"><thead><tr><th>Value</th><th>Description</th></tr></thead><tbody></tbody></table>');
-			     $('#valList').append('<tr><td><input name="val"></td><td><input name="desc"></td></tr>');
+    myID = id.split(',')[1] + id.split(',')[2] + id.split(',')[3];
+    $('#alterAttributes').html('<p>Attribute <b>' + id.split(',')[3] + '</b>  (from ' + id.split(',')[2] + ')<span class="button closedOrOpen">Open List</span>');
+    $('#alterAttributes').append('<table id="valList"><thead><tr><th>Value</th><th>Description</th></tr></thead><tbody></tbody></table>');
+    $('#valList').append('<tr><td><input class="valinput" name="val1"></td><td><input  class="valinput" name="desc1"></td></tr>');
+    $('#valList').append('<span class="button addNewValItem">+</span>');
+
 	      $(".closedOrOpen").html("Open List");
 	      $.each(closedAndOpen, function(i, closeOpen) {
-		    if (closeOpen.split(',')[2] + closeOpen.split(',')[3] + closeOpen.split(',')[4] == id.split(',')[1] + id.split(',')[2] + id.split(',')[3]) {
+		    if (closeOpen.split(',')[2] + closeOpen.split(',')[3] + closeOpen.split(',')[4] == myID) {
 		if (closeOpen.split(',')[0] == 'closed') {
                 $(".closedOrOpen").html("Closed List");
             }
@@ -1069,7 +1072,28 @@ $(document).on('click', 'span.deleteDatabase', function() {
     localStorage.removeItem("tei%*$&#" + name);
     doShowDatabases();
 });
+// function to add a new row to a table by cloning the last row and 
+// incrementing the name and id values by 1 to make them unique
+$(document).on('click', 'span.addNewValItem', function() {
+    // clone the last row in the table
+    var $tr =$("#valList").find("tbody tr:last").clone();
+    // get the name attribute for the input fields
+    $tr.find("input").attr("name", function(){
+	// break the field name and it's number into two parts
+	var parts = this.name.match(/(\D+)(\d+)$/);
+	// create a unique name for the new field by incrementing
+	// the number for the previous field by 1
+	return parts[1] + ++parts[2];
+	// repeat for id attributes
+    });
+    // append the new row to the table
+    $("#valList").find("tbody tr:last").after($tr);
+});
 
+$(document).on('change', '#alterAttributes', function() {
+    alert($(this).text());
+});
+    
 // EXPORTS
 TEIExport.checkFileSupport = checkFileSupport;
 TEIExport.editInfo = editInfo;
