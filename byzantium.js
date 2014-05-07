@@ -23,10 +23,11 @@ All rights reserved.
 (function () {
 
 'use strict';
-var VERSION = '0.5',
+var VERSION = '0.6',
     EMAIL = 'tei@it.ox.ac.uk',
     defaultDatabase = 'http://bits.nsms.ox.ac.uk:8080/jenkins/job/TEIP5/lastSuccessfulBuild/artifact/release/xml/tei/odd/p5subset.js',
     OXGARAGE = 'http://oxgarage.oucs.ox.ac.uk:8080/ege-webservice/',
+//    OXGARAGE = 'http://localhost:8080/ege-webservice/',
     TODAY = new Date(),
     TEIExport = {},
     xmlDoc,
@@ -864,12 +865,12 @@ $(document).on('click', 'span.output', function() {
         case 'JSON':
             target = 'ODD:text:xml/ODDC:text:xml/oddjson:application:json'; break;
     }
-    target = encodeURIComponent(target);
+//    target = encodeURIComponent(target);
     oxgproperties = "?properties=<conversions><conversion%20index='0'><property%20id='pl.psnc.dl.ege.tei.profileNames'>tei</property></conversion><conversion%20index='1'><property%20id='pl.psnc.dl.ege.tei.profileNames'>tei</property><property%20id='oxgarage.textOnly'>true</property><property%20id='oxgarage.lang'>" + language +  "</property></conversion></conversions>";
     setXML();
     f = document.createElement('form');
     f.id = "outputFormMulti";
-    status("Send request to " + OXGARAGE + "Conversions/" + target + "/" + oxgproperties);
+    status("Call OxGarage: " + OXGARAGE + "Conversions/" + target + "/" + oxgproperties);
     f.action = OXGARAGE + "Conversions/" + target + "/" + oxgproperties;
     f.method = "post";
     f.innerHTML += "<textarea name='input' style='display:none;'>default</textarea>";
@@ -1097,6 +1098,7 @@ $(document).on('change', '#alterAttributes', function() {
 // EXPORTS
 TEIExport.checkFileSupport = checkFileSupport;
 TEIExport.editInfo = editInfo;
+TEIExport.showFiles = showFiles;
 TEIExport.doShowDatabases = doShowDatabases;
 TEIExport.showModules = showModules;
 TEIExport.makeReport = makeReport;
